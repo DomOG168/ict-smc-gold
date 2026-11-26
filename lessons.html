@@ -1,0 +1,1566 @@
+<!doctype html>
+<html lang="km" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>មេរៀន SMC & ICT • ICT + SMC Institutional Gold Engine</title>
+
+    <link rel="icon" type="image/png" href="./icon.png" />
+    <link rel="apple-touch-icon" href="./icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="SMC & ICT Lessons" />
+    <meta name="theme-color" content="#080b10" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Noto Sans Khmer"', "Inter", "sans-serif"],
+              mono: ['"JetBrains Mono"', "monospace"],
+            },
+            colors: {
+              void: "#080b10",
+              obsidian: "#0f1520",
+              slatecard: "#131b29",
+              neoncyan: "#00f0ff",
+              instred: "#ff3b5c",
+              instgreen: "#00e676",
+              instamber: "#ffb703",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        background-color: #080b10;
+        color: #e5e7eb;
+        font-family: "Noto Sans Khmer", "Inter", sans-serif;
+        overflow-x: hidden;
+      }
+
+      .glass-panel {
+        background: linear-gradient(
+          145deg,
+          rgba(15, 21, 32, 0.94) 0%,
+          rgba(8, 11, 16, 0.98) 100%
+        );
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.85);
+      }
+
+      .neon-border {
+        border: 1px solid rgba(0, 240, 255, 0.35);
+        box-shadow: 0 0 24px rgba(0, 240, 255, 0.08);
+      }
+
+      .amber-border {
+        border: 1px solid rgba(255, 183, 3, 0.35);
+        box-shadow: 0 0 24px rgba(255, 183, 3, 0.08);
+      }
+
+      .tab-btn.active-smc {
+        background-color: #00f0ff;
+        color: #080b10;
+      }
+
+      .tab-btn.active-ict {
+        background-color: #ffb703;
+        color: #080b10;
+      }
+
+      .tab-btn.active-all {
+        background-color: #00e676;
+        color: #080b10;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen flex flex-col selection:bg-neoncyan selection:text-void"
+  >
+    <!-- TOP HEADER WITH HOME PAGE & LESSON PAGE BUTTONS -->
+    <header
+      class="sticky top-0 z-40 glass-panel border-b border-white/10 px-3 sm:px-6 py-3"
+    >
+      <div
+        class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-br from-neoncyan/20 to-amber-400/15 border border-neoncyan/40 flex items-center justify-center shrink-0 font-mono font-extrabold text-neoncyan text-sm"
+          >
+            ICT
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-sm sm:text-lg font-extrabold text-white">
+                មេរៀន SMC &amp; ICT ពេញលេញ (VISUAL ACADEMY)
+              </h1>
+              <span
+                class="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded-full bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                >SMC + ICT + DIAGRAMS</span
+              >
+            </div>
+            <p class="text-[11px] sm:text-xs text-gray-400">
+              សិក្សាពីរចនាសម្ព័ន្ធទីផ្សារ Order Block, FVG, Liquidity,
+              Killzones, OTE និង Power of 3 ជាមួយរូបភាពពន្យល់ងាយយល់
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <nav
+            aria-label="Main Navigation"
+            class="flex items-center gap-1.5 bg-void p-1 rounded-xl border border-white/10"
+          >
+            <a
+              href="./index.html"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5"
+            >
+              <span>Home Page</span>
+            </a>
+            <a
+              href="./lessons.html"
+              class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-neoncyan text-void transition flex items-center gap-1.5"
+            >
+              <span>Lesson Page</span>
+            </a>
+          </nav>
+
+          <a
+            href="./mt5.html"
+            class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 font-semibold transition"
+          >
+            MT5 Monitor
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-6">
+      <!-- HERO & CATEGORY FILTER -->
+      <section class="glass-panel neon-border rounded-2xl p-5 sm:p-6 space-y-4">
+        <div
+          class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+        >
+          <div class="space-y-1.5 max-w-2xl">
+            <span
+              class="text-[11px] font-mono font-bold uppercase tracking-wider text-neoncyan"
+              >Institutional Trading Curriculum • XAUUSD / Gold</span
+            >
+            <h2 class="text-xl sm:text-2xl font-extrabold text-white">
+              មេរៀនគ្រឹះ និងយុទ្ធសាស្ត្រ Smart Money Concepts (SMC) &amp; ICT
+            </h2>
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+              រាល់មេរៀននីមួយៗមាន
+              <strong>រូបភាពក្រាហ្វិកគំរូ (Diagram)</strong>
+              បង្ហាញច្បាស់ពីរបៀបមើល Price Action របស់ស្ថាប័នធំៗ
+              រួមទាំងគន្លឹះអនុវត្តផ្ទាល់លើ XAUUSD និងការគ្រប់គ្រងហានិភ័យ
+              <code>0.01 Lot</code>។
+            </p>
+          </div>
+
+          <!-- Category Filter Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              id="filter-all"
+              onclick="filterLessons('all')"
+              class="tab-btn active-all px-3.5 py-2 rounded-xl text-xs font-extrabold transition"
+            >
+              មេរៀនទាំងអស់ (8)
+            </button>
+            <button
+              type="button"
+              id="filter-smc"
+              onclick="filterLessons('smc')"
+              class="tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-void text-neoncyan border border-neoncyan/30 hover:bg-neoncyan/10 transition"
+            >
+              SMC Lessons (4)
+            </button>
+            <button
+              type="button"
+              id="filter-ict"
+              onclick="filterLessons('ict')"
+              class="tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-void text-instamber border border-instamber/30 hover:bg-instamber/10 transition"
+            >
+              ICT Lessons (4)
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Jump Pills -->
+        <div
+          class="flex flex-wrap gap-2 pt-2 border-t border-white/10 text-[11px]"
+        >
+          <a
+            href="#smc-1"
+            class="px-2.5 py-1 rounded-lg bg-void hover:bg-white/10 border border-white/10 text-gray-300"
+            >១. BOS &amp; MSS / CHoCH</a
+          >
+          <a
+            href="#smc-2"
+            class="px-2.5 py-1 rounded-lg bg-void hover:bg-white/10 border border-white/10 text-gray-300"
+            >២. Order Blocks (OB)</a
+          >
+          <a
+            href="#smc-3"
+            class="px-2.5 py-1 rounded-lg bg-void hover:bg-white/10 border border-white/10 text-gray-300"
+            >៣. Fair Value Gap (FVG)</a
+          >
+          <a
+            href="#smc-4"
+            class="px-2.5 py-1 rounded-lg bg-void hover:bg-white/10 border border-white/10 text-gray-300"
+            >៤. Liquidity &amp; Inducement</a
+          >
+          <a
+            href="#ict-1"
+            class="px-2.5 py-1 rounded-lg bg-void hover:bg-white/10 border border-white/10 text-gray-300"
+            >៥. Killzones &amp; Sessions</a
+          >
+          <a
+            href="#ict-2"
+            class="px-2.5 py-1 rounded-lg bg-void hover:bg-white/10 border border-white/10 text-gray-300"
+            >៦. Power of 3 (AMD)</a
+          >
+          <a
+            href="#ict-3"
+            class="px-2.5 py-1 rounded-lg bg-void hover:bg-white/10 border border-white/10 text-gray-300"
+            >៧. Premium, Discount &amp; OTE</a
+          >
+          <a
+            href="#ict-4"
+            class="px-2.5 py-1 rounded-lg bg-void hover:bg-white/10 border border-white/10 text-gray-300"
+            >៨. Multi-TF Bias &amp; Risk</a
+          >
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SMC LESSONS SECTION                                                   -->
+      <!-- ===================================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-xs font-mono font-bold uppercase text-neoncyan"
+              >Part I • Smart Money Concepts</span
+            >
+            <h2 class="text-lg sm:text-xl font-extrabold text-white">
+              មេរៀន SMC (Smart Money Concepts)
+            </h2>
+          </div>
+          <span class="text-xs font-mono text-gray-400">4 Core Modules</span>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5">
+          <!-- SMC 1: Market Structure (BOS & MSS) -->
+          <article
+            id="smc-1"
+            data-category="smc"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                  >SMC #01</span
+                >
+                <span class="text-xs text-gray-400 font-mono"
+                  >MARKET STRUCTURE</span
+                >
+              </div>
+              <h3 class="text-lg font-extrabold text-white">
+                ១. រចនាសម្ព័ន្ធទីផ្សារ៖ BOS និង MSS / CHoCH
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                ទីផ្សារផ្លាស់ទីតាមរយៈ Swing High និង Swing Low។ ដើម្បីដឹងថា
+                និន្នាការ (Trend) បន្ត ឬកំពុងប្តូរទិស
+                យើងមើលការបំបែករចនាសម្ព័ន្ធសំខាន់ៗ៖
+              </p>
+              <ul
+                class="space-y-2 text-xs sm:text-sm text-gray-300 list-disc pl-5"
+              >
+                <li>
+                  <strong>BOS (Break of Structure):</strong> តម្លៃបំបែក Swing
+                  High ក្នុងនិន្នាការឡើង (Bullish BOS) ឬបំបែក Swing Low
+                  ក្នុងនិន្នាការធ្លាក់ (Bearish BOS) បញ្ជាក់ថានិន្នាការនៅបន្ត។
+                </li>
+                <li>
+                  <strong
+                    >MSS / CHoCH (Market Structure Shift / Change of
+                    Character):</strong
+                  >
+                  តម្លៃបំបែក Swing ផ្ទុយនឹងនិន្នាការចាស់ (ឧ. កំពុងធ្លាក់
+                  តែទម្លុះ Swing High ឡើងវិញ) បង្ហាញពីការផ្លាស់ប្តូរទិសដៅ។
+                </li>
+                <li>
+                  <strong>ការប្រើលើ XAUUSD៖</strong> ប្រើ 4H / 1H កំណត់ទិសដៅធំ
+                  រួចរង់ចាំ MSS លើ 15m / 30m ដើម្បីរកកន្លែងចូល។
+                </li>
+              </ul>
+            </div>
+
+            <!-- Diagram 1: BOS & MSS -->
+            <div
+              class="lg:col-span-6 bg-void rounded-2xl p-3 border border-white/10"
+            >
+              <svg
+                viewBox="0 0 560 280"
+                class="w-full h-auto block"
+                role="img"
+                aria-label="BOS and MSS diagram"
+              >
+                <rect width="560" height="280" rx="14" fill="#080b10" />
+                <line
+                  x1="35"
+                  y1="75"
+                  x2="525"
+                  y2="75"
+                  stroke="#00e676"
+                  stroke-dasharray="5 5"
+                  stroke-opacity="0.5"
+                />
+                <line
+                  x1="35"
+                  y1="150"
+                  x2="525"
+                  y2="150"
+                  stroke="#00f0ff"
+                  stroke-dasharray="5 5"
+                  stroke-opacity="0.45"
+                />
+                <line
+                  x1="35"
+                  y1="225"
+                  x2="525"
+                  y2="225"
+                  stroke="#ff3b5c"
+                  stroke-dasharray="5 5"
+                  stroke-opacity="0.5"
+                />
+
+                <!-- Bullish trend then MSS shift to Bearish -->
+                <polyline
+                  points="45,210 105,145 145,175 215,75 255,120 315,55 365,135 425,95 495,235"
+                  fill="none"
+                  stroke="#e5e7eb"
+                  stroke-width="3"
+                  stroke-linejoin="round"
+                />
+
+                <!-- BOS Label -->
+                <rect
+                  x="180"
+                  y="52"
+                  width="84"
+                  height="20"
+                  rx="5"
+                  fill="#00e676"
+                  fill-opacity="0.18"
+                  stroke="#00e676"
+                />
+                <text
+                  x="222"
+                  y="66"
+                  text-anchor="middle"
+                  fill="#00e676"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  BULLISH BOS
+                </text>
+
+                <!-- MSS Shift Label -->
+                <rect
+                  x="380"
+                  y="205"
+                  width="125"
+                  height="22"
+                  rx="5"
+                  fill="#ff3b5c"
+                  fill-opacity="0.2"
+                  stroke="#ff3b5c"
+                />
+                <text
+                  x="442"
+                  y="220"
+                  text-anchor="middle"
+                  fill="#ff3b5c"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  BEARISH MSS (SHIFT)
+                </text>
+
+                <text
+                  x="45"
+                  y="262"
+                  fill="#9ca3af"
+                  font-size="11"
+                  font-family="sans-serif"
+                >
+                  ឡើងបន្ត (BOS) → បំបែក Structure ចុះក្រោម (MSS)
+                </text>
+              </svg>
+            </div>
+          </article>
+
+          <!-- SMC 2: Order Blocks -->
+          <article
+            id="smc-2"
+            data-category="smc"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                  >SMC #02</span
+                >
+                <span class="text-xs text-gray-400 font-mono"
+                  >ORDER BLOCKS (OB)</span
+                >
+              </div>
+              <h3 class="text-lg font-extrabold text-white">
+                ២. Order Block (Bullish OB &amp; Bearish OB)
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                Order Block គឺជាតំបន់ចុងក្រោយដែលធនាគារ ឬស្ថាប័នធំៗបានដាក់ Order
+                មុនពេលតម្លៃរុញច្រានខ្លាំង (Displacement) បង្កើត BOS ឬ MSS។
+              </p>
+              <ul
+                class="space-y-2 text-xs sm:text-sm text-gray-300 list-disc pl-5"
+              >
+                <li>
+                  <strong>Bullish Order Block (OB+):</strong> ទៀនក្រហម (Bearish
+                  candle) ចុងក្រោយមុនពេលតម្លៃផ្ទុះឡើងខ្លាំង។ ប្រើសម្រាប់រង់ចាំ
+                  <strong>BUY LIMIT</strong> ពេលតម្លៃត្រឡប់មកប៉ះ។
+                </li>
+                <li>
+                  <strong>Bearish Order Block (OB-):</strong> ទៀនបៃតង (Bullish
+                  candle) ចុងក្រោយមុនពេលតម្លៃធ្លាក់ខ្លាំង។ ប្រើសម្រាប់រង់ចាំ
+                  <strong>SELL LIMIT</strong> ពេលតម្លៃត្រឡប់មកប៉ះ។
+                </li>
+                <li>
+                  <strong>គន្លឹះសំខាន់៖</strong> រើសតែ OB ដែលមិនទាន់ត្រូវបាន
+                  Mitigate (Unmitigated) និងមាន Imbalance / FVG នៅខាងមុខ។
+                </li>
+              </ul>
+            </div>
+
+            <!-- Diagram 2: Order Block -->
+            <div
+              class="lg:col-span-6 bg-void rounded-2xl p-3 border border-white/10"
+            >
+              <svg
+                viewBox="0 0 560 280"
+                class="w-full h-auto block"
+                role="img"
+                aria-label="Order block diagram"
+              >
+                <rect width="560" height="280" rx="14" fill="#080b10" />
+                <!-- Bearish OB Zone -->
+                <rect
+                  x="110"
+                  y="68"
+                  width="390"
+                  height="36"
+                  fill="#ff3b5c"
+                  fill-opacity="0.22"
+                  stroke="#ff3b5c"
+                  stroke-dasharray="4 3"
+                />
+                <text
+                  x="120"
+                  y="62"
+                  fill="#ff3b5c"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  BEARISH ORDER BLOCK (SELL ZONE)
+                </text>
+
+                <!-- Candles -->
+                <rect
+                  x="118"
+                  y="74"
+                  width="18"
+                  height="24"
+                  fill="#00e676"
+                  rx="2"
+                />
+                <line
+                  x1="127"
+                  y1="68"
+                  x2="127"
+                  y2="104"
+                  stroke="#00e676"
+                  stroke-width="2"
+                />
+
+                <!-- Sharp drop -->
+                <polyline
+                  points="136,84 185,175 235,155 290,225 360,115 435,86"
+                  fill="none"
+                  stroke="#00f0ff"
+                  stroke-width="3"
+                />
+
+                <!-- Retest reaction arrow -->
+                <path
+                  d="M 435,86 C 465,86 475,135 505,195"
+                  fill="none"
+                  stroke="#ff3b5c"
+                  stroke-width="2.5"
+                  marker-end="url(#arrowRed)"
+                />
+                <defs>
+                  <marker
+                    id="arrowRed"
+                    viewBox="0 0 10 10"
+                    refX="7"
+                    refY="5"
+                    markerWidth="6"
+                    markerHeight="6"
+                    orient="auto-start-reverse"
+                  >
+                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#ff3b5c" />
+                  </marker>
+                </defs>
+                <text
+                  x="442"
+                  y="165"
+                  fill="#ffb703"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  RETEST &amp; DROP
+                </text>
+                <text
+                  x="45"
+                  y="262"
+                  fill="#9ca3af"
+                  font-size="11"
+                  font-family="sans-serif"
+                >
+                  តម្លៃទម្លាក់ខ្លាំង → ត្រឡប់មកប៉ះ OB- → បន្តធ្លាក់
+                </text>
+              </svg>
+            </div>
+          </article>
+
+          <!-- SMC 3: Fair Value Gap (FVG) -->
+          <article
+            id="smc-3"
+            data-category="smc"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                  >SMC #03</span
+                >
+                <span class="text-xs text-gray-400 font-mono"
+                  >FAIR VALUE GAP (FVG / IMBALANCE)</span
+                >
+              </div>
+              <h3 class="text-lg font-extrabold text-white">
+                ៣. Fair Value Gap (FVG) / Imbalance
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                FVG កើតឡើងនៅពេលតម្លៃផ្លាស់ទីលឿនខ្លាំងពេក
+                រហូតបង្កើតជាចន្លោះទំនេររវាងកន្ទុយទៀនទី១ និងកន្ទុយទៀនទី៣
+                (ក្នុងទម្រង់ 3-Candle Pattern)។
+              </p>
+              <ul
+                class="space-y-2 text-xs sm:text-sm text-gray-300 list-disc pl-5"
+              >
+                <li>
+                  <strong>Bullish FVG:</strong> ចន្លោះរវាង High របស់ Candle #1
+                  និង Low របស់ Candle #3 នៅពេលតម្លៃឡើងខ្លាំង។
+                </li>
+                <li>
+                  <strong>Bearish FVG:</strong> ចន្លោះរវាង Low របស់ Candle #1
+                  និង High របស់ Candle #3 នៅពេលតម្លៃធ្លាក់ខ្លាំង។
+                </li>
+                <li>
+                  <strong>ការប្រើប្រាស់៖</strong> តម្លៃច្រើនត្រឡប់មកបំពេញ
+                  (Rebalance / Fill) 50% (Consequent Encroachment) នៃ FVG
+                  មុនបន្តទិសដៅដើម។
+                </li>
+              </ul>
+            </div>
+
+            <!-- Diagram 3: FVG -->
+            <div
+              class="lg:col-span-6 bg-void rounded-2xl p-3 border border-white/10"
+            >
+              <svg
+                viewBox="0 0 560 280"
+                class="w-full h-auto block"
+                role="img"
+                aria-label="Fair Value Gap diagram"
+              >
+                <rect width="560" height="280" rx="14" fill="#080b10" />
+                <!-- FVG Highlight Box -->
+                <rect
+                  x="145"
+                  y="105"
+                  width="340"
+                  height="65"
+                  fill="#00f0ff"
+                  fill-opacity="0.16"
+                  stroke="#00f0ff"
+                  stroke-dasharray="5 4"
+                />
+                <line
+                  x1="145"
+                  y1="137.5"
+                  x2="485"
+                  y2="137.5"
+                  stroke="#ffb703"
+                  stroke-dasharray="3 3"
+                />
+                <text
+                  x="155"
+                  y="98"
+                  fill="#00f0ff"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  BULLISH FVG (IMBALANCE ZONE)
+                </text>
+                <text
+                  x="365"
+                  y="132"
+                  fill="#ffb703"
+                  font-size="10"
+                  font-family="monospace"
+                >
+                  50% CE LEVEL
+                </text>
+
+                <!-- Candle 1 -->
+                <line
+                  x1="120"
+                  y1="170"
+                  x2="120"
+                  y2="225"
+                  stroke="#00e676"
+                  stroke-width="2"
+                />
+                <rect
+                  x="112"
+                  y="185"
+                  width="16"
+                  height="28"
+                  fill="#00e676"
+                  rx="2"
+                />
+
+                <!-- Candle 2 (Displacement) -->
+                <line
+                  x1="165"
+                  y1="65"
+                  x2="165"
+                  y2="195"
+                  stroke="#00e676"
+                  stroke-width="2"
+                />
+                <rect
+                  x="157"
+                  y="80"
+                  width="16"
+                  height="95"
+                  fill="#00e676"
+                  rx="2"
+                />
+
+                <!-- Candle 3 -->
+                <line
+                  x1="210"
+                  y1="45"
+                  x2="210"
+                  y2="105"
+                  stroke="#00e676"
+                  stroke-width="2"
+                />
+                <rect
+                  x="202"
+                  y="55"
+                  width="16"
+                  height="35"
+                  fill="#00e676"
+                  rx="2"
+                />
+
+                <!-- Pullback into FVG then bounce -->
+                <path
+                  d="M 218,75 Q 295,120 330,142 T 485,48"
+                  fill="none"
+                  stroke="#00e676"
+                  stroke-width="2.5"
+                />
+                <text
+                  x="45"
+                  y="262"
+                  fill="#9ca3af"
+                  font-size="11"
+                  font-family="sans-serif"
+                >
+                  Candle 1 High → Candle 3 Low = Gap • តម្លៃចុះមកប៉ះ Gap ហើយឡើង
+                </text>
+              </svg>
+            </div>
+          </article>
+
+          <!-- SMC 4: Liquidity & Sweep -->
+          <article
+            id="smc-4"
+            data-category="smc"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                  >SMC #04</span
+                >
+                <span class="text-xs text-gray-400 font-mono"
+                  >LIQUIDITY &amp; SWEEP (BSL / SSL)</span
+                >
+              </div>
+              <h3 class="text-lg font-extrabold text-white">
+                ៤. Liquidity (សាច់ប្រាក់ងាយស្រួល) &amp; Liquidity Sweep
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                ទីផ្សារត្រូវការ Liquidity (កន្លែងដែល Trader ភាគច្រើនដាក់ Stop
+                Loss ឬ Pending Order) ដើម្បីបំពេញ Order ធំៗ។
+              </p>
+              <ul
+                class="space-y-2 text-xs sm:text-sm text-gray-300 list-disc pl-5"
+              >
+                <li>
+                  <strong>Buy-Side Liquidity (BSL):</strong> ស្ថិតនៅពីលើ Equal
+                  Highs, Swing Highs ឬ PDH (កន្លែង Stop Loss របស់អ្នក Sell និង
+                  Buy Stop)។
+                </li>
+                <li>
+                  <strong>Sell-Side Liquidity (SSL):</strong> ស្ថិតនៅពីក្រោម
+                  Equal Lows, Swing Lows ឬ PDL (កន្លែង Stop Loss របស់អ្នក Buy
+                  និង Sell Stop)។
+                </li>
+                <li>
+                  <strong>Liquidity Sweep / Stop Hunt៖</strong>
+                  តម្លៃទម្លុះកម្រិត High/Low បន្តិច (ច្រើនមានកន្ទុយទៀនវែង)
+                  ដើម្បីប្រមូល Liquidity រួចបកក្រោយវិញ។
+                </li>
+              </ul>
+            </div>
+
+            <!-- Diagram 4: Liquidity Sweep -->
+            <div
+              class="lg:col-span-6 bg-void rounded-2xl p-3 border border-white/10"
+            >
+              <svg
+                viewBox="0 0 560 280"
+                class="w-full h-auto block"
+                role="img"
+                aria-label="Liquidity sweep diagram"
+              >
+                <rect width="560" height="280" rx="14" fill="#080b10" />
+                <!-- Equal Highs BSL -->
+                <line
+                  x1="60"
+                  y1="82"
+                  x2="490"
+                  y2="82"
+                  stroke="#ffb703"
+                  stroke-dasharray="6 4"
+                  stroke-width="1.8"
+                />
+                <text
+                  x="70"
+                  y="72"
+                  fill="#ffb703"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  EQUAL HIGHS • BUY-SIDE LIQUIDITY (BSL)
+                </text>
+
+                <!-- Price touching equal highs then sweeping above and reversing down -->
+                <polyline
+                  points="65,180 140,82 200,145 275,82 330,135 390,52 435,120 500,225"
+                  fill="none"
+                  stroke="#e5e7eb"
+                  stroke-width="2.8"
+                />
+                <circle cx="390" cy="52" r="6" fill="#ff3b5c" />
+                <text
+                  x="402"
+                  y="55"
+                  fill="#ff3b5c"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  SWEEP (STOP HUNT)
+                </text>
+                <text
+                  x="45"
+                  y="262"
+                  fill="#9ca3af"
+                  font-size="11"
+                  font-family="sans-serif"
+                >
+                  បំបែក Equal Highs ប្រមូល Stop Loss → បត់ចុះក្រោមវិញ
+                </text>
+              </svg>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- ICT LESSONS SECTION                                                   -->
+      <!-- ===================================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-xs font-mono font-bold uppercase text-instamber"
+              >Part II • Inner Circle Trader (ICT)</span
+            >
+            <h2 class="text-lg sm:text-xl font-extrabold text-white">
+              មេរៀន ICT (Inner Circle Trader)
+            </h2>
+          </div>
+          <span class="text-xs font-mono text-gray-400">4 Core Modules</span>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5">
+          <!-- ICT 1: Killzones & Sessions -->
+          <article
+            id="ict-1"
+            data-category="ict"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-instamber/15 text-instamber border border-instamber/30"
+                  >ICT #01</span
+                >
+                <span class="text-xs text-gray-400 font-mono"
+                  >TIME &amp; KILLZONES (UTC+7)</span
+                >
+              </div>
+              <h3 class="text-lg font-extrabold text-white">
+                ៥. ICT Killzones &amp; ពេលវេលាទីផ្សារ (ម៉ោងកម្ពុជា UTC+7)
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                ICT ផ្តោតលើ <strong>Time + Price</strong>។ នៅលើ XAUUSD
+                ការផ្លាស់ទីខ្លាំង និង Setup ច្បាស់ច្រើនកើតឡើងក្នុងម៉ោង Killzone
+                ជាជាងម៉ោង Consolidation។
+              </p>
+              <ul
+                class="space-y-2 text-xs sm:text-sm text-gray-300 list-disc pl-5"
+              >
+                <li>
+                  <strong>Asian Range (ប្រហែល 07:00–12:00 UTC+7):</strong>
+                  តម្លៃច្រើនបង្កើត Range កំណត់ High/Low សម្រាប់ Sweep នៅ Session
+                  បន្ទាប់។
+                </li>
+                <li>
+                  <strong>London Killzone (ប្រហែល 14:00–17:00 UTC+7):</strong>
+                  ចាប់ផ្តើមបំបែក Range ពេលព្រឹក និងបង្កើត Momentum ដំបូង។
+                </li>
+                <li>
+                  <strong>New York Killzone (ប្រហែល 19:00–22:00 UTC+7):</strong>
+                  វគ្គធំសម្រាប់ XAUUSD និង USD News មាន Volume ខ្ពស់។
+                </li>
+              </ul>
+            </div>
+
+            <!-- Diagram 5: Killzones -->
+            <div
+              class="lg:col-span-6 bg-void rounded-2xl p-3 border border-white/10"
+            >
+              <svg
+                viewBox="0 0 560 280"
+                class="w-full h-auto block"
+                role="img"
+                aria-label="ICT Killzones timeline diagram"
+              >
+                <rect width="560" height="280" rx="14" fill="#080b10" />
+                <!-- Session Bars -->
+                <rect
+                  x="45"
+                  y="70"
+                  width="145"
+                  height="90"
+                  rx="8"
+                  fill="#ffb703"
+                  fill-opacity="0.14"
+                  stroke="#ffb703"
+                />
+                <text
+                  x="117"
+                  y="102"
+                  text-anchor="middle"
+                  fill="#ffb703"
+                  font-size="12"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  ASIAN RANGE
+                </text>
+                <text
+                  x="117"
+                  y="122"
+                  text-anchor="middle"
+                  fill="#e5e7eb"
+                  font-size="11"
+                  font-family="monospace"
+                >
+                  07:00 - 12:00
+                </text>
+                <text
+                  x="117"
+                  y="142"
+                  text-anchor="middle"
+                  fill="#9ca3af"
+                  font-size="10"
+                  font-family="sans-serif"
+                >
+                  បង្កើត High / Low
+                </text>
+
+                <rect
+                  x="205"
+                  y="70"
+                  width="150"
+                  height="90"
+                  rx="8"
+                  fill="#00f0ff"
+                  fill-opacity="0.14"
+                  stroke="#00f0ff"
+                />
+                <text
+                  x="280"
+                  y="102"
+                  text-anchor="middle"
+                  fill="#00f0ff"
+                  font-size="12"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  LONDON KZ
+                </text>
+                <text
+                  x="280"
+                  y="122"
+                  text-anchor="middle"
+                  fill="#e5e7eb"
+                  font-size="11"
+                  font-family="monospace"
+                >
+                  14:00 - 17:00
+                </text>
+                <text
+                  x="280"
+                  y="142"
+                  text-anchor="middle"
+                  fill="#9ca3af"
+                  font-size="10"
+                  font-family="sans-serif"
+                >
+                  Sweep &amp; Expansion
+                </text>
+
+                <rect
+                  x="370"
+                  y="70"
+                  width="145"
+                  height="90"
+                  rx="8"
+                  fill="#00e676"
+                  fill-opacity="0.14"
+                  stroke="#00e676"
+                />
+                <text
+                  x="442"
+                  y="102"
+                  text-anchor="middle"
+                  fill="#00e676"
+                  font-size="12"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  NY KILLZONE
+                </text>
+                <text
+                  x="442"
+                  y="122"
+                  text-anchor="middle"
+                  fill="#e5e7eb"
+                  font-size="11"
+                  font-family="monospace"
+                >
+                  19:00 - 22:00
+                </text>
+                <text
+                  x="442"
+                  y="142"
+                  text-anchor="middle"
+                  fill="#9ca3af"
+                  font-size="10"
+                  font-family="sans-serif"
+                >
+                  High Volume / Trend
+                </text>
+
+                <text
+                  x="45"
+                  y="262"
+                  fill="#9ca3af"
+                  font-size="11"
+                  font-family="sans-serif"
+                >
+                  ម៉ោងកម្ពុជា (UTC+7) • ជៀសវាង Trade ពេលតម្លៃកំពុង Sideways
+                  គ្មាន Volume
+                </text>
+              </svg>
+            </div>
+          </article>
+
+          <!-- ICT 2: Power of 3 (AMD) -->
+          <article
+            id="ict-2"
+            data-category="ict"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-instamber/15 text-instamber border border-instamber/30"
+                  >ICT #02</span
+                >
+                <span class="text-xs text-gray-400 font-mono"
+                  >POWER OF 3 (ACCUMULATION • MANIPULATION • DISTRIBUTION)</span
+                >
+              </div>
+              <h3 class="text-lg font-extrabold text-white">
+                ៦. ICT Power of 3 (AMD: Accumulation, Manipulation,
+                Distribution)
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                Power of 3 គឺជាវដ្តប្រចាំថ្ងៃ (ឬប្រចាំ Session)
+                ដែលតម្លៃប្រមូលផ្តុំ បោកបញ្ឆោត (Judas Swing)
+                រួចរត់ទៅទិសដៅពិតប្រាកដ។
+              </p>
+              <ul
+                class="space-y-2 text-xs sm:text-sm text-gray-300 list-disc pl-5"
+              >
+                <li>
+                  <strong>A – Accumulation៖</strong> តម្លៃដើរក្នុង Range
+                  តូចចង្អៀត ប្រមូល Order។
+                </li>
+                <li>
+                  <strong>M – Manipulation (Judas Swing)៖</strong> ទម្លាក់
+                  ឬទាញតម្លៃបញ្ឆោតទិសដៅផ្ទុយដើម្បីបំបែក Low/High និងចាប់ Stop
+                  Loss។
+                </li>
+                <li>
+                  <strong>D – Distribution៖</strong>
+                  រត់ទៅទិសដៅពិតប្រាកដយ៉ាងមាននិន្នាការ និងយក TP។
+                </li>
+              </ul>
+            </div>
+
+            <!-- Diagram 6: Power of 3 (AMD) -->
+            <div
+              class="lg:col-span-6 bg-void rounded-2xl p-3 border border-white/10"
+            >
+              <svg
+                viewBox="0 0 560 280"
+                class="w-full h-auto block"
+                role="img"
+                aria-label="Power of 3 AMD diagram"
+              >
+                <rect width="560" height="280" rx="14" fill="#080b10" />
+                <!-- Accumulation box -->
+                <rect
+                  x="45"
+                  y="110"
+                  width="130"
+                  height="55"
+                  rx="6"
+                  fill="#00f0ff"
+                  fill-opacity="0.12"
+                  stroke="#00f0ff"
+                />
+                <text
+                  x="110"
+                  y="134"
+                  text-anchor="middle"
+                  fill="#00f0ff"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  ACCUMULATION
+                </text>
+                <text
+                  x="110"
+                  y="152"
+                  text-anchor="middle"
+                  fill="#cbd5e1"
+                  font-size="10"
+                  font-family="sans-serif"
+                >
+                  ប្រមូល Range
+                </text>
+
+                <!-- Manipulation dip -->
+                <polyline
+                  points="175,135 245,205 295,125"
+                  fill="none"
+                  stroke="#ff3b5c"
+                  stroke-width="2.8"
+                />
+                <text
+                  x="245"
+                  y="224"
+                  text-anchor="middle"
+                  fill="#ff3b5c"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  MANIPULATION (JUDAS)
+                </text>
+
+                <!-- Distribution rally -->
+                <polyline
+                  points="295,125 385,78 440,98 515,42"
+                  fill="none"
+                  stroke="#00e676"
+                  stroke-width="3"
+                />
+                <text
+                  x="435"
+                  y="70"
+                  text-anchor="middle"
+                  fill="#00e676"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  DISTRIBUTION
+                </text>
+
+                <text
+                  x="45"
+                  y="262"
+                  fill="#9ca3af"
+                  font-size="11"
+                  font-family="sans-serif"
+                >
+                  A (រួមតូច) → M (ទម្លាក់បោក) → D (រត់ឡើងពិត)
+                </text>
+              </svg>
+            </div>
+          </article>
+
+          <!-- ICT 3: Premium, Discount & OTE -->
+          <article
+            id="ict-3"
+            data-category="ict"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-instamber/15 text-instamber border border-instamber/30"
+                  >ICT #03</span
+                >
+                <span class="text-xs text-gray-400 font-mono"
+                  >PREMIUM, DISCOUNT &amp; OTE (0.62–0.79)</span
+                >
+              </div>
+              <h3 class="text-lg font-extrabold text-white">
+                ៧. Premium, Discount Zone និង Optimal Trade Entry (OTE)
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                ដោយប្រើ Fibonacci ពី Swing Low ទៅ Swing High យើងចែកតំបន់ជា ២
+                ផ្នែកធំៗ ដើម្បីកុំឱ្យទិញនៅកំពូលថ្លៃពេក ឬលក់នៅបាតថោកពេក។
+              </p>
+              <ul
+                class="space-y-2 text-xs sm:text-sm text-gray-300 list-disc pl-5"
+              >
+                <li>
+                  <strong>Discount Zone (ក្រោម 0.5 / 50%):</strong>
+                  តំបន់តម្លៃបញ្ចុះតម្លៃ សមស្របសម្រាប់រក
+                  <strong>BUY</strong> ក្នុង Bullish Trend។
+                </li>
+                <li>
+                  <strong>Premium Zone (លើ 0.5 / 50%):</strong> តំបន់តម្លៃថ្លៃ
+                  សមស្របសម្រាប់រក <strong>SELL</strong> ក្នុង Bearish Trend។
+                </li>
+                <li>
+                  <strong>OTE (Optimal Trade Entry: 0.62 – 0.79):</strong> តំបន់
+                  Retracement ជ្រៅដែលមាន RR ល្អ ជាពិសេសពេលត្រូវជាមួយ OB ឬ FVG។
+                </li>
+              </ul>
+            </div>
+
+            <!-- Diagram 7: Premium / Discount / OTE -->
+            <div
+              class="lg:col-span-6 bg-void rounded-2xl p-3 border border-white/10"
+            >
+              <svg
+                viewBox="0 0 560 280"
+                class="w-full h-auto block"
+                role="img"
+                aria-label="Premium Discount and OTE diagram"
+              >
+                <rect width="560" height="280" rx="14" fill="#080b10" />
+                <!-- Premium area -->
+                <rect
+                  x="65"
+                  y="42"
+                  width="430"
+                  height="92"
+                  fill="#ff3b5c"
+                  fill-opacity="0.12"
+                />
+                <text
+                  x="485"
+                  y="60"
+                  text-anchor="end"
+                  fill="#ff3b5c"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  PREMIUM ZONE (&gt; 0.5)
+                </text>
+
+                <!-- Equilibrium 0.5 -->
+                <line
+                  x1="65"
+                  y1="134"
+                  x2="495"
+                  y2="134"
+                  stroke="#ffffff"
+                  stroke-dasharray="4 4"
+                  stroke-opacity="0.55"
+                />
+                <text
+                  x="75"
+                  y="129"
+                  fill="#ffffff"
+                  font-size="10"
+                  font-family="monospace"
+                >
+                  EQUILIBRIUM (0.50)
+                </text>
+
+                <!-- Discount area -->
+                <rect
+                  x="65"
+                  y="134"
+                  width="430"
+                  height="96"
+                  fill="#00e676"
+                  fill-opacity="0.12"
+                />
+                <text
+                  x="485"
+                  y="220"
+                  text-anchor="end"
+                  fill="#00e676"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  DISCOUNT ZONE (&lt; 0.5)
+                </text>
+
+                <!-- OTE Sweet Spot -->
+                <rect
+                  x="220"
+                  y="168"
+                  width="150"
+                  height="36"
+                  rx="4"
+                  fill="#00f0ff"
+                  fill-opacity="0.22"
+                  stroke="#00f0ff"
+                />
+                <text
+                  x="295"
+                  y="190"
+                  text-anchor="middle"
+                  fill="#00f0ff"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  OTE (0.62 - 0.79)
+                </text>
+
+                <!-- Price swing & pullback -->
+                <polyline
+                  points="85,222 215,52 305,186 480,46"
+                  fill="none"
+                  stroke="#ffb703"
+                  stroke-width="2.8"
+                />
+                <text
+                  x="45"
+                  y="262"
+                  fill="#9ca3af"
+                  font-size="11"
+                  font-family="sans-serif"
+                >
+                  ឡើងបង្កើត Range → ធ្លាក់មក Discount / OTE → ឡើងបន្ត
+                </text>
+              </svg>
+            </div>
+          </article>
+
+          <!-- ICT 4: Multi-TF Alignment & Discipline -->
+          <article
+            id="ict-4"
+            data-category="ict"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-instamber/15 text-instamber border border-instamber/30"
+                  >ICT #04</span
+                >
+                <span class="text-xs text-gray-400 font-mono"
+                  >MULTI-TF EXECUTION &amp; RISK DISCIPLINE</span
+                >
+              </div>
+              <h3 class="text-lg font-extrabold text-white">
+                ៨. ការផ្គុំ Multi-Timeframe (4H/1H/30m/15m) និងវិន័យហានិភ័យ
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                ចំណេះដឹង SMC &amp; ICT នឹងមានប្រសិទ្ធភាពខ្ពស់បំផុត
+                ពេលផ្គុំជាមួយការអាន Timeframe ធំ-តូច និងរក្សាហានិភ័យឱ្យថេរ។
+              </p>
+              <ul
+                class="space-y-2 text-xs sm:text-sm text-gray-300 list-disc pl-5"
+              >
+                <li>
+                  <strong>4H &amp; 1H (HTF Bias &amp; Key Levels):</strong>
+                  កំណត់ទិសដៅសំខាន់ PDH/PDL, Major OB, FVG និង Liquidity។
+                </li>
+                <li>
+                  <strong>30m &amp; 15m (LTF Entry):</strong> រង់ចាំ Sweep / MSS
+                  និង Zone ចូលច្បាស់លាស់ (1 Setup ល្អបំផុត ឬ
+                  <strong>NO SETUP</strong> បើគ្មាន)។
+                </li>
+                <li>
+                  <strong>Risk Rule (0.01 Lot):</strong> រក្សា SL ប្រមាណ
+                  <code>$10–$13</code> និងរំកិល SL ទៅ Breakeven (BE) នៅ
+                  <code>1:1 – 1:1.5</code>។
+                </li>
+              </ul>
+            </div>
+
+            <!-- Diagram 8: Multi-TF Funnel -->
+            <div
+              class="lg:col-span-6 bg-void rounded-2xl p-3 border border-white/10"
+            >
+              <svg
+                viewBox="0 0 560 280"
+                class="w-full h-auto block"
+                role="img"
+                aria-label="Multi-timeframe execution funnel diagram"
+              >
+                <rect width="560" height="280" rx="14" fill="#080b10" />
+                <!-- Funnel stages -->
+                <rect
+                  x="55"
+                  y="42"
+                  width="450"
+                  height="42"
+                  rx="8"
+                  fill="#00f0ff"
+                  fill-opacity="0.14"
+                  stroke="#00f0ff"
+                />
+                <text
+                  x="280"
+                  y="68"
+                  text-anchor="middle"
+                  fill="#00f0ff"
+                  font-size="12"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  4H / 1H : HTF BIAS &amp; KEY LEVELS (PDH/PDL, OB, FVG)
+                </text>
+
+                <rect
+                  x="95"
+                  y="98"
+                  width="370"
+                  height="42"
+                  rx="8"
+                  fill="#ffb703"
+                  fill-opacity="0.14"
+                  stroke="#ffb703"
+                />
+                <text
+                  x="280"
+                  y="124"
+                  text-anchor="middle"
+                  fill="#ffb703"
+                  font-size="12"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  30m / 15m : LIQUIDITY SWEEP + MSS + ENTRY ZONE
+                </text>
+
+                <rect
+                  x="135"
+                  y="154"
+                  width="290"
+                  height="44"
+                  rx="8"
+                  fill="#00e676"
+                  fill-opacity="0.16"
+                  stroke="#00e676"
+                />
+                <text
+                  x="280"
+                  y="174"
+                  text-anchor="middle"
+                  fill="#00e676"
+                  font-size="11"
+                  font-family="monospace"
+                  font-weight="bold"
+                >
+                  0.01 LOT • SL ~$10–$13 • BE @ 1:1–1:1.5
+                </text>
+                <text
+                  x="280"
+                  y="190"
+                  text-anchor="middle"
+                  fill="#e5e7eb"
+                  font-size="10"
+                  font-family="sans-serif"
+                >
+                  បើគ្មាន Setup ច្បាស់ → NO SETUP
+                </text>
+
+                <text
+                  x="45"
+                  y="262"
+                  fill="#9ca3af"
+                  font-size="11"
+                  font-family="sans-serif"
+                >
+                  ធ្វើតាមលំដាប់ពីធំទៅតូច • ចុច «Home Page» ដើម្បីវិភាគ Chart
+                  ផ្ទាល់
+                </text>
+              </svg>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- BOTTOM CALL TO ACTION -->
+      <section
+        class="glass-panel neon-border rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4"
+      >
+        <div>
+          <h3 class="text-base font-extrabold text-white">
+            រួចរាល់ក្នុងការអនុវត្តលើ Chart XAUUSD ផ្ទាល់ឬនៅ?
+          </h3>
+          <p class="text-xs text-gray-400 mt-0.5">
+            ត្រឡប់ទៅ Home Page (`index.html`) ដើម្បីមើលក្រាហ្វិក XAUUSD ផ្ទាល់
+            វិភាគ 4-TF Signal ឬស្វែងរក Key Levels 1H/4H/1D។
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <a
+            href="./index.html"
+            class="px-4 py-2.5 rounded-xl bg-neoncyan text-void font-extrabold text-xs hover:brightness-110 transition"
+          >
+            ទៅកាន់ Home Page
+          </a>
+          <a
+            href="./lessons.html"
+            class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-xs transition"
+          >
+            Lesson Page
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function filterLessons(category) {
+        const cards = document.querySelectorAll(".lesson-card");
+        const btnAll = document.getElementById("filter-all");
+        const btnSmc = document.getElementById("filter-smc");
+        const btnIct = document.getElementById("filter-ict");
+
+        btnAll.className =
+          "tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-void text-instgreen border border-instgreen/30 hover:bg-instgreen/10 transition";
+        btnSmc.className =
+          "tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-void text-neoncyan border border-neoncyan/30 hover:bg-neoncyan/10 transition";
+        btnIct.className =
+          "tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-void text-instamber border border-instamber/30 hover:bg-instamber/10 transition";
+
+        if (category === "all") {
+          btnAll.className =
+            "tab-btn active-all px-3.5 py-2 rounded-xl text-xs font-extrabold transition";
+        } else if (category === "smc") {
+          btnSmc.className =
+            "tab-btn active-smc px-3.5 py-2 rounded-xl text-xs font-extrabold transition";
+        } else if (category === "ict") {
+          btnIct.className =
+            "tab-btn active-ict px-3.5 py-2 rounded-xl text-xs font-extrabold transition";
+        }
+
+        cards.forEach((card) => {
+          const cardCat = card.getAttribute("data-category");
+          if (category === "all" || cardCat === category) {
+            card.classList.remove("hidden");
+          } else {
+            card.classList.add("hidden");
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
