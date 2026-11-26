@@ -455,7 +455,7 @@
               ចុចជ្រើសរើសរូបភាព Chart (រហូតដល់ 4 រូប) ឬ Paste (Ctrl+V)
             </p>
             <p id="dropZoneHint" class="text-xs text-gray-400 mt-1">
-              រើសតែ 1 Setup ល្អបំផុត ឬ NO SETUP បើគ្មានកន្លែងចូលច្បាស់
+              វិភាគទាំង 4 Timeframe + ចូលគ្នា (រើសតែ 1 Setup ឬ NO SETUP)
             </p>
           </label>
 
@@ -566,7 +566,7 @@
                 class="w-10 h-10 border-4 border-neoncyan/20 border-t-neoncyan rounded-full animate-spin"
               ></div>
               <p id="visionLoadingText" class="text-sm font-bold text-neoncyan">
-                កំពុង Check Pic និងវិភាគ Chart ជាមួយ Gemini...
+                កំពុង Check Pic និងវិភាគទាំង 4 Timeframe...
               </p>
             </div>
 
@@ -580,7 +580,8 @@
               <p class="text-xs max-w-md mx-auto">
                 ជ្រើសរើស Mode (<strong>4-TF Signal</strong> ឬ
                 <strong>Key Levels 1H/4H/1D</strong>) រួច Upload/Paste រូបភាព
-                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹងរើសតែ 1 Setup ល្អបំផុត ឬ NO SETUP!
+                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹងវិភាគទាំង 4 TF និងរើសតែ 1 Setup ឬ NO
+                SETUP!
               </p>
             </div>
 
@@ -617,7 +618,7 @@
               <strong class="text-white font-mono">0.01 Lot</strong> | Risk Cap:
               <strong class="text-white font-mono">$10–$13</strong></span
             >
-            <span>Single Best Setup • Auto Pic Check</span>
+            <span>4-TF Analysis + Alignment • Auto Pic Check</span>
           </div>
         </div>
       </section>
@@ -667,9 +668,9 @@
             <code>$10.00 – $13.50</code>។
           </li>
           <li>
-            <strong class="text-white">២. Single Best Setup ឬ NO SETUP៖</strong>
-            រើសយកតែ 1 Setup ដែលមាន Confluence / Winrate ខ្ពស់ជាងគេបំផុត
-            ហើយបើទីផ្សារគ្មានកន្លែងចូលច្បាស់លាស់ ត្រូវរង់ចាំ (NO SETUP)។
+            <strong class="text-white">២. វិភាគទាំង 4 TF + ចូលគ្នា៖</strong>
+            ចេញ Signal តែពេល 4H, 1H, 30m, និង 15m ចូលគ្នា ហើយបើមិនចូលគ្នា ឬគ្មាន
+            Zone ច្បាស់ នឹងចេញ <code>NO SETUP</code>។
           </li>
           <li>
             <strong class="text-white">៣. Pic Check Validation៖</strong>
@@ -694,7 +695,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v1_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v3_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -1022,10 +1023,17 @@
       );
       window.addEventListener("paste", (e) => {
         if (e.clipboardData && e.clipboardData.files.length > 0) {
-          handleFiles(e.clipboardData.files);
-          showToast(
-            `បានបន្ថែមរូបភាព Chart (${Math.min(uploadedImages.length + e.clipboardData.files.length, MAX_IMAGES)}/${MAX_IMAGES})!`,
+          const pastedImgs = Array.from(e.clipboardData.files).filter((f) =>
+            f.type.startsWith("image/"),
           );
+          if (pastedImgs.length > 0) {
+            handleFiles(pastedImgs);
+            const actualCount = Math.min(
+              MAX_IMAGES,
+              uploadedImages.length + pastedImgs.length,
+            );
+            showToast(`បានបន្ថែមរូបភាព Chart (${actualCount}/${MAX_IMAGES})!`);
+          }
         }
       });
 
@@ -1160,9 +1168,14 @@
             "rounded-xl p-3.5 bg-instred/10 border border-instred/40 space-y-1.5";
           card.innerHTML = `
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
                 <span class="px-2.5 py-1 rounded-lg bg-instred text-white font-mono font-extrabold text-xs">NO SETUP</span>
-                <span class="text-xs text-red-200 font-bold">គ្មានកន្លែងចូលសមរម្យទាល់តែសោះ — រង់ចាំតម្លៃមកប៉ះ Zone ច្បាស់សិន</span>
+                ${
+                  parsed?.mtf_alignment
+                    ? `<span class="px-2 py-0.5 rounded bg-black/40 border border-white/15 text-[10px] font-mono text-instamber">${parsed.mtf_alignment}</span>`
+                    : ""
+                }
+                <span class="text-xs text-red-200 font-bold">Timeframe មិនទាន់ចូលគ្នា ឬគ្មានកន្លែងចូលសមរម្យ — រង់ចាំ Setup ច្បាស់សិន</span>
               </div>
               <span class="font-mono text-[11px] text-gray-300">0.01 Lot • SL $10–$13</span>
             </div>
@@ -1188,6 +1201,11 @@
               <span class="px-2.5 py-1 rounded-lg font-mono font-extrabold text-xs ${dirBadgeClass}">${parsed.direction}</span>
               <span class="text-xs font-bold text-white">HTF Bias: <span class="text-neoncyan">${parsed.htf_bias || "LOCKED"}</span></span>
               ${
+                parsed.mtf_alignment
+                  ? `<span class="px-2 py-0.5 rounded bg-neoncyan/10 border border-neoncyan/30 text-[10px] font-mono text-neoncyan">${parsed.mtf_alignment}</span>`
+                  : ""
+              }
+              ${
                 parsed.setup_quality
                   ? `<span class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-instamber">QUALITY: ${parsed.setup_quality}</span>`
                   : ""
@@ -1211,7 +1229,7 @@
           </div>
           ${
             parsed.selection_reason_km
-              ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">មូលហេតុរើស Setup នេះ៖</strong> ${parsed.selection_reason_km}</p>`
+              ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">ការចូលគ្នា &amp; មូលហេតុរើស Setup នេះ៖</strong> ${parsed.selection_reason_km}</p>`
               : ""
           }
         `;
@@ -1330,7 +1348,7 @@
             ctx.fillStyle = "#ff3b5c";
             ctx.font = `bold ${Math.max(18, Math.round(w * 0.024))}px sans-serif`;
             ctx.fillText(
-              "NO SETUP (NO FOMO)",
+              "NO SETUP (NOT ALIGNED / NO FOMO)",
               Math.round(w * 0.04),
               Math.round(h * 0.18),
             );
@@ -1419,7 +1437,7 @@
           if (loadingText) {
             loadingText.textContent =
               attempt === 0
-                ? `កំពុង Check Pic និងវិភាគ ${uploadedImages.length} រូបជាមួយ ${modelName}...`
+                ? `កំពុង Check Pic និងវិភាគទាំង 4 Timeframe ជាមួយ ${modelName}...`
                 : `Server រវល់ (${modelName}) — កំពុងព្យាយាមម្តងទៀត (${attempt}/${maxRetries})...`;
           }
 
@@ -1538,14 +1556,17 @@ Return ONLY valid JSON:
       "y_ratio": 0.32
     }
   ],
-  "khmer_summary_markdown": "### 🎯 វិភាគ Key Levels (1H / 4H / 1D)\\n- ..."
+  "khmer_summary_markdown": "### 🎯 វិភាគ Key Levels (1H / 4H / 1D)\n- ..."
 }`;
         } else {
-          promptText = `You are a strict, high-discipline ICT + SMC Gold (XAUUSD) trading engine.
-NON-NEGOTIABLE SIGNAL RULES:
-1. SINGLE BEST SETUP ONLY: Even if you see both a BUY and a SELL possibility on the chart, you MUST output ONLY ONE setup (BUY LIMIT or SELL LIMIT) that has the highest confluence, clearest HTF bias (4H/1H), clearest liquidity sweep / BOS / MSS, and cleanest unmitigated FVG or Order Block. Never give two entries or flip casually between BUY and SELL.
-2. STRICT NO-SETUP RULE: If price is in choppy mid-range without a clear high-probability zone near current price, if HTF and LTF conflict strongly, or if SL (~$10-$13 on 0.01 lot) cannot be placed logically behind structure/zone, you MUST set "has_setup": false and "direction": "NONE". Do NOT force a trade when market structure is unclear.
-3. Keep SL distance around $10.00 to $13.00 on 0.01 lot (roughly 100 to 130 price points on XAUUSD) and align entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) accurately with image #1.
+          promptText = `You are a high-discipline ICT + SMC Gold (XAUUSD) institutional trading analyst.
+Analyze the chart(s) with the exact depth, structure, caution, and clarity of a disciplined ICT/SMC trader:
+1. INSPECT EACH TIMEFRAME (4H, 1H, 30m, 15m): Look at market structure (BOS / MSS / CHoCH), premium/discount & Fibonacci reaction levels (0.618 / 0.705), unmitigated Order Blocks (+OB / -OB), Fair Value Gaps (FVG), liquidity sweeps, and current price position relative to HTF supply/demand or FVG zones.
+2. CHECK ALIGNMENT ("ចូលគ្នា") & MID-RANGE TRAP:
+   - Explicitly assess alignment ("ALIGNED (ចូលគ្នាល្អ)", "PARTIAL (ចូលគ្នាមួយផ្នែក)", or "CONFLICT (ផ្ទុយគ្នា)").
+   - If HTF (4H) is strongly bearish/bullish while LTF (1H/30m/15m) is pulling back inside a fib/liquidity zone or sitting under a heavy HTF FVG/OB without clear LTF confirmation, or if price is in choppy/indecisive mid-range where a tight SL (~$10-$13 on 0.01 lot) could easily get wicked/swept, set "has_setup": false and "direction": "NONE", and provide actionable conditional waiting zones (SELL zone on rally/rejection into supply/FVG, BUY zone on pullback/confirmation into demand/+OB) inside "khmer_summary_markdown".
+3. SINGLE BEST SETUP ONLY (WHEN HIGH CONFLUENCE & ALIGNED): Output AT MOST ONE setup ("BUY LIMIT" or "SELL LIMIT"). Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10 to 13 gold dollars/points) and align entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) accurately with image #1.
+4. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER: Write thorough, practical Khmer analysis ("khmer_summary_markdown") with sections for Multi-Timeframe breakdown, Alignment & Decision, and Conditional Watchlist / Risk Notes.
 
 ${liveText} User note: "${userNote}".
 ${picCheckInstruction}
@@ -1559,11 +1580,12 @@ Return ONLY valid JSON:
     "message_km": "បញ្ជាក់ជាភាសាខ្មែរថា រូបភាពត្រឹមត្រូវ ឬខុសត្រង់ណា..."
   },
   "htf_bias": "BEARISH" or "BULLISH" or "RANGE",
+  "mtf_alignment": "ALIGNED (ចូលគ្នាល្អ)" or "PARTIAL (ចូលគ្នាមួយផ្នែក)" or "CONFLICT (ផ្ទុយគ្នា)",
   "has_setup": true or false,
   "direction": "BUY LIMIT" or "SELL LIMIT" or "NONE",
   "setup_quality": "HIGH / A+" or "MODERATE" or "NONE",
-  "selection_reason_km": "ពន្យល់ខ្លីជាភាសាខ្មែរថា ហេតុអ្វីបានជ្រើសរើស Setup នេះជាងទិសដៅផ្សេងទៀត",
-  "no_setup_reason_km": "បើ has_setup=false សូមប្រាប់មូលហេតុខ្លីជាភាសាខ្មែរថា ហេតុអ្វីគ្មានកន្លែងចូល",
+  "selection_reason_km": "ពន្យល់ជាភាសាខ្មែរថា ទាំង 4 Timeframe ចូលគ្នាយ៉ាងម៉េច ទើបជ្រើសរើស Setup នេះ",
+  "no_setup_reason_km": "បើ has_setup=false សូមប្រាប់មូលហេតុជាភាសាខ្មែរថា ហេតុអ្វីមិនទាន់ចូល (ឧ. មិនទាន់ចូលគ្នា នៅកណ្តាល Range / Fib ងាយត្រូវ Wick ឬរង់ចាំ Confirmation)",
   "entry_price": "string",
   "sl_price": "string",
   "tp_price": "string",
@@ -1571,7 +1593,7 @@ Return ONLY valid JSON:
   "entry_y_ratio": 0.55,
   "sl_y_ratio": 0.65,
   "tp_y_ratio": 0.35,
-  "khmer_summary_markdown": "### វិភាគ Multi-Timeframe (15m / 30m / 1H / 4H)\\n- ..."
+  "khmer_summary_markdown": "### 📊 វិភាគ Multi-Timeframe (4H / 1H / 30m / 15m)\n- **4H:** ...\n- **1H:** ...\n- **30m:** ...\n- **15m:** ...\n### 🔗 ការចូលគ្នា & សេចក្តីសម្រេច\n- ...\n### 🎯 ផែនការរង់ចាំ Setup បន្ទាប់ (Conditional Watchlist)\n- ..."
 }`;
         }
 
@@ -1614,7 +1636,13 @@ Return ONLY valid JSON:
           const rawContent =
             data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
           const cleanedJson = rawContent.replace(/```json|```/gi, "").trim();
-          const parsed = JSON.parse(cleanedJson);
+          const firstBrace = cleanedJson.indexOf("{");
+          const lastBrace = cleanedJson.lastIndexOf("}");
+          const jsonSlice =
+            firstBrace !== -1 && lastBrace > firstBrace
+              ? cleanedJson.slice(firstBrace, lastBrace + 1)
+              : cleanedJson;
+          const parsed = JSON.parse(jsonSlice);
 
           try {
             sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
