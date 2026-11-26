@@ -6,6 +6,35 @@
     <title>
       ICT + SMC Institutional Gold Engine (4-TF Signal & Key Levels)
     </title>
+    <link rel="icon" type="image/avif" href="./icon.png" />
+    <link rel="apple-touch-icon" href="./icon.png" />
+    <!-- Custom App / Home Screen Icon (No "I" fallback) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23080b10'/%3E%3Crect x='18' y='18' width='476' height='476' rx='98' fill='none' stroke='%2300f0ff' stroke-opacity='0.45' stroke-width='8'/%3E%3Cpath d='M104 336 L196 244 L268 296 L408 156' fill='none' stroke='%2300e676' stroke-width='28' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='408' cy='156' r='22' fill='%2300f0ff'/%3E%3Ctext x='256' y='422' text-anchor='middle' fill='%23ffb703' font-family='monospace' font-weight='800' font-size='78'%3EXAU%3C/text%3E%3C/svg%3E"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='0' fill='%23080b10'/%3E%3Cpath d='M104 336 L196 244 L268 296 L408 156' fill='none' stroke='%2300e676' stroke-width='30' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='408' cy='156' r='24' fill='%2300f0ff'/%3E%3Ctext x='256' y='426' text-anchor='middle' fill='%23ffb703' font-family='monospace' font-weight='800' font-size='82'%3EXAU%3C/text%3E%3C/svg%3E"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="XAU SMC" />
+    <meta name="theme-color" content="#080b10" />
+    <!-- Custom App / Home Screen Icon (No "I" fallback) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23080b10'/%3E%3Crect x='18' y='18' width='476' height='476' rx='98' fill='none' stroke='%2300f0ff' stroke-opacity='0.45' stroke-width='8'/%3E%3Cpath d='M104 336 L196 244 L268 296 L408 156' fill='none' stroke='%2300e676' stroke-width='28' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='408' cy='156' r='22' fill='%2300f0ff'/%3E%3Ctext x='256' y='422' text-anchor='middle' fill='%23ffb703' font-family='monospace' font-weight='800' font-size='78'%3EXAU%3C/text%3E%3C/svg%3E"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='0' fill='%23080b10'/%3E%3Cpath d='M104 336 L196 244 L268 296 L408 156' fill='none' stroke='%2300e676' stroke-width='30' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='408' cy='156' r='24' fill='%2300f0ff'/%3E%3Ctext x='256' y='426' text-anchor='middle' fill='%23ffb703' font-family='monospace' font-weight='800' font-size='82'%3EXAU%3C/text%3E%3C/svg%3E"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="XAU SMC" />
+    <meta name="theme-color" content="#080b10" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -427,8 +456,7 @@
               ចុចជ្រើសរើសរូបភាព Chart (រហូតដល់ 4 រូប) ឬ Paste (Ctrl+V)
             </p>
             <p id="dropZoneHint" class="text-xs text-gray-400 mt-1">
-              ឧ. 15m / 30m / 1H / 4H ឬ 1H / 4H / 1D — ប្រព័ន្ធនឹង Check Pic
-              ស្វ័យប្រវត្តិ
+              គួរដាក់ #1 = 15m (ឬ TF តូច) ដើម្បីគូស Entry ច្បាស់ជាងមុន
             </p>
           </label>
 
@@ -444,7 +472,7 @@
             <input
               type="text"
               id="visionUserNote"
-              placeholder="ឧ. #1=15m, #2=30m, #3=1H, #4=4H ឬ #1=1H, #2=4H, #3=1D"
+              placeholder="ឧ. #1=15m, #2=30m, #3=1H, #4=4H — SL ~$11 (0.01 lot)"
               class="w-full bg-void border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-neoncyan"
             />
           </div>
@@ -554,6 +582,12 @@
             <div
               id="picCheckBanner"
               class="hidden rounded-xl p-3.5 text-xs"
+            ></div>
+
+            <!-- CLEAR ENTRY / SL / TP SUMMARY CARD -->
+            <div
+              id="signalSummaryCard"
+              class="hidden rounded-xl p-3.5 bg-void/95 border border-neoncyan/30 space-y-2.5"
             ></div>
 
             <div
@@ -693,7 +727,7 @@
           analyzeLabel.textContent = "វិភាគ 4-TF & Check Pic";
           if (noteInput) {
             noteInput.placeholder =
-              "ឧ. #1=15m, #2=30m, #3=1H, #4=4H — SL ~$12 (0.01 lot)";
+              "ឧ. #1=15m, #2=30m, #3=1H, #4=4H — SL ~$11 (0.01 lot)";
           }
         }
       }
@@ -857,7 +891,7 @@
           }
         } catch (_) {}
 
-        const referenceSpot = liveGoldPrice || 3465.0;
+        const referenceSpot = liveGoldPrice || 3574.0;
         applyGoldPriceUI(referenceSpot, "REF SPOT", false);
         if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
       }
@@ -1018,6 +1052,8 @@
         document.getElementById("btnDownloadMarked").classList.add("hidden");
         document.getElementById("picCheckBanner").classList.add("hidden");
         document.getElementById("picCheckBanner").innerHTML = "";
+        document.getElementById("signalSummaryCard").classList.add("hidden");
+        document.getElementById("signalSummaryCard").innerHTML = "";
         document.getElementById("visionOutput").classList.add("hidden");
         document.getElementById("visionOutput").innerHTML = "";
         document.getElementById("visionEmptyState").classList.remove("hidden");
@@ -1079,6 +1115,66 @@
             ${detectedList ? `<span class="font-mono text-[11px] px-2 py-0.5 rounded bg-black/40 text-neoncyan">${detectedList}</span>` : ""}
           `;
         }
+      }
+
+      function renderSignalSummaryCard(parsed) {
+        const card = document.getElementById("signalSummaryCard");
+        if (!card || currentAnalysisMode === "keylevels") {
+          if (card) card.classList.add("hidden");
+          return;
+        }
+
+        const hasSignal =
+          parsed &&
+          parsed.has_setup &&
+          parsed.direction &&
+          parsed.direction !== "NONE";
+
+        card.classList.remove("hidden");
+
+        if (!hasSignal) {
+          card.className =
+            "rounded-xl p-3.5 bg-instred/10 border border-instred/40 flex flex-wrap items-center justify-between gap-2";
+          card.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-instred text-white font-mono font-extrabold text-xs">NO SETUP</span>
+              <span class="text-xs text-red-200 font-semibold">គ្មាន Entry ច្បាស់លាស់ជិតតម្លៃបច្ចុប្បន្ន (រង់ចាំ Retrace / Sweep ឱ្យច្បាស់សិន)</span>
+            </div>
+            <span class="font-mono text-[11px] text-gray-300">0.01 Lot • SL $10–$13</span>
+          `;
+          return;
+        }
+
+        const isBuy = String(parsed.direction).toUpperCase().includes("BUY");
+        const dirBadgeClass = isBuy
+          ? "bg-instgreen/20 text-instgreen border border-instgreen/40"
+          : "bg-instred/20 text-instred border border-instred/40";
+
+        card.className =
+          "rounded-xl p-3.5 bg-void/95 border border-neoncyan/35 space-y-2.5";
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg font-mono font-extrabold text-xs ${dirBadgeClass}">${parsed.direction}</span>
+              <span class="text-xs font-bold text-white">HTF Bias: <span class="text-neoncyan">${parsed.htf_bias || "LOCKED"}</span></span>
+            </div>
+            <span class="text-[11px] font-mono text-gray-400">0.01 Lot • BE @ ${parsed.be_target || "1:1–1.5"}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 font-mono text-center">
+            <div class="p-2 rounded-lg bg-obsidian border border-neoncyan/25">
+              <div class="text-[10px] text-gray-400">ENTRY PRICE</div>
+              <div class="text-sm font-extrabold text-neoncyan mt-0.5">${parsed.entry_price || "N/A"}</div>
+            </div>
+            <div class="p-2 rounded-lg bg-obsidian border border-instred/25">
+              <div class="text-[10px] text-gray-400">STOP LOSS ($10–$13)</div>
+              <div class="text-sm font-extrabold text-instred mt-0.5">${parsed.sl_price || "N/A"}</div>
+            </div>
+            <div class="p-2 rounded-lg bg-obsidian border border-instgreen/25">
+              <div class="text-[10px] text-gray-400">TAKE PROFIT</div>
+              <div class="text-sm font-extrabold text-instgreen mt-0.5">${parsed.tp_price || "N/A"}</div>
+            </div>
+          </div>
+        `;
       }
 
       function drawOverlayOnCanvas(dataUrl, parsedData) {
@@ -1152,7 +1248,7 @@
               levels.slice(0, 6).forEach((lvl, idx) => {
                 const y = clampY(lvl.y_ratio);
                 const typeUpper = (lvl.type || "").toUpperCase();
-                let color = "#ffb703"; // amber default
+                let color = "#ffb703";
                 if (
                   typeUpper.includes("RESISTANCE") ||
                   typeUpper.includes("SUPPLY") ||
@@ -1280,7 +1376,7 @@
             body: JSON.stringify({
               contents: [{ role: "user", parts }],
               generationConfig: {
-                temperature: 0.15,
+                temperature: 0.05,
                 responseMimeType: "application/json",
               },
             }),
@@ -1322,11 +1418,13 @@
         const emptyEl = document.getElementById("visionEmptyState");
         const outputEl = document.getElementById("visionOutput");
         const bannerEl = document.getElementById("picCheckBanner");
+        const summaryCardEl = document.getElementById("signalSummaryCard");
         const btn = document.getElementById("btnAnalyzeVision");
 
         emptyEl.classList.add("hidden");
         outputEl.classList.add("hidden");
         bannerEl.classList.add("hidden");
+        summaryCardEl.classList.add("hidden");
         document.getElementById("markedCanvasWrap").classList.add("hidden");
         loadingEl.classList.remove("hidden");
         btn.disabled = true;
@@ -1376,9 +1474,15 @@ Return ONLY valid JSON:
   "khmer_summary_markdown": "### 🎯 វិភាគ Key Levels (1H / 4H / 1D)\\n- ..."
 }`;
         } else {
-          promptText = `Analyze these XAU/USD chart screenshots (up to 4 timeframes such as 15m, 30m, 1H, 4H) using ICT + SMC (4H/1H bias, BOS/MSS, liquidity sweep, unmitigated FVG/OB near current price, 0.01 lot, SL ~$10-$13, move SL to BE at 1:1-1.5). ${liveText} User note: "${userNote}".
+          promptText = `You are a deterministic ICT + SMC Gold (XAUUSD) trading engine.
+STRICT CONSISTENCY RULES:
+1. Lock HTF Bias first from 4H and 1H structure/liquidity/FVG/OB. Do NOT flip randomly between BUY and SELL on the same chart set unless there is a clear break of structure on LTF and a single unmistakable primary setup.
+2. Pick ONLY ONE primary setup (either SELL LIMIT or BUY LIMIT) that has a clear unmitigated FVG/OB or liquidity sweep near current price, with Stop Loss distance roughly $10.00 to $13.00 on 0.01 lot (100 to 130 price points on XAUUSD).
+3. If price is stuck in mid-range with no clear HTF+LTF alignment or zone is too far/unclear, set has_setup=false and direction="NONE".
+4. Carefully estimate entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) relative to image #1's price axis so the drawn lines align closely with the entry_price, sl_price, and tp_price.
+
+${liveText} User note: "${userNote}".
 ${picCheckInstruction}
-Draw signal lines on image #1 only if there is a clear, valid setup near current price AND pic_check.is_valid_chart is true; otherwise set has_setup=false and direction="NONE".
 
 Return ONLY valid JSON:
 {
@@ -1388,11 +1492,13 @@ Return ONLY valid JSON:
     "detected_timeframes": ["#1: 15m", "#2: 30m", "#3: 1H", "#4: 4H"],
     "message_km": "បញ្ជាក់ជាភាសាខ្មែរថា រូបភាពត្រឹមត្រូវ ឬខុសត្រង់ណា..."
   },
+  "htf_bias": "BEARISH" or "BULLISH" or "RANGE",
   "has_setup": true or false,
   "direction": "BUY LIMIT" or "SELL LIMIT" or "NONE",
   "entry_price": "string",
   "sl_price": "string",
   "tp_price": "string",
+  "be_target": "1:1 – 1:1.5",
   "entry_y_ratio": 0.55,
   "sl_y_ratio": 0.65,
   "tp_y_ratio": 0.35,
@@ -1442,6 +1548,7 @@ Return ONLY valid JSON:
           const parsed = JSON.parse(cleanedJson);
 
           renderPicCheckBanner(parsed.pic_check);
+          renderSignalSummaryCard(parsed);
           drawOverlayOnCanvas(uploadedImages[0].dataUrl, parsed);
           outputEl.innerHTML = marked.parse(
             parsed.khmer_summary_markdown || "គ្មានសេចក្តីសង្ខេប",
