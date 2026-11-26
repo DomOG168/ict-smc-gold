@@ -1,349 +1,750 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="km" class="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ICT + SMC Institutional Gold Engine (Live Chart & Price Edition)</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter, JetBrains Mono & Noto Sans Khmer -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Marked.js for clean AI Markdown rendering -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <!-- TradingView Official Widget Library -->
-  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      ICT + SMC Institutional Gold Engine (4-TF Signal & Key Levels)
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://s3.tradingview.com/tv.js"
+    ></script>
 
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Noto Sans Khmer"', 'Inter', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Noto Sans Khmer"', "Inter", "sans-serif"],
+              mono: ['"JetBrains Mono"', "monospace"],
+            },
+            colors: {
+              void: "#080b10",
+              obsidian: "#0f1520",
+              slatecard: "#131b29",
+              neoncyan: "#00f0ff",
+              instred: "#ff3b5c",
+              instgreen: "#00e676",
+              instamber: "#ffb703",
+            },
           },
-          colors: {
-            void: '#080b10',
-            obsidian: '#0f1520',
-            slatecard: '#131b29',
-            neoncyan: '#00f0ff',
-            instred: '#ff3b5c',
-            instgreen: '#00e676',
-            instamber: '#ffb703',
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        background-color: #080b10;
+        color: #e5e7eb;
+        font-family: "Noto Sans Khmer", "Inter", sans-serif;
+        overflow-x: hidden;
+      }
+
+      .glass-panel {
+        background: linear-gradient(
+          145deg,
+          rgba(15, 21, 32, 0.92) 0%,
+          rgba(8, 11, 16, 0.97) 100%
+        );
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.8);
+      }
+
+      .neon-border {
+        border: 1px solid rgba(0, 240, 255, 0.35);
+        box-shadow: 0 0 24px rgba(0, 240, 255, 0.08);
+      }
+
+      .ai-report h3 {
+        color: #00f0ff;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-top: 0.9rem;
+        margin-bottom: 0.4rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 0.25rem;
+      }
+      .ai-report ul {
+        list-style-type: disc;
+        padding-left: 1.25rem;
+        margin-bottom: 0.75rem;
+      }
+      .ai-report li {
+        margin-bottom: 0.35rem;
+        line-height: 1.65;
+      }
+      .ai-report strong {
+        color: #ffffff;
+      }
+      .ai-report code {
+        background: rgba(0, 240, 255, 0.12);
+        color: #00f0ff;
+        padding: 0.1rem 0.35rem;
+        border-radius: 0.25rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen flex flex-col selection:bg-neoncyan selection:text-void"
+  >
+    <!-- TOP HEADER -->
+    <header
+      class="sticky top-0 z-40 glass-panel border-b border-white/10 px-3 sm:px-6 py-3"
+    >
+      <div
+        class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-br from-neoncyan/20 to-emerald-500/10 border border-neoncyan/40 flex items-center justify-center shrink-0"
+          >
+            <svg
+              class="w-6 h-6 text-neoncyan"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+              />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1
+                class="text-sm sm:text-lg font-extrabold tracking-tight text-white"
+              >
+                ICT + SMC INSTITUTIONAL GOLD ENGINE
+              </h1>
+              <span
+                class="px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-full bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                >4-TF + KEY LEVELS</span
+              >
+            </div>
+            <p class="text-[11px] sm:text-xs text-gray-400">
+              វិភាគ 4-TF Signal, រក Key Levels (1H / 4H / 1D) &
+              ពិនិត្យភាពត្រឹមត្រូវនៃរូបភាព
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
+          <div
+            class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-void border border-neoncyan/30"
+          >
+            <span
+              id="liveStatusDot"
+              class="w-2.5 h-2.5 rounded-full bg-instgreen animate-ping"
+            ></span>
+            <div>
+              <div class="text-[10px] text-gray-400 leading-none">
+                XAUUSD LIVE
+              </div>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span
+                  id="liveTickerPrice"
+                  class="font-mono font-extrabold text-sm sm:text-base text-neoncyan"
+                  >Loading...</span
+                >
+                <span
+                  id="liveSourceTag"
+                  class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-gray-400"
+                  >API</span
+                >
+              </div>
+            </div>
+            <button
+              onclick="syncLivePriceToEngine()"
+              class="ml-1 px-2.5 py-1.5 rounded-lg bg-neoncyan/15 hover:bg-neoncyan text-neoncyan hover:text-void font-bold text-[11px] border border-neoncyan/40 transition"
+            >
+              Sync តម្លៃ
+            </button>
+          </div>
+
+          <div
+            class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-void border border-white/10"
+          >
+            <div>
+              <div class="text-[10px] text-gray-400 leading-none">
+                ម៉ោងកម្ពុជា (UTC+7)
+              </div>
+              <div
+                id="cambodiaClock"
+                class="font-mono font-bold text-white text-xs mt-0.5"
+              >
+                --:--:--
+              </div>
+            </div>
+            <span
+              id="killzoneBadge"
+              class="px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-white/10 text-gray-300"
+            >
+              CHECKING...
+            </span>
+          </div>
+
+          <button
+            id="btnDisciplineRules"
+            class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 font-semibold transition flex items-center gap-1.5"
+          >
+            <span>🛡️</span>
+            <span class="hidden sm:inline">ក្បួនវិន័យ</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 space-y-5">
+      <!-- LIVE TRADINGVIEW XAUUSD CHART -->
+      <section class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span
+              class="text-[11px] font-mono font-bold uppercase tracking-wider text-neoncyan"
+              >Live Market Chart • XAUUSD Spot</span
+            >
+            <h2 class="text-base sm:text-lg font-bold text-white mt-0.5">
+              ក្រាហ្វិកផ្ទាល់ XAUUSD (Interactive Chart)
+            </h2>
+          </div>
+
+          <div
+            class="flex flex-wrap items-center gap-1.5 bg-void p-1 rounded-xl border border-white/10"
+          >
+            <button
+              id="tv_tf_15"
+              onclick="setTVInterval('15')"
+              class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-neoncyan text-void transition"
+            >
+              15m
+            </button>
+            <button
+              id="tv_tf_30"
+              onclick="setTVInterval('30')"
+              class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition"
+            >
+              30m
+            </button>
+            <button
+              id="tv_tf_60"
+              onclick="setTVInterval('60')"
+              class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition"
+            >
+              1H
+            </button>
+            <button
+              id="tv_tf_240"
+              onclick="setTVInterval('240')"
+              class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition"
+            >
+              4H
+            </button>
+            <button
+              id="tv_tf_1D"
+              onclick="setTVInterval('1D')"
+              class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition"
+            >
+              1D
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="tradingview_xauusd"
+          class="w-full h-[340px] sm:h-[400px] rounded-xl overflow-hidden border border-white/10 bg-void"
+        ></div>
+      </section>
+
+      <!-- GEMINI VISION SCREENSHOT SIGNAL & KEY LEVEL OVERLAY SECTION -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Upload & Key Zone (5 cols) -->
+        <div
+          class="lg:col-span-5 glass-panel rounded-2xl p-5 flex flex-col gap-4"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <span
+                class="text-[11px] font-mono font-bold uppercase tracking-wider text-neoncyan"
+                >Vision Marker & Pic Check</span
+              >
+              <h2
+                id="uploadHeaderTitle"
+                class="text-lg font-bold text-white mt-0.5"
+              >
+                Upload Screenshot (15m / 30m / 1H / 4H)
+              </h2>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+              >MAX 4 PICS</span
+            >
+          </div>
+
+          <!-- MODE SELECTOR OPTION -->
+          <div>
+            <label class="block text-xs text-gray-400 mb-1.5"
+              >ជ្រើសរើស Option វិភាគ (Analysis Mode)</label
+            >
+            <div
+              class="grid grid-cols-2 gap-2 bg-void p-1.5 rounded-xl border border-white/10"
+            >
+              <button
+                type="button"
+                id="mode_signal"
+                onclick="setAnalysisMode('signal')"
+                class="py-2 px-2.5 rounded-lg text-xs font-bold bg-neoncyan text-void transition flex items-center justify-center gap-1.5"
+              >
+                <span>⚡</span>
+                <span>4-TF Signal</span>
+              </button>
+              <button
+                type="button"
+                id="mode_keylevels"
+                onclick="setAnalysisMode('keylevels')"
+                class="py-2 px-2.5 rounded-lg text-xs font-bold text-gray-300 hover:text-white transition flex items-center justify-center gap-1.5"
+              >
+                <span>🎯</span>
+                <span>Key Levels (1H/4H/1D)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- KEY LEVEL TF FILTER (Shown when Key Levels mode is active) -->
+          <div
+            id="keyLevelTfBox"
+            class="hidden p-3 rounded-xl bg-void/90 border border-instamber/30 space-y-2"
+          >
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-instamber"
+                >🎯 ជ្រើសរើស Timeframe សម្រាប់រក Key Levels</span
+              >
+              <span class="text-[10px] font-mono text-gray-400">HTF ZONES</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button
+                type="button"
+                id="kl_tf_ALL"
+                onclick="setKeyLevelTF('ALL (1H, 4H, 1D)')"
+                class="kl-tf-btn py-1.5 rounded-lg text-[11px] font-mono font-bold bg-instamber text-void transition"
+              >
+                1H+4H+1D
+              </button>
+              <button
+                type="button"
+                id="kl_tf_1H"
+                onclick="setKeyLevelTF('1H')"
+                class="kl-tf-btn py-1.5 rounded-lg text-[11px] font-mono font-bold bg-white/5 text-gray-300 hover:text-white transition"
+              >
+                1H
+              </button>
+              <button
+                type="button"
+                id="kl_tf_4H"
+                onclick="setKeyLevelTF('4H')"
+                class="kl-tf-btn py-1.5 rounded-lg text-[11px] font-mono font-bold bg-white/5 text-gray-300 hover:text-white transition"
+              >
+                4H
+              </button>
+              <button
+                type="button"
+                id="kl_tf_1D"
+                onclick="setKeyLevelTF('1D')"
+                class="kl-tf-btn py-1.5 rounded-lg text-[11px] font-mono font-bold bg-white/5 text-gray-300 hover:text-white transition"
+              >
+                1D
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-gray-400 mb-1"
+              >Gemini API Key (រក្សាទុកក្នុង Browser ផ្ទាល់ខ្លួន)</label
+            >
+            <div class="flex gap-2">
+              <input
+                type="password"
+                id="geminiKeyInput"
+                placeholder="AIza..."
+                oninput="saveGeminiKey()"
+                class="flex-1 bg-void border border-white/15 rounded-xl px-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:border-neoncyan"
+              />
+              <button
+                type="button"
+                onclick="clearGeminiKey()"
+                class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300"
+              >
+                លុប Key
+              </button>
+            </div>
+          </div>
+
+          <label
+            id="dropZone"
+            for="chartFileInput"
+            class="flex flex-col items-center justify-center border-2 border-dashed border-white/20 hover:border-neoncyan/60 rounded-2xl p-5 text-center cursor-pointer bg-void/60 transition min-h-[140px]"
+          >
+            <input
+              type="file"
+              id="chartFileInput"
+              accept="image/*"
+              multiple
+              class="hidden"
+            />
+            <div
+              class="w-11 h-11 rounded-2xl bg-neoncyan/10 border border-neoncyan/30 flex items-center justify-center mb-2.5 text-neoncyan"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <p class="text-sm font-bold text-white">
+              ចុចជ្រើសរើសរូបភាព Chart (រហូតដល់ 4 រូប) ឬ Paste (Ctrl+V)
+            </p>
+            <p id="dropZoneHint" class="text-xs text-gray-400 mt-1">
+              ឧ. 15m / 30m / 1H / 4H ឬ 1H / 4H / 1D — ប្រព័ន្ធនឹង Check Pic
+              ស្វ័យប្រវត្តិ
+            </p>
+          </label>
+
+          <div
+            id="imagePreviewGrid"
+            class="grid grid-cols-2 sm:grid-cols-4 gap-2 hidden"
+          ></div>
+
+          <div>
+            <label class="block text-xs text-gray-400 mb-1"
+              >កំណត់ចំណាំ / លំដាប់ Timeframe</label
+            >
+            <input
+              type="text"
+              id="visionUserNote"
+              placeholder="ឧ. #1=15m, #2=30m, #3=1H, #4=4H ឬ #1=1H, #2=4H, #3=1D"
+              class="w-full bg-void border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-neoncyan"
+            />
+          </div>
+
+          <div class="flex gap-2">
+            <button
+              id="btnAnalyzeVision"
+              onclick="analyzeAndDrawSignalWithGemini()"
+              class="flex-1 py-3 px-4 rounded-xl bg-neoncyan text-void font-extrabold text-sm hover:brightness-110 transition flex items-center justify-center gap-2 shadow-lg shadow-neoncyan/20"
+            >
+              <span>⚡</span>
+              <span id="btnAnalyzeLabel">វិភាគ 4-TF & Check Pic</span>
+            </button>
+            <button
+              type="button"
+              onclick="resetPictureState()"
+              class="py-3 px-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 font-semibold"
+            >
+              Reset រូប
+            </button>
+          </div>
+
+          <div
+            class="p-3.5 rounded-xl bg-void/90 border border-white/10 space-y-2"
+          >
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-bold text-gray-300"
+                >⚖️ Risk & Breakeven Reference (0.01 Lot)</span
+              >
+              <span class="font-mono text-instgreen font-bold"
+                >$10–$13 CAP</span
+              >
+            </div>
+            <div
+              class="grid grid-cols-3 gap-2 text-center font-mono text-[11px]"
+            >
+              <div class="p-2 rounded-lg bg-obsidian border border-white/5">
+                <div class="text-[10px] text-gray-500">Lot Size</div>
+                <div class="font-bold text-white mt-0.5">0.01 Lot</div>
+              </div>
+              <div class="p-2 rounded-lg bg-obsidian border border-white/5">
+                <div class="text-[10px] text-gray-500">SL Target</div>
+                <div class="font-bold text-instred mt-0.5">$10–$13</div>
+              </div>
+              <div class="p-2 rounded-lg bg-obsidian border border-white/5">
+                <div class="text-[10px] text-gray-500">Move BE</div>
+                <div class="font-bold text-neoncyan mt-0.5">1 : 1 – 1.5</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Marked Screenshot + Pic Verification + Analysis Output (7 cols) -->
+        <div
+          class="lg:col-span-7 glass-panel neon-border rounded-2xl p-5 flex flex-col justify-between min-h-[450px]"
+        >
+          <div class="space-y-4">
+            <div
+              class="flex items-center justify-between pb-3 border-b border-white/10"
+            >
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-neoncyan"></span>
+                <h3
+                  id="outputPanelTitle"
+                  class="font-bold text-sm sm:text-base text-white"
+                >
+                  រូបភាព Chart (#1) & លទ្ធផលវិភាគ + Pic Check
+                </h3>
+              </div>
+              <button
+                id="btnDownloadMarked"
+                onclick="downloadMarkedChart()"
+                class="hidden px-3 py-1 rounded-lg bg-neoncyan/15 hover:bg-neoncyan text-neoncyan hover:text-void font-bold text-xs border border-neoncyan/40 transition"
+              >
+                ទាញយករូប
+              </button>
+            </div>
+
+            <div
+              id="visionLoading"
+              class="hidden py-16 flex flex-col items-center justify-center text-center space-y-3"
+            >
+              <div
+                class="w-10 h-10 border-4 border-neoncyan/20 border-t-neoncyan rounded-full animate-spin"
+              ></div>
+              <p id="visionLoadingText" class="text-sm font-bold text-neoncyan">
+                កំពុង Check Pic និងវិភាគ Chart ជាមួយ Gemini...
+              </p>
+            </div>
+
+            <div
+              id="visionEmptyState"
+              class="py-16 text-center space-y-2 text-gray-400"
+            >
+              <div class="text-3xl">🎯📉</div>
+              <p class="text-sm font-semibold text-gray-300">
+                មិនទាន់មានរូបភាព Chart ត្រូវបានវិភាគនៅឡើយទេ
+              </p>
+              <p class="text-xs max-w-md mx-auto">
+                ជ្រើសរើស Mode (<strong>4-TF Signal</strong> ឬ
+                <strong>Key Levels 1H/4H/1D</strong>) រួច Upload/Paste រូបភាព
+                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹង Check Pic ប្រាប់ភ្លាមបើមានចំណុចខុស!
+              </p>
+            </div>
+
+            <!-- PIC CHECK ALERT BANNER -->
+            <div
+              id="picCheckBanner"
+              class="hidden rounded-xl p-3.5 text-xs"
+            ></div>
+
+            <div
+              id="markedCanvasWrap"
+              class="hidden rounded-xl overflow-hidden border border-white/15 bg-black"
+            >
+              <canvas id="signalCanvas" class="w-full h-auto block"></canvas>
+            </div>
+
+            <div
+              id="visionOutput"
+              class="hidden ai-report text-sm text-gray-200 leading-relaxed"
+            ></div>
+          </div>
+
+          <div
+            class="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-400"
+          >
+            <span
+              >Lot Standard:
+              <strong class="text-white font-mono">0.01 Lot</strong> | Risk Cap:
+              <strong class="text-white font-mono">$10–$13</strong></span
+            >
+            <span>Auto Pic Check • 1H / 4H / 1D Key Levels</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast -->
+    <div
+      id="toastBox"
+      class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none"
+    >
+      <div
+        class="glass-panel neon-border rounded-xl px-4 py-3 text-xs font-bold text-white flex items-center gap-2.5 shadow-2xl"
+      >
+        <span class="text-neoncyan text-base">✓</span>
+        <span id="toastMessage">បានធ្វើបច្ចុប្បន្នភាពរួចរាល់!</span>
+      </div>
+    </div>
+
+    <!-- Discipline Rules Modal -->
+    <div
+      id="rulesModal"
+      class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+    >
+      <div
+        class="glass-panel neon-border rounded-2xl max-w-lg w-full p-6 space-y-4"
+      >
+        <div
+          class="flex items-center justify-between border-b border-white/10 pb-3"
+        >
+          <h3 class="text-base font-bold text-neoncyan flex items-center gap-2">
+            <span>🛡️</span>
+            <span>វិន័យជួញដូរ Set & Forget (ICT + SMC Rules)</span>
+          </h3>
+          <button
+            onclick="toggleRulesModal(false)"
+            class="text-gray-400 hover:text-white text-lg font-bold px-2"
+          >
+            &times;
+          </button>
+        </div>
+        <ul
+          class="space-y-2.5 text-xs sm:text-sm text-gray-300 leading-relaxed"
+        >
+          <li>
+            <strong class="text-white">១. ទំហំ Lot និងហានិភ័យថេរ៖</strong>
+            ប្រើប្រាស់ <code>0.01 lot</code> ជានិច្ច ដោយកំណត់ Stop Loss ចន្លោះ
+            <code>$10.00 – $13.50</code>។
+          </li>
+          <li>
+            <strong class="text-white">២. Key Levels (1H / 4H / 1D)៖</strong>
+            កំណត់ PDH/PDL, PWH/PWL, HTF FVG និង Order Block ជាមុន
+            ដើម្បីដឹងកន្លែងដែលតម្លៃអាចប្រតិកម្មខ្លាំង។
+          </li>
+          <li>
+            <strong class="text-white">៣. Pic Check Validation៖</strong>
+            ផ្ទៀងផ្ទាត់ជានិច្ចថា រូប Chart ត្រូវ Symbol (`XAUUSD`), ត្រូវ
+            Timeframe និងតម្លៃទាន់សម័យមុនចូល Order។
+          </li>
+          <li>
+            <strong class="text-white">៤. Breakeven (BE)：</strong> រំកិល SL មក
+            BE នៅ <code>1:1 ឬ 1:1.5</code>។
+          </li>
+        </ul>
+        <div class="pt-2 flex justify-end">
+          <button
+            onclick="toggleRulesModal(false)"
+            class="px-4 py-2 rounded-xl bg-neoncyan text-void font-bold text-xs"
+          >
+            យល់ព្រម
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const STORAGE_KEY = "ict_smc_gemini_api_key";
+      const MAX_IMAGES = 4;
+      let liveGoldPrice = null;
+      let currentTVInterval = "15";
+      let uploadedImages = [];
+      let currentAnalysisMode = "signal"; // 'signal' | 'keylevels'
+      let selectedKeyLevelTF = "ALL (1H, 4H, 1D)";
+
+      function setAnalysisMode(mode) {
+        currentAnalysisMode = mode;
+        const btnSignal = document.getElementById("mode_signal");
+        const btnKeyLevels = document.getElementById("mode_keylevels");
+        const klBox = document.getElementById("keyLevelTfBox");
+        const headerTitle = document.getElementById("uploadHeaderTitle");
+        const analyzeLabel = document.getElementById("btnAnalyzeLabel");
+        const noteInput = document.getElementById("visionUserNote");
+
+        if (mode === "keylevels") {
+          btnSignal.className =
+            "py-2 px-2.5 rounded-lg text-xs font-bold text-gray-300 hover:text-white transition flex items-center justify-center gap-1.5";
+          btnKeyLevels.className =
+            "py-2 px-2.5 rounded-lg text-xs font-bold bg-instamber text-void transition flex items-center justify-center gap-1.5";
+          klBox.classList.remove("hidden");
+          headerTitle.textContent =
+            "Upload Screenshot (1H / 4H / 1D Key Levels)";
+          analyzeLabel.textContent = "រក Key Levels & Check Pic";
+          if (noteInput) {
+            noteInput.placeholder =
+              "ឧ. #1=1H, #2=4H, #3=1D — រក PDH/PDL, OB, FVG, Liquidity";
+          }
+        } else {
+          btnSignal.className =
+            "py-2 px-2.5 rounded-lg text-xs font-bold bg-neoncyan text-void transition flex items-center justify-center gap-1.5";
+          btnKeyLevels.className =
+            "py-2 px-2.5 rounded-lg text-xs font-bold text-gray-300 hover:text-white transition flex items-center justify-center gap-1.5";
+          klBox.classList.add("hidden");
+          headerTitle.textContent = "Upload Screenshot (15m / 30m / 1H / 4H)";
+          analyzeLabel.textContent = "វិភាគ 4-TF & Check Pic";
+          if (noteInput) {
+            noteInput.placeholder =
+              "ឧ. #1=15m, #2=30m, #3=1H, #4=4H — SL ~$12 (0.01 lot)";
           }
         }
       }
-    }
-  </script>
 
-  <style>
-    body {
-      background-color: #080b10;
-      color: #e5e7eb;
-      font-family: 'Noto Sans Khmer', 'Inter', sans-serif;
-      overflow-x: hidden;
-    }
+      function setKeyLevelTF(tfLabel) {
+        selectedKeyLevelTF = tfLabel;
+        document.querySelectorAll(".kl-tf-btn").forEach((btn) => {
+          btn.className =
+            "kl-tf-btn py-1.5 rounded-lg text-[11px] font-mono font-bold bg-white/5 text-gray-300 hover:text-white transition";
+        });
+        const mapId = {
+          "ALL (1H, 4H, 1D)": "kl_tf_ALL",
+          "1H": "kl_tf_1H",
+          "4H": "kl_tf_4H",
+          "1D": "kl_tf_1D",
+        };
+        const active = document.getElementById(mapId[tfLabel]);
+        if (active) {
+          active.className =
+            "kl-tf-btn py-1.5 rounded-lg text-[11px] font-mono font-bold bg-instamber text-void transition";
+        }
+      }
 
-    .glass-panel {
-      background: linear-gradient(145deg, rgba(15, 21, 32, 0.92) 0%, rgba(8, 11, 16, 0.97) 100%);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.8);
-    }
+      function loadSavedGeminiKey() {
+        const input = document.getElementById("geminiKeyInput");
+        if (!input) return;
+        const saved = localStorage.getItem(STORAGE_KEY) || "";
+        if (saved) input.value = saved;
+      }
 
-    .neon-border {
-      border: 1px solid rgba(0, 240, 255, 0.35);
-      box-shadow: 0 0 24px rgba(0, 240, 255, 0.08);
-    }
+      function saveGeminiKey() {
+        const input = document.getElementById("geminiKeyInput");
+        if (!input) return;
+        const val = input.value.trim();
+        if (val) localStorage.setItem(STORAGE_KEY, val);
+        else localStorage.removeItem(STORAGE_KEY);
+      }
 
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #080b10;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #00f0ff;
-    }
+      function clearGeminiKey() {
+        const input = document.getElementById("geminiKeyInput");
+        if (input) input.value = "";
+        localStorage.removeItem(STORAGE_KEY);
+        showToast("បានលុប Gemini API Key ចេញពី Browser!");
+      }
 
-    .ai-report h3 {
-      color: #00f0ff;
-      font-weight: 700;
-      font-size: 1.05rem;
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 0.25rem;
-    }
-    .ai-report ul {
-      list-style-type: disc;
-      padding-left: 1.25rem;
-      margin-bottom: 0.75rem;
-    }
-    .ai-report li {
-      margin-bottom: 0.35rem;
-      line-height: 1.65;
-    }
-    .ai-report strong {
-      color: #ffffff;
-    }
-    .ai-report code {
-      background: rgba(0, 240, 255, 0.12);
-      color: #00f0ff;
-      padding: 0.1rem 0.35rem;
-      border-radius: 0.25rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9em;
-    }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col selection:bg-neoncyan selection:text-void">
+      function initTradingViewWidget(interval = "15") {
+        const container = document.getElementById("tradingview_xauusd");
+        if (!container) return;
+        container.innerHTML = "";
 
-  <!-- ======================================================================= -->
-  <!-- TOP HEADER: LIVE XAUUSD TICKER + ICT KILLZONE CLOCK (PHNOM PENH UTC+7)  -->
-  <!-- ======================================================================= -->
-  <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-3 sm:px-6 py-3">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <!-- Brand Identity -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neoncyan/20 to-emerald-500/10 border border-neoncyan/40 flex items-center justify-center shrink-0">
-          <svg class="w-6 h-6 text-neoncyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <h1 class="text-sm sm:text-lg font-extrabold tracking-tight text-white">ICT + SMC INSTITUTIONAL GOLD ENGINE</h1>
-            <span class="px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-full bg-neoncyan/15 text-neoncyan border border-neoncyan/30">Live Chart & Price</span>
-          </div>
-          <p class="text-[11px] sm:text-xs text-gray-400">ប្រព័ន្ធវិភាគរចនាសម្ព័ន្ធមាស XAUUSD & Set & Forget (0.01 Lot)</p>
-        </div>
-      </div>
-
-      <!-- Live Price Ticker + Killzone Clock + Rules Button -->
-      <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
-        <!-- Live Spot Price Box -->
-        <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-void border border-neoncyan/30">
-          <span id="liveStatusDot" class="w-2.5 h-2.5 rounded-full bg-instgreen animate-ping"></span>
-          <div>
-            <div class="text-[10px] text-gray-400 leading-none">XAUUSD LIVE</div>
-            <div class="flex items-center gap-1.5 mt-0.5">
-              <span id="liveTickerPrice" class="font-mono font-extrabold text-sm sm:text-base text-neoncyan">Loading...</span>
-              <span id="liveSourceTag" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-gray-400">API</span>
-            </div>
-          </div>
-          <button onclick="syncLivePriceToEngine()" title="ធ្វើបច្ចុប្បន្នភាពតម្លៃ Live និងផ្ញើទៅកាន់កំណត់ចំណាំ AI" class="ml-1 px-2.5 py-1.5 rounded-lg bg-neoncyan/15 hover:bg-neoncyan text-neoncyan hover:text-void font-bold text-[11px] border border-neoncyan/40 transition">
-            Sync តម្លៃ
-          </button>
-        </div>
-
-        <!-- ICT Killzone Clock (Cambodia UTC+7) -->
-        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-void border border-white/10">
-          <div>
-            <div class="text-[10px] text-gray-400 leading-none">ម៉ោងកម្ពុជា (UTC+7)</div>
-            <div id="cambodiaClock" class="font-mono font-bold text-white text-xs mt-0.5">--:--:--</div>
-          </div>
-          <span id="killzoneBadge" class="px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-white/10 text-gray-300">
-            CHECKING...
-          </span>
-        </div>
-
-        <!-- Discipline Rules Modal Button -->
-        <button id="btnDisciplineRules" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 font-semibold transition flex items-center gap-1.5">
-          <span>🛡️</span>
-          <span class="hidden sm:inline">ក្បួនវិន័យ</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 space-y-5">
-
-    <!-- ===================================================================== -->
-    <!-- RESTORED LIVE TRADINGVIEW XAUUSD CHART (MULTI-TIMEFRAME CONTROLS)     -->
-    <!-- ===================================================================== -->
-    <section class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-neoncyan">Live Market Chart • XAUUSD Spot</span>
-          <h2 class="text-base sm:text-lg font-bold text-white mt-0.5">ក្រាហ្វិកផ្ទាល់ XAUUSD (Interactive Chart)</h2>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-1.5 bg-void p-1 rounded-xl border border-white/10">
-          <button id="tv_tf_15" onclick="setTVInterval('15')" class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-neoncyan text-void transition">15m</button>
-          <button id="tv_tf_30" onclick="setTVInterval('30')" class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition">30m</button>
-          <button id="tv_tf_60" onclick="setTVInterval('60')" class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition">1H</button>
-          <button id="tv_tf_240" onclick="setTVInterval('240')" class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition">4H</button>
-          <button id="tv_tf_1D" onclick="setTVInterval('1D')" class="tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition">1D</button>
-        </div>
-      </div>
-
-      <div id="tradingview_xauusd" class="w-full h-[360px] sm:h-[430px] rounded-xl overflow-hidden border border-white/10 bg-void"></div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- PRIMARY ACTIVE MODE: GEMINI AI VISION MULTI-TIMEFRAME CHART ANALYZER -->
-    <!-- ===================================================================== -->
-    <section id="modeVision" class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-      <!-- Upload Zone (5 cols) -->
-      <div class="lg:col-span-5 glass-panel rounded-2xl p-5 flex flex-col gap-4">
-        <div class="flex items-center justify-between gap-2">
-          <div>
-            <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-neoncyan">Primary Active Mode • AI Multi-Timeframe Vision</span>
-            <h2 class="text-lg font-bold text-white mt-0.5">AI Vision អានរូប Chart (Multi-TF)</h2>
-          </div>
-          <span class="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30">ACTIVE</span>
-        </div>
-
-        <p class="text-xs text-gray-400 leading-relaxed">
-          Upload ឬ Paste (<code class="text-neoncyan">Ctrl+V</code>) រូបភាព Screenshot ពី TradingView ឬ MT5 (15m, 30m, 1H, 4H, 1D) ដើម្បីឱ្យ AI វិភាគ BOS, MSS, Unmitigated FVG, Liquidity Sweep និងចេញ Setup <strong>Set & Forget (0.01 Lot)</strong> ជាភាសាខ្មែរ។
-        </p>
-
-        <label id="dropZone" for="chartFileInput" class="flex flex-col items-center justify-center border-2 border-dashed border-white/20 hover:border-neoncyan/60 rounded-2xl p-6 text-center cursor-pointer bg-void/60 transition min-h-[190px]">
-          <input type="file" id="chartFileInput" accept="image/*" multiple class="hidden" />
-          <div class="w-12 h-12 rounded-2xl bg-neoncyan/10 border border-neoncyan/30 flex items-center justify-center mb-3 text-neoncyan">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-          </div>
-          <p class="text-sm font-bold text-white">ចុចជ្រើសរើសរូបភាព Chart ឬ Paste (Ctrl+V)</p>
-          <p class="text-xs text-gray-400 mt-1">គាំទ្ររូបភាពច្រើនសន្លឹកក្នុងពេលតែមួយ (Multi-Timeframe)</p>
-        </label>
-
-        <div id="imagePreviewGrid" class="grid grid-cols-3 gap-2 hidden"></div>
-
-        <div>
-          <label class="block text-xs text-gray-400 mb-1">កំណត់ចំណាំបន្ថែម / តម្លៃយោង (ស្រេចចិត្ត)</label>
-          <input type="text" id="visionUserNote" placeholder="ឧទាហរណ៍៖ តើតំបន់ FVG នេះ Fresh ឬ Mitigated? រង់ចាំ Set & Forget 0.01 lot" class="w-full bg-void border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-neoncyan" />
-        </div>
-
-        <div class="flex gap-2">
-          <button id="btnAnalyzeVision" onclick="analyzeChartsWithGemini()" class="flex-1 py-3 px-4 rounded-xl bg-neoncyan text-void font-extrabold text-sm hover:brightness-110 transition flex items-center justify-center gap-2 shadow-lg shadow-neoncyan/20">
-            <span>⚡</span>
-            <span>វិភាគ Chart ដោយ AI (Analyze Setup)</span>
-          </button>
-          <button onclick="clearVisionImages()" class="py-3 px-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 font-semibold">
-            សម្អាត
-          </button>
-        </div>
-
-        <!-- Compact Risk & Breakeven Reference Panel -->
-        <div class="p-3.5 rounded-xl bg-void/90 border border-white/10 space-y-2">
-          <div class="flex items-center justify-between text-[11px]">
-            <span class="font-bold text-gray-300">⚖️ Risk & Breakeven Reference (0.01 Lot)</span>
-            <span class="font-mono text-instgreen font-bold">$10–$13 CAP</span>
-          </div>
-          <div class="grid grid-cols-3 gap-2 text-center font-mono text-[11px]">
-            <div class="p-2 rounded-lg bg-obsidian border border-white/5">
-              <div class="text-[10px] text-gray-500">Lot Size</div>
-              <div class="font-bold text-white mt-0.5">0.01 Lot</div>
-            </div>
-            <div class="p-2 rounded-lg bg-obsidian border border-white/5">
-              <div class="text-[10px] text-gray-500">SL Target</div>
-              <div class="font-bold text-instred mt-0.5">$10–$13</div>
-            </div>
-            <div class="p-2 rounded-lg bg-obsidian border border-white/5">
-              <div class="text-[10px] text-gray-500">Move BE</div>
-              <div class="font-bold text-neoncyan mt-0.5">1 : 1 – 1.5</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- AI Analysis Output (7 cols) -->
-      <div class="lg:col-span-7 glass-panel neon-border rounded-2xl p-5 flex flex-col justify-between min-h-[420px]">
-        <div>
-          <div class="flex items-center justify-between pb-3 border-b border-white/10">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-neoncyan"></span>
-              <h3 class="font-bold text-sm sm:text-base text-white">លទ្ធផលវិភាគ ICT + SMC ជាភាសាខ្មែរ</h3>
-            </div>
-            <span class="text-[11px] font-mono text-gray-400">AI Vision Analyst</span>
-          </div>
-
-          <div id="visionLoading" class="hidden py-16 flex flex-col items-center justify-center text-center space-y-3">
-            <div class="w-10 h-10 border-4 border-neoncyan/20 border-t-neoncyan rounded-full animate-spin"></div>
-            <p class="text-sm font-bold text-neoncyan">កំពុងអានរចនាសម្ព័ន្ធ BOS, MSS, Liquidity Sweep និង FVG...</p>
-            <p class="text-xs text-gray-400">សូមរង់ចាំបន្តិច ប្រព័ន្ធកំពុងផ្ទៀងផ្ទាត់តំបន់ Unmitigated FVG & OTE</p>
-          </div>
-
-          <div id="visionEmptyState" class="py-16 text-center space-y-2 text-gray-400">
-            <div class="text-3xl">📉📈</div>
-            <p class="text-sm font-semibold text-gray-300">មិនទាន់មានរូបភាព Chart ត្រូវបានវិភាគនៅឡើយទេ</p>
-            <p class="text-xs max-w-md mx-auto">
-              សូមបញ្ចូល Screenshot ពី TradingView ឬ MT5 នៅខាងឆ្វេង រួចចុច <strong>"វិភាគ Chart ដោយ AI"</strong> ដើម្បីទទួលបានផែនការ Set & Forget (Entry, SL, TP សម្រាប់ 0.01 lot)។
-            </p>
-          </div>
-
-          <div id="visionOutput" class="hidden ai-report pt-3 text-sm text-gray-200 leading-relaxed"></div>
-        </div>
-
-        <div class="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-400">
-          <span>Lot Standard: <strong class="text-white font-mono">0.01 Lot</strong> | Risk Cap: <strong class="text-white font-mono">$10–$13</strong></span>
-          <span>No FOMO • Unmitigated Zones Only</span>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Custom Toast Notification (No alert() used) -->
-  <div id="toastBox" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="glass-panel neon-border rounded-xl px-4 py-3 text-xs font-bold text-white flex items-center gap-2.5 shadow-2xl">
-      <span class="text-neoncyan text-base">✓</span>
-      <span id="toastMessage">បានធ្វើបច្ចុប្បន្នភាពរួចរាល់!</span>
-    </div>
-  </div>
-
-  <!-- Discipline Rules Modal -->
-  <div id="rulesModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-panel neon-border rounded-2xl max-w-lg w-full p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <h3 class="text-base font-bold text-neoncyan flex items-center gap-2">
-          <span>🛡️</span>
-          <span>វិន័យជួញដូរ Set & Forget (ICT + SMC Rules)</span>
-        </h3>
-        <button onclick="toggleRulesModal(false)" class="text-gray-400 hover:text-white text-lg font-bold px-2">&times;</button>
-      </div>
-      <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 leading-relaxed">
-        <li><strong class="text-white">១. ទំហំ Lot និងហានិភ័យថេរ៖</strong> ប្រើប្រាស់ <code>0.01 lot</code> ជានិច្ច ដោយកំណត់ Stop Loss ចន្លោះ <code>$10.00 – $13.50</code> ដើម្បីការពារដើមទុនពី Price Noise។</li>
-        <li><strong class="text-white">២. តំបន់ Fresh / Unmitigated FVG តែប៉ុណ្ណោះ៖</strong> ជៀសវាងការដាក់ Limit Order លើតំបន់ FVG ឬ OB ដែលធ្លាប់ប៉ះរួចហើយ (Mitigated)។</li>
-        <li><strong class="text-white">៣. No FOMO (មិនដេញតម្លៃកណ្តាលផ្លូវ)៖</strong> បើតម្លៃនៅកណ្តាលចន្លោះ (Mid-Range) ឬគ្មាន MSS បញ្ជាក់ គឺត្រូវ <strong>"No Setup / សម្រាកដៃ"</strong>។</li>
-        <li><strong class="text-white">៤. ការការពារ Breakeven (BE Hit):</strong> នៅពេលតម្លៃរត់តាមទិសដៅចំណេញបាន <code>1:1 ឬ 1:1.5</code> សូមរំកិល SL មកចំណុចចូល (BE) ជាបន្ទាន់។</li>
-      </ul>
-      <div class="pt-2 flex justify-end">
-        <button onclick="toggleRulesModal(false)" class="px-4 py-2 rounded-xl bg-neoncyan text-void font-bold text-xs">យល់ព្រម & អនុវត្តតាមវិន័យ</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // =========================================================================
-    // 1. GLOBAL STATE & CONFIGURATION
-    // =========================================================================
-    const apiKey = ""; // Injected automatically by environment
-    let liveGoldPrice = null;
-    let currentTVInterval = '15';
-    let uploadedImages = [];
-
-    // =========================================================================
-    // 2. LIVE TRADINGVIEW CHART WIDGET (OANDA:XAUUSD)
-    // =========================================================================
-    function initTradingViewWidget(interval = '15') {
-      const container = document.getElementById('tradingview_xauusd');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const renderWidget = () => {
-        if (typeof TradingView !== 'undefined' && TradingView.widget) {
+        if (typeof TradingView !== "undefined" && TradingView.widget) {
           try {
             new TradingView.widget({
               autosize: true,
@@ -360,383 +761,719 @@
               save_image: true,
               container_id: "tradingview_xauusd",
               backgroundColor: "#080b10",
-              gridColor: "rgba(255, 255, 255, 0.05)"
+              gridColor: "rgba(255, 255, 255, 0.05)",
             });
-            return true;
-          } catch (e) {
-            return false;
-          }
+            return;
+          } catch (_) {}
         }
-        return false;
-      };
 
-      if (!renderWidget()) {
-        // Fallback iframe if TradingView script is still loading or blocked in sandbox
         container.innerHTML = `
-          <iframe
-            title="XAUUSD TradingView Chart"
-            src="https://s.tradingview.com/widgetembed/?frameElementId=tv_xauusd_frame&symbol=OANDA%3AXAUUSD&interval=${encodeURIComponent(interval)}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=080b10&theme=dark&style=1&timezone=Asia%2FPhnom_Penh&withdateranges=1&showpopupbutton=1&locale=en"
-            class="w-full h-full border-0"
-            allowtransparency="true"
-            scrolling="no"
-            allowfullscreen>
-          </iframe>
-        `;
+        <iframe
+          title="XAUUSD TradingView Chart"
+          src="https://s.tradingview.com/widgetembed/?frameElementId=tv_xauusd_frame&symbol=OANDA%3AXAUUSD&interval=${encodeURIComponent(interval)}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=080b10&theme=dark&style=1&timezone=Asia%2FPhnom_Penh&withdateranges=1&showpopupbutton=1&locale=en"
+          class="w-full h-full border-0"
+          allowtransparency="true"
+          scrolling="no"
+          allowfullscreen>
+        </iframe>
+      `;
       }
-    }
 
-    function setTVInterval(tf) {
-      currentTVInterval = tf;
-      document.querySelectorAll('.tv-tf-btn').forEach(btn => {
-        btn.className = 'tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition';
-      });
-      const activeBtn = document.getElementById(`tv_tf_${tf}`);
-      if (activeBtn) {
-        activeBtn.className = 'tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-neoncyan text-void transition';
-      }
-      initTradingViewWidget(tf);
-    }
-
-    // =========================================================================
-    // 3. LIVE XAUUSD PRICE FETCHER & AUTO-SYNC
-    // =========================================================================
-    function applyGoldPriceUI(priceVal, sourceLabel, isLiveFeed = true) {
-      const tickerEl = document.getElementById('liveTickerPrice');
-      const sourceEl = document.getElementById('liveSourceTag');
-      const dotEl = document.getElementById('liveStatusDot');
-      const parsed = Number(parseFloat(priceVal));
-
-      if (!Number.isFinite(parsed) || parsed <= 100) return false;
-      liveGoldPrice = Number(parsed.toFixed(2));
-
-      if (tickerEl) {
-        tickerEl.textContent = liveGoldPrice.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
+      function setTVInterval(tf) {
+        currentTVInterval = tf;
+        document.querySelectorAll(".tv-tf-btn").forEach((btn) => {
+          btn.className =
+            "tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-gray-400 hover:text-white transition";
         });
-      }
-      if (sourceEl) sourceEl.textContent = sourceLabel;
-      if (dotEl) {
-        dotEl.className = isLiveFeed
-          ? 'w-2.5 h-2.5 rounded-full bg-instgreen animate-ping'
-          : 'w-2.5 h-2.5 rounded-full bg-instamber';
-      }
-      return true;
-    }
-
-    async function fetchWithTimeout(url, timeoutMs = 4500) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
-        return res;
-      } finally {
-        clearTimeout(timer);
-      }
-    }
-
-    async function fetchLiveGoldPrice(autoSyncOnFirstLoad = false) {
-      // Source 1: Gold-API XAU Spot
-      try {
-        const res1 = await fetchWithTimeout('https://api.gold-api.com/price/XAU');
-        if (res1 && res1.ok) {
-          const d1 = await res1.json();
-          if (d1 && applyGoldPriceUI(d1.price, 'XAU SPOT', true)) {
-            if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
-            return;
-          }
+        const activeBtn = document.getElementById(`tv_tf_${tf}`);
+        if (activeBtn) {
+          activeBtn.className =
+            "tv-tf-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-neoncyan text-void transition";
         }
-      } catch (_) { /* try next source */ }
-
-      // Source 2: Binance PAXG/USDT (1 PAXG = 1 Fine Troy Ounce of Gold)
-      try {
-        const res2 = await fetchWithTimeout('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
-        if (res2 && res2.ok) {
-          const d2 = await res2.json();
-          if (d2 && applyGoldPriceUI(d2.price, 'PAXG/GOLD', true)) {
-            if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
-            return;
-          }
-        }
-      } catch (_) { /* try next source */ }
-
-      // Source 3: Frankfurter / ECB XAU rate fallback
-      try {
-        const res3 = await fetchWithTimeout('https://api.frankfurter.app/latest?from=XAU&to=USD');
-        if (res3 && res3.ok) {
-          const d3 = await res3.json();
-          const xauUsd = d3?.rates?.USD;
-          if (applyGoldPriceUI(xauUsd, 'ECB XAU', true)) {
-            if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
-            return;
-          }
-        }
-      } catch (_) { /* fallback to reference spot */ }
-
-      // Resilient Reference Spot Fallback so ticker never stays stuck on "Loading..."
-      const referenceSpot = liveGoldPrice || 3529.50;
-      applyGoldPriceUI(referenceSpot, 'REF SPOT', false);
-      if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
-    }
-
-    function syncLivePriceToEngine(silent = false) {
-      if (!liveGoldPrice) {
-        fetchLiveGoldPrice(false).then(() => {
-          if (liveGoldPrice) syncLivePriceToEngine(silent);
-        });
-        if (!silent) showToast('កំពុងទាញតម្លៃ XAUUSD...');
-        return;
-      }
-      const noteInput = document.getElementById('visionUserNote');
-      if (noteInput) {
-        const priceTag = `Live XAUUSD: ${liveGoldPrice.toFixed(2)}`;
-        if (!noteInput.value.includes('Live XAUUSD:')) {
-          noteInput.value = noteInput.value.trim()
-            ? `${noteInput.value.trim()} | ${priceTag}`
-            : priceTag;
-        } else {
-          noteInput.value = noteInput.value.replace(/Live XAUUSD:\s*[0-9.]+/, priceTag);
-        }
-      }
-      if (!silent) showToast(`បាន Sync តម្លៃ Live (${liveGoldPrice.toFixed(2)}) រួចរាល់!`);
-    }
-
-    // =========================================================================
-    // 4. CAMBODIA (UTC+7) ICT KILLZONE LIVE CLOCK
-    // =========================================================================
-    function updateCambodiaKillzoneClock() {
-      const now = new Date();
-      let hh = '00', mm = '00', ss = '00', hour = 0;
-
-      try {
-        const formatter = new Intl.DateTimeFormat('en-GB', {
-          timeZone: 'Asia/Phnom_Penh',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: false
-        });
-        const parts = formatter.formatToParts(now);
-        hh = parts.find(p => p.type === 'hour')?.value ?? '00';
-        mm = parts.find(p => p.type === 'minute')?.value ?? '00';
-        ss = parts.find(p => p.type === 'second')?.value ?? '00';
-        hour = parseInt(hh, 10) || 0;
-      } catch (_) {
-        const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
-        const khTime = new Date(utcMs + (7 * 3600000));
-        hh = String(khTime.getHours()).padStart(2, '0');
-        mm = String(khTime.getMinutes()).padStart(2, '0');
-        ss = String(khTime.getSeconds()).padStart(2, '0');
-        hour = khTime.getHours();
+        initTradingViewWidget(tf);
       }
 
-      const clockEl = document.getElementById('cambodiaClock');
-      if (clockEl) clockEl.textContent = `${hh}:${mm}:${ss}`;
+      function applyGoldPriceUI(priceVal, sourceLabel, isLiveFeed = true) {
+        const tickerEl = document.getElementById("liveTickerPrice");
+        const sourceEl = document.getElementById("liveSourceTag");
+        const dotEl = document.getElementById("liveStatusDot");
+        const parsed = Number(parseFloat(priceVal));
 
-      const badgeEl = document.getElementById('killzoneBadge');
-      if (!badgeEl) return;
+        if (!Number.isFinite(parsed) || parsed <= 100) return false;
+        liveGoldPrice = Number(parsed.toFixed(2));
 
-      if (hour >= 14 && hour < 17) {
-        badgeEl.textContent = 'LONDON KILLZONE (14:00–17:00)';
-        badgeEl.className = 'px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-neoncyan/20 text-neoncyan border border-neoncyan/40';
-      } else if (hour >= 19 && hour < 22) {
-        badgeEl.textContent = 'NY KILLZONE (19:00–22:00)';
-        badgeEl.className = 'px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-instgreen/20 text-instgreen border border-instgreen/40';
-      } else if (hour >= 7 && hour < 12) {
-        badgeEl.textContent = 'ASIAN RANGE';
-        badgeEl.className = 'px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-instamber/20 text-instamber border border-instamber/40';
-      } else {
-        badgeEl.textContent = 'OFF-SESSION';
-        badgeEl.className = 'px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-white/10 text-gray-300 border border-white/10';
-      }
-    }
-
-    // =========================================================================
-    // 5. MODAL & TOAST HELPERS
-    // =========================================================================
-    function toggleRulesModal(show) {
-      const modal = document.getElementById('rulesModal');
-      if (show) modal.classList.remove('hidden');
-      else modal.classList.add('hidden');
-    }
-
-    document.getElementById('btnDisciplineRules').addEventListener('click', () => toggleRulesModal(true));
-
-    function showToast(msg) {
-      const box = document.getElementById('toastBox');
-      document.getElementById('toastMessage').textContent = msg;
-      box.classList.remove('translate-y-20', 'opacity-0');
-      setTimeout(() => {
-        box.classList.add('translate-y-20', 'opacity-0');
-      }, 2600);
-    }
-
-    // =========================================================================
-    // 6. GEMINI AI VISION CHART SCREENSHOT ANALYZER
-    // =========================================================================
-    const chartFileInput = document.getElementById('chartFileInput');
-    const imagePreviewGrid = document.getElementById('imagePreviewGrid');
-
-    function handleFiles(files) {
-      Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const dataUrl = ev.target.result;
-          const base64 = dataUrl.split(',')[1];
-          uploadedImages.push({
-            base64,
-            mimeType: file.type,
-            previewUrl: dataUrl
+        if (tickerEl) {
+          tickerEl.textContent = liveGoldPrice.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           });
-          renderImagePreviews();
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    chartFileInput.addEventListener('change', (e) => handleFiles(e.target.files));
-
-    window.addEventListener('paste', (e) => {
-      if (e.clipboardData && e.clipboardData.files.length > 0) {
-        handleFiles(e.clipboardData.files);
-        showToast('បានបញ្ចូលរូបភាព Chart ពី Clipboard!');
-      }
-    });
-
-    function renderImagePreviews() {
-      if (uploadedImages.length === 0) {
-        imagePreviewGrid.classList.add('hidden');
-        imagePreviewGrid.innerHTML = '';
-        return;
-      }
-      imagePreviewGrid.classList.remove('hidden');
-      imagePreviewGrid.innerHTML = uploadedImages.map((img, i) => `
-        <div class="relative rounded-xl overflow-hidden border border-white/15 aspect-video bg-black">
-          <img src="${img.previewUrl}" class="w-full h-full object-cover" alt="Chart ${i + 1}" />
-          <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/80 text-[10px] font-mono text-neoncyan">#${i + 1}</span>
-        </div>
-      `).join('');
-    }
-
-    function clearVisionImages() {
-      uploadedImages = [];
-      chartFileInput.value = '';
-      renderImagePreviews();
-      document.getElementById('visionOutput').classList.add('hidden');
-      document.getElementById('visionEmptyState').classList.remove('hidden');
-    }
-
-    async function fetchWithBackoff(url, payload, maxRetries = 4) {
-      let delay = 1000;
-      for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (response.ok) return await response.json();
-        if (attempt === maxRetries) throw new Error(`API Error: ${response.status}`);
-        await new Promise(r => setTimeout(r, delay));
-        delay *= 2;
-      }
-    }
-
-    async function analyzeChartsWithGemini() {
-      if (uploadedImages.length === 0) {
-        showToast('សូម Upload ឬ Paste រូបភាព Chart ជាមុនសិន!');
-        return;
+        }
+        if (sourceEl) sourceEl.textContent = sourceLabel;
+        if (dotEl) {
+          dotEl.className = isLiveFeed
+            ? "w-2.5 h-2.5 rounded-full bg-instgreen animate-ping"
+            : "w-2.5 h-2.5 rounded-full bg-instamber";
+        }
+        return true;
       }
 
-      const loadingEl = document.getElementById('visionLoading');
-      const emptyEl = document.getElementById('visionEmptyState');
-      const outputEl = document.getElementById('visionOutput');
-      const btn = document.getElementById('btnAnalyzeVision');
+      async function fetchWithTimeout(url, timeoutMs = 4500) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          return await fetch(url, {
+            signal: controller.signal,
+            cache: "no-store",
+          });
+        } finally {
+          clearTimeout(timer);
+        }
+      }
 
-      emptyEl.classList.add('hidden');
-      outputEl.classList.add('hidden');
-      loadingEl.classList.remove('hidden');
-      btn.disabled = true;
-      btn.classList.add('opacity-60');
-
-      const userNote = document.getElementById('visionUserNote').value.trim();
-      const liveContext = liveGoldPrice ? ` | Current Live Spot Price: ${liveGoldPrice.toFixed(2)}` : '';
-
-      const systemPrompt = `You are a disciplined, institutional ICT + Smart Money Concepts (SMC) Gold (XAUUSD) market analyst.
-Analyze the uploaded TradingView or MT5 chart screenshot(s) and respond in natural, clear Khmer mixed with standard English ICT/SMC terms (BOS, MSS, CHoCH, Unmitigated FVG, -OB/+OB, OTE, Liquidity Sweep, Set & Forget, No FOMO).
-
-Follow these strict trading rules:
-1. Identify the Macro & Intraday Market Structure (Bearish or Bullish BOS/MSS) and the exact current price visible on the chart.
-2. Check if nearby Fair Value Gaps (FVGs) or Order Blocks are Fresh/Unmitigated or already Mitigated/Tested. Never recommend entering on a mitigated zone or chasing mid-range price noise.
-3. If there is no valid institutional setup right now, explicitly state **"No Setup (សម្រាកដៃសិន)"** and explain why.
-4. If there IS a valid setup, provide ONLY ONE disciplined **Set & Forget** Pending Order (Sell Limit or Buy Limit) with:
-   - Exact single-price **Entry**
-   - Exact **Stop Loss (SL)** calibrated for **0.01 lot** so max loss is strictly around **$10.00 – $13.50** (protected beyond the FVG/swing point to survive price noise)
-   - Exact **Take Profit (TP)** targeting the opposing liquidity / FVG with strong Risk-to-Reward (R:R)
-   - Reminder to move SL to Breakeven (BE) at 1:1 to 1:1.5 R:R.
-Keep the response structured with clean headings and bullet points.`;
-
-      const parts = [
-        {
-          text: userNote
-            ? `សូមវិភាគរូបភាព Chart XAUUSD ទាំងនេះតាមក្បួន ICT + SMC Set & Forget (0.01 lot, SL ~$10-$13)${liveContext}។ កំណត់ចំណាំបន្ថែម៖ ${userNote}`
-            : `សូមវិភាគរូបភាព Chart XAUUSD ទាំងនេះតាមក្បួន ICT + SMC Set & Forget (0.01 lot, SL ~$10-$13)${liveContext} និងប្រាប់ពី Entry, SL, TP ជាក់លាក់ ឬប្រាប់ថា No Setup ប្រសិនបើគ្មានច្រកចូលល្អ។`
-        },
-        ...uploadedImages.map(img => ({
-          inlineData: {
-            mimeType: img.mimeType,
-            data: img.base64
+      async function fetchLiveGoldPrice(autoSyncOnFirstLoad = false) {
+        try {
+          const res1 = await fetchWithTimeout(
+            "https://api.gold-api.com/price/XAU",
+          );
+          if (res1 && res1.ok) {
+            const d1 = await res1.json();
+            if (d1 && applyGoldPriceUI(d1.price, "XAU SPOT", true)) {
+              if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
+              return;
+            }
           }
-        }))
-      ];
+        } catch (_) {}
 
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-      const payload = {
-        contents: [{ role: 'user', parts }],
-        systemInstruction: { parts: [{ text: systemPrompt }] }
-      };
+        try {
+          const res2 = await fetchWithTimeout(
+            "https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT",
+          );
+          if (res2 && res2.ok) {
+            const d2 = await res2.json();
+            if (d2 && applyGoldPriceUI(d2.price, "PAXG/GOLD", true)) {
+              if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
+              return;
+            }
+          }
+        } catch (_) {}
 
-      try {
-        const result = await fetchWithBackoff(apiUrl, payload);
-        const markdownText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const referenceSpot = liveGoldPrice || 3465.0;
+        applyGoldPriceUI(referenceSpot, "REF SPOT", false);
+        if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
+      }
 
-        if (!markdownText) {
-          throw new Error('មិនទទួលបានទិន្នន័យវិភាគពី AI ទេ។');
+      function syncLivePriceToEngine(silent = false) {
+        if (!liveGoldPrice) {
+          fetchLiveGoldPrice(false);
+          if (!silent) showToast("កំពុងទាញតម្លៃ XAUUSD...");
+          return;
+        }
+        const noteInput = document.getElementById("visionUserNote");
+        if (noteInput) {
+          const cleaned = noteInput.value
+            .replace(/\|\s*Live XAUUSD:\s*[\d.]+/i, "")
+            .replace(/Live XAUUSD:\s*[\d.]+/i, "")
+            .trim();
+          const tag = `Live XAUUSD: ${liveGoldPrice.toFixed(2)}`;
+          noteInput.value = cleaned ? `${cleaned} | ${tag}` : tag;
+        }
+        if (!silent) showToast(`បាន Sync តម្លៃ (${liveGoldPrice.toFixed(2)})!`);
+      }
+
+      function updateCambodiaKillzoneClock() {
+        const now = new Date();
+        let hh = "00",
+          mm = "00",
+          ss = "00",
+          hour = 0;
+        try {
+          const formatter = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Phnom_Penh",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          });
+          const parts = formatter.formatToParts(now);
+          hh = parts.find((p) => p.type === "hour")?.value ?? "00";
+          mm = parts.find((p) => p.type === "minute")?.value ?? "00";
+          ss = parts.find((p) => p.type === "second")?.value ?? "00";
+          hour = parseInt(hh, 10) || 0;
+        } catch (_) {}
+
+        const clockEl = document.getElementById("cambodiaClock");
+        if (clockEl) clockEl.textContent = `${hh}:${mm}:${ss}`;
+
+        const badgeEl = document.getElementById("killzoneBadge");
+        if (!badgeEl) return;
+
+        if (hour >= 14 && hour < 17) {
+          badgeEl.textContent = "LONDON KILLZONE (14:00–17:00)";
+          badgeEl.className =
+            "px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-neoncyan/20 text-neoncyan border border-neoncyan/40";
+        } else if (hour >= 19 && hour < 22) {
+          badgeEl.textContent = "NY KILLZONE (19:00–22:00)";
+          badgeEl.className =
+            "px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-instgreen/20 text-instgreen border border-instgreen/40";
+        } else if (hour >= 7 && hour < 12) {
+          badgeEl.textContent = "ASIAN RANGE";
+          badgeEl.className =
+            "px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-instamber/20 text-instamber border border-instamber/40";
+        } else {
+          badgeEl.textContent = "OFF-SESSION";
+          badgeEl.className =
+            "px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-white/10 text-gray-300 border border-white/10";
+        }
+      }
+
+      function toggleRulesModal(show) {
+        const modal = document.getElementById("rulesModal");
+        if (show) modal.classList.remove("hidden");
+        else modal.classList.add("hidden");
+      }
+      document
+        .getElementById("btnDisciplineRules")
+        .addEventListener("click", () => toggleRulesModal(true));
+
+      function showToast(msg) {
+        const box = document.getElementById("toastBox");
+        document.getElementById("toastMessage").textContent = msg;
+        box.classList.remove("translate-y-20", "opacity-0");
+        setTimeout(
+          () => box.classList.add("translate-y-20", "opacity-0"),
+          2600,
+        );
+      }
+
+      const chartFileInput = document.getElementById("chartFileInput");
+      const imagePreviewGrid = document.getElementById("imagePreviewGrid");
+
+      function handleFiles(files) {
+        const imgFiles = Array.from(files).filter((f) =>
+          f.type.startsWith("image/"),
+        );
+        if (imgFiles.length === 0) return;
+
+        for (const file of imgFiles) {
+          if (uploadedImages.length >= MAX_IMAGES) {
+            uploadedImages.shift();
+          }
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const dataUrl = ev.target.result;
+            const base64 = dataUrl.split(",")[1];
+            uploadedImages.push({
+              dataUrl,
+              base64,
+              mimeType: file.type,
+            });
+            if (uploadedImages.length > MAX_IMAGES) {
+              uploadedImages = uploadedImages.slice(-MAX_IMAGES);
+            }
+            renderImagePreviews();
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      chartFileInput.addEventListener("change", (e) =>
+        handleFiles(e.target.files),
+      );
+      window.addEventListener("paste", (e) => {
+        if (e.clipboardData && e.clipboardData.files.length > 0) {
+          handleFiles(e.clipboardData.files);
+          showToast(
+            `បានបន្ថែមរូបភាព Chart (${Math.min(uploadedImages.length + e.clipboardData.files.length, MAX_IMAGES)}/${MAX_IMAGES})!`,
+          );
+        }
+      });
+
+      function renderImagePreviews() {
+        if (uploadedImages.length === 0) {
+          imagePreviewGrid.classList.add("hidden");
+          imagePreviewGrid.innerHTML = "";
+          return;
+        }
+        imagePreviewGrid.classList.remove("hidden");
+        imagePreviewGrid.innerHTML = uploadedImages
+          .map(
+            (img, i) => `
+        <div class="relative rounded-xl overflow-hidden border border-white/15 aspect-video bg-black group">
+          <img src="${img.dataUrl}" class="w-full h-full object-cover" alt="Chart ${i + 1}" />
+          <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/85 text-[10px] font-mono text-neoncyan">#${i + 1}</span>
+          <button type="button" onclick="deleteSingleImage(${i})" title="លុបរូបភាពនេះ" aria-label="Delete image ${i + 1}" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/85 hover:bg-instred text-white text-xs font-bold flex items-center justify-center border border-white/20 transition">&times;</button>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function resetOverlayAndOutput() {
+        const canvas = document.getElementById("signalCanvas");
+        if (canvas) {
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        document.getElementById("markedCanvasWrap").classList.add("hidden");
+        document.getElementById("btnDownloadMarked").classList.add("hidden");
+        document.getElementById("picCheckBanner").classList.add("hidden");
+        document.getElementById("picCheckBanner").innerHTML = "";
+        document.getElementById("visionOutput").classList.add("hidden");
+        document.getElementById("visionOutput").innerHTML = "";
+        document.getElementById("visionEmptyState").classList.remove("hidden");
+      }
+
+      function deleteSingleImage(index) {
+        if (index < 0 || index >= uploadedImages.length) return;
+        uploadedImages.splice(index, 1);
+        chartFileInput.value = "";
+        renderImagePreviews();
+        resetOverlayAndOutput();
+        showToast("បានលុបរូបភាពរួចរាល់!");
+      }
+
+      function resetPictureState() {
+        uploadedImages = [];
+        chartFileInput.value = "";
+        renderImagePreviews();
+        resetOverlayAndOutput();
+        showToast("បាន Reset រូបភាព និងលទ្ធផល!");
+      }
+
+      function renderPicCheckBanner(picCheck) {
+        const banner = document.getElementById("picCheckBanner");
+        if (!banner || !picCheck) return;
+
+        const isValid = picCheck.is_valid_chart !== false;
+        const hasMismatch = Boolean(picCheck.has_mismatch);
+        const messageKm =
+          picCheck.message_km ||
+          (isValid && !hasMismatch
+            ? "រូបភាពត្រឹមត្រូវតាមលក្ខខណ្ឌ Chart XAUUSD និង Timeframe។"
+            : "រកឃើញភាពខុសគ្នានៅលើរូបភាព Chart សូមពិនិត្យមើលខាងក្រោម!");
+        const detectedList = Array.isArray(picCheck.detected_timeframes)
+          ? picCheck.detected_timeframes.join(" | ")
+          : "";
+
+        banner.classList.remove("hidden");
+
+        if (!isValid || hasMismatch) {
+          banner.className =
+            "rounded-xl p-3.5 text-xs bg-instamber/15 border border-instamber/50 text-amber-200 space-y-1.5";
+          banner.innerHTML = `
+            <div class="flex items-center gap-2 font-bold text-instamber text-sm">
+              <span>⚠️</span>
+              <span>បញ្ជាក់ការពិនិត្យរូបភាព (Pic Check Warning)</span>
+            </div>
+            <p class="leading-relaxed">${messageKm}</p>
+            ${detectedList ? `<div class="font-mono text-[11px] text-white/90 bg-black/40 px-2.5 py-1 rounded-lg">Timeframes ដែលរកឃើញលើរូប៖ ${detectedList}</div>` : ""}
+          `;
+        } else {
+          banner.className =
+            "rounded-xl p-3 text-xs bg-instgreen/10 border border-instgreen/35 text-emerald-200 flex flex-wrap items-center justify-between gap-2";
+          banner.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-instgreen font-bold">✓ Pic Check ត្រឹមត្រូវ៖</span>
+              <span>${messageKm}</span>
+            </div>
+            ${detectedList ? `<span class="font-mono text-[11px] px-2 py-0.5 rounded bg-black/40 text-neoncyan">${detectedList}</span>` : ""}
+          `;
+        }
+      }
+
+      function drawOverlayOnCanvas(dataUrl, parsedData) {
+        const canvas = document.getElementById("signalCanvas");
+        const wrap = document.getElementById("markedCanvasWrap");
+        const dlBtn = document.getElementById("btnDownloadMarked");
+        if (!canvas || !wrap) return;
+
+        const img = new Image();
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+
+          const h = canvas.height;
+          const w = canvas.width;
+
+          const clampY = (ratio) => {
+            const r = Number.isFinite(ratio)
+              ? Math.min(0.92, Math.max(0.08, ratio))
+              : 0.5;
+            return Math.round(r * h);
+          };
+
+          const drawPriceLine = (y, color, label, alignLeft = false) => {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = Math.max(2, Math.round(w * 0.0028));
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(w, y);
+            ctx.stroke();
+
+            ctx.font = `bold ${Math.max(13, Math.round(w * 0.017))}px monospace`;
+            const textWidth = ctx.measureText(label).width;
+            const padX = 9;
+            const boxH = Math.max(22, Math.round(w * 0.025));
+            const boxX = alignLeft
+              ? 12
+              : Math.max(10, w - textWidth - padX * 2 - 14);
+            const boxY = Math.max(6, y - boxH - 3);
+
+            ctx.fillStyle = "rgba(8, 11, 16, 0.9)";
+            ctx.fillRect(boxX, boxY, textWidth + padX * 2, boxH);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(boxX, boxY, textWidth + padX * 2, boxH);
+
+            ctx.fillStyle = color;
+            ctx.fillText(label, boxX + padX, boxY + boxH - 6);
+            ctx.restore();
+          };
+
+          // MODE 2: KEY LEVELS (1H / 4H / 1D)
+          if (currentAnalysisMode === "keylevels") {
+            const levels = Array.isArray(parsedData.key_levels)
+              ? parsedData.key_levels
+              : [];
+            if (levels.length === 0) {
+              ctx.fillStyle = "rgba(255, 183, 3, 0.22)";
+              ctx.fillRect(0, h * 0.12, w, h * 0.09);
+              ctx.fillStyle = "#ffb703";
+              ctx.font = `bold ${Math.max(16, Math.round(w * 0.022))}px sans-serif`;
+              ctx.fillText(
+                "NO CLEAR KEY LEVELS DETECTED",
+                Math.round(w * 0.04),
+                Math.round(h * 0.18),
+              );
+            } else {
+              levels.slice(0, 6).forEach((lvl, idx) => {
+                const y = clampY(lvl.y_ratio);
+                const typeUpper = (lvl.type || "").toUpperCase();
+                let color = "#ffb703"; // amber default
+                if (
+                  typeUpper.includes("RESISTANCE") ||
+                  typeUpper.includes("SUPPLY") ||
+                  typeUpper.includes("PDH") ||
+                  typeUpper.includes("PWH") ||
+                  typeUpper.includes("OB-")
+                ) {
+                  color = "#ff3b5c";
+                } else if (
+                  typeUpper.includes("SUPPORT") ||
+                  typeUpper.includes("DEMAND") ||
+                  typeUpper.includes("PDL") ||
+                  typeUpper.includes("PWL") ||
+                  typeUpper.includes("OB+")
+                ) {
+                  color = "#00e676";
+                } else if (typeUpper.includes("FVG")) {
+                  color = "#00f0ff";
+                }
+                const tfTag = lvl.timeframe ? `[${lvl.timeframe}] ` : "";
+                const labelText = `${tfTag}${lvl.label || lvl.type || "KEY LEVEL"}: ${lvl.price || ""}`;
+                drawPriceLine(y, color, labelText, idx % 2 === 1);
+              });
+            }
+            wrap.classList.remove("hidden");
+            dlBtn.classList.remove("hidden");
+            return;
+          }
+
+          // MODE 1: 4-TF SIGNAL OVERLAY
+          const hasSignal =
+            parsedData &&
+            parsedData.has_setup &&
+            parsedData.direction &&
+            parsedData.direction !== "NONE";
+          if (!hasSignal) {
+            ctx.fillStyle = "rgba(255, 59, 92, 0.22)";
+            ctx.fillRect(0, h * 0.12, w, h * 0.1);
+            ctx.fillStyle = "#ff3b5c";
+            ctx.font = `bold ${Math.max(18, Math.round(w * 0.024))}px sans-serif`;
+            ctx.fillText(
+              "NO SETUP (NO FOMO)",
+              Math.round(w * 0.04),
+              Math.round(h * 0.18),
+            );
+            wrap.classList.remove("hidden");
+            dlBtn.classList.remove("hidden");
+            return;
+          }
+
+          const entryY = clampY(parsedData.entry_y_ratio);
+          const slY = clampY(parsedData.sl_y_ratio);
+          const tpY = clampY(parsedData.tp_y_ratio);
+
+          ctx.fillStyle = "rgba(255, 59, 92, 0.22)";
+          ctx.fillRect(
+            0,
+            Math.min(entryY, slY),
+            w,
+            Math.max(12, Math.abs(slY - entryY)),
+          );
+
+          ctx.fillStyle = "rgba(0, 230, 118, 0.16)";
+          ctx.fillRect(
+            0,
+            Math.min(entryY, tpY),
+            w,
+            Math.max(12, Math.abs(tpY - entryY)),
+          );
+
+          drawPriceLine(
+            entryY,
+            "#00f0ff",
+            `${parsedData.direction} ENTRY: ${parsedData.entry_price || "N/A"} (0.01)`,
+          );
+          drawPriceLine(
+            slY,
+            "#ff3b5c",
+            `SL: ${parsedData.sl_price || "N/A"} ($10-$13)`,
+          );
+          drawPriceLine(tpY, "#00e676", `TP: ${parsedData.tp_price || "N/A"}`);
+
+          wrap.classList.remove("hidden");
+          dlBtn.classList.remove("hidden");
+        };
+        img.src = dataUrl;
+      }
+
+      function downloadMarkedChart() {
+        const canvas = document.getElementById("signalCanvas");
+        if (!canvas) return;
+        const link = document.createElement("a");
+        link.download =
+          currentAnalysisMode === "keylevels"
+            ? "xauusd-key-levels.png"
+            : "xauusd-signal-chart.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      async function callGeminiModelWithRetry(
+        apiKey,
+        modelName,
+        parts,
+        maxRetries = 2,
+      ) {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const loadingText = document.getElementById("visionLoadingText");
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+          if (loadingText) {
+            loadingText.textContent =
+              attempt === 0
+                ? `កំពុង Check Pic និងវិភាគ ${uploadedImages.length} រូបជាមួយ ${modelName}...`
+                : `Server រវល់ (${modelName}) — កំពុងព្យាយាមម្តងទៀត (${attempt}/${maxRetries})...`;
+          }
+
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ role: "user", parts }],
+              generationConfig: {
+                temperature: 0.15,
+                responseMimeType: "application/json",
+              },
+            }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            return data;
+          }
+
+          const errMsg = data?.error?.message || `Gemini API ${res.status}`;
+          const isHighDemand =
+            res.status === 503 ||
+            res.status === 429 ||
+            /high demand|overloaded|unavailable|quota|rate/i.test(errMsg);
+
+          if (isHighDemand && attempt < maxRetries) {
+            await sleep(1200 * (attempt + 1));
+            continue;
+          }
+          throw new Error(errMsg);
+        }
+      }
+
+      async function analyzeAndDrawSignalWithGemini() {
+        const apiKey = (
+          document.getElementById("geminiKeyInput")?.value || ""
+        ).trim();
+        if (!apiKey) {
+          showToast("សូមបញ្ចូល Gemini API Key ជាមុនសិន!");
+          return;
+        }
+        if (uploadedImages.length === 0) {
+          showToast("សូម Upload ឬ Paste រូបភាព Chart ជាមុនសិន!");
+          return;
         }
 
-        outputEl.innerHTML = marked.parse(markdownText);
-        loadingEl.classList.add('hidden');
-        outputEl.classList.remove('hidden');
-      } catch (err) {
-        loadingEl.classList.add('hidden');
-        outputEl.innerHTML = `<div class="p-4 rounded-xl bg-instred/15 border border-instred/40 text-instred text-xs">
-          <strong>មានបញ្ហាក្នុងការភ្ជាប់ទៅកាន់ AI Vision:</strong> ${err.message}។ សូមព្យាយាមម្តងទៀត ឬផ្ញើរូបភាព Chart ដោយផ្ទាល់។
+        const loadingEl = document.getElementById("visionLoading");
+        const emptyEl = document.getElementById("visionEmptyState");
+        const outputEl = document.getElementById("visionOutput");
+        const bannerEl = document.getElementById("picCheckBanner");
+        const btn = document.getElementById("btnAnalyzeVision");
+
+        emptyEl.classList.add("hidden");
+        outputEl.classList.add("hidden");
+        bannerEl.classList.add("hidden");
+        document.getElementById("markedCanvasWrap").classList.add("hidden");
+        loadingEl.classList.remove("hidden");
+        btn.disabled = true;
+        btn.classList.add("opacity-60");
+
+        const userNote = document.getElementById("visionUserNote").value.trim();
+        const liveText = liveGoldPrice
+          ? `Live XAUUSD reference price is ~${liveGoldPrice.toFixed(2)}.`
+          : "";
+
+        const picCheckInstruction = `
+MANDATORY IMAGE VERIFICATION ("pic_check"):
+1. Check every uploaded image (#1 to #${uploadedImages.length}) to verify:
+   - Is it actually a financial candlestick/trading chart (specifically XAUUSD / Gold)?
+   - What exact timeframe(s) are visible on each image (e.g., 15m, 30m, 1H, 4H, 1D)?
+   - Does the uploaded image match the user's note/expected timeframes, and is the chart price consistent with ${liveText || "current market price"}?
+2. If ANY image is NOT a trading chart, is the wrong symbol, has duplicate/wrong timeframes compared to what was requested or noted, or shows an outdated/mismatched price, set "has_mismatch": true (and "is_valid_chart": false if not a chart) and clearly explain in Khmer in "message_km" what is wrong or mismatched!`;
+
+        let promptText = "";
+
+        if (currentAnalysisMode === "keylevels") {
+          promptText = `You are an institutional ICT + SMC Gold (XAUUSD) analyst.
+Task: Identify major institutional KEY LEVELS on timeframes: ${selectedKeyLevelTF} (specifically looking across 1H, 4H, and 1D charts provided).
+${liveText} User note: "${userNote}".
+${picCheckInstruction}
+
+Find the most important Key Levels (e.g., Previous Day High/Low PDH/PDL, Previous Week High/Low PWH/PWL, 1D/4H/1H Unmitigated Order Blocks, 1D/4H/1H Fair Value Gaps FVG, Major Liquidity Pools / Equal Highs & Lows).
+Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible on image #1 so we can draw them on image #1.
+
+Return ONLY valid JSON:
+{
+  "pic_check": {
+    "is_valid_chart": true or false,
+    "has_mismatch": true or false,
+    "detected_timeframes": ["#1: 1H", "#2: 4H", "#3: 1D"],
+    "message_km": "បញ្ជាក់ជាភាសាខ្មែរថា រូបភាពត្រឹមត្រូវ ឬខុសត្រង់ណា..."
+  },
+  "key_levels": [
+    {
+      "timeframe": "1D" or "4H" or "1H",
+      "type": "RESISTANCE / SUPPLY / OB- / FVG / SUPPORT / DEMAND / OB+ / PDH / PDL",
+      "label": "4H Bearish OB",
+      "price": "3535.00",
+      "y_ratio": 0.32
+    }
+  ],
+  "khmer_summary_markdown": "### 🎯 វិភាគ Key Levels (1H / 4H / 1D)\\n- ..."
+}`;
+        } else {
+          promptText = `Analyze these XAU/USD chart screenshots (up to 4 timeframes such as 15m, 30m, 1H, 4H) using ICT + SMC (4H/1H bias, BOS/MSS, liquidity sweep, unmitigated FVG/OB near current price, 0.01 lot, SL ~$10-$13, move SL to BE at 1:1-1.5). ${liveText} User note: "${userNote}".
+${picCheckInstruction}
+Draw signal lines on image #1 only if there is a clear, valid setup near current price AND pic_check.is_valid_chart is true; otherwise set has_setup=false and direction="NONE".
+
+Return ONLY valid JSON:
+{
+  "pic_check": {
+    "is_valid_chart": true or false,
+    "has_mismatch": true or false,
+    "detected_timeframes": ["#1: 15m", "#2: 30m", "#3: 1H", "#4: 4H"],
+    "message_km": "បញ្ជាក់ជាភាសាខ្មែរថា រូបភាពត្រឹមត្រូវ ឬខុសត្រង់ណា..."
+  },
+  "has_setup": true or false,
+  "direction": "BUY LIMIT" or "SELL LIMIT" or "NONE",
+  "entry_price": "string",
+  "sl_price": "string",
+  "tp_price": "string",
+  "entry_y_ratio": 0.55,
+  "sl_y_ratio": 0.65,
+  "tp_y_ratio": 0.35,
+  "khmer_summary_markdown": "### វិភាគ Multi-Timeframe (15m / 30m / 1H / 4H)\\n- ..."
+}`;
+        }
+
+        const parts = [
+          { text: promptText },
+          ...uploadedImages.slice(0, MAX_IMAGES).map((img) => ({
+            inlineData: {
+              mimeType: img.mimeType,
+              data: img.base64,
+            },
+          })),
+        ];
+
+        const modelsToTry = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
+
+        try {
+          let data = null;
+          let lastError = null;
+
+          for (const modelName of modelsToTry) {
+            try {
+              data = await callGeminiModelWithRetry(
+                apiKey,
+                modelName,
+                parts,
+                2,
+              );
+              break;
+            } catch (err) {
+              lastError = err;
+            }
+          }
+
+          if (!data) {
+            throw (
+              lastError || new Error("Gemini models are currently unavailable.")
+            );
+          }
+
+          const rawContent =
+            data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          const cleanedJson = rawContent.replace(/```json|```/gi, "").trim();
+          const parsed = JSON.parse(cleanedJson);
+
+          renderPicCheckBanner(parsed.pic_check);
+          drawOverlayOnCanvas(uploadedImages[0].dataUrl, parsed);
+          outputEl.innerHTML = marked.parse(
+            parsed.khmer_summary_markdown || "គ្មានសេចក្តីសង្ខេប",
+          );
+          loadingEl.classList.add("hidden");
+          outputEl.classList.remove("hidden");
+        } catch (err) {
+          loadingEl.classList.add("hidden");
+          outputEl.innerHTML = `<div class="p-4 rounded-xl bg-instred/15 border border-instred/40 text-instred text-xs">
+          <strong>បញ្ហាវិភាគ / Check Pic៖</strong> ${err.message}
         </div>`;
-        outputEl.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
-        btn.classList.remove('opacity-60');
+          outputEl.classList.remove("hidden");
+        } finally {
+          btn.disabled = false;
+          btn.classList.remove("opacity-60");
+        }
       }
-    }
 
-    // =========================================================================
-    // 7. INITIALIZE ON WINDOW LOAD
-    // =========================================================================
-    // 7. INITIALIZE IMMEDIATELY + ON WINDOW LOAD
-    // =========================================================================
-    function startEngineApp() {
-      updateCambodiaKillzoneClock();
-      fetchLiveGoldPrice(true);
-      initTradingViewWidget(currentTVInterval);
-    }
+      function startEngineApp() {
+        loadSavedGeminiKey();
+        updateCambodiaKillzoneClock();
+        fetchLiveGoldPrice(true);
+        initTradingViewWidget(currentTVInterval);
+      }
 
-    startEngineApp();
-    setInterval(updateCambodiaKillzoneClock, 1000);
-    setInterval(() => fetchLiveGoldPrice(false), 20000);
-    window.addEventListener('load', () => {
-      updateCambodiaKillzoneClock();
-      initTradingViewWidget(currentTVInterval);
-    });
-  </script>
-</body>
+      startEngineApp();
+      setInterval(updateCambodiaKillzoneClock, 1000);
+      setInterval(() => fetchLiveGoldPrice(false), 20000);
+      window.addEventListener("load", () => {
+        updateCambodiaKillzoneClock();
+        initTradingViewWidget(currentTVInterval);
+      });
+    </script>
+  </body>
 </html>
