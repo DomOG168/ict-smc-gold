@@ -7,7 +7,6 @@
       ICT + SMC Institutional Gold Engine (4-TF Signal & Key Levels)
     </title>
 
-    <!-- Custom App / Home Screen Icon (PNG + SVG fallback, No "I" fallback) -->
     <link rel="icon" type="image/png" href="./icon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icon.png" />
     <link rel="apple-touch-icon" sizes="512x512" href="./icon.png" />
@@ -301,7 +300,6 @@
 
       <!-- GEMINI VISION SCREENSHOT SIGNAL & KEY LEVEL OVERLAY SECTION -->
       <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <!-- Upload & Key Zone (5 cols) -->
         <div
           class="lg:col-span-5 glass-panel rounded-2xl p-5 flex flex-col gap-4"
         >
@@ -324,7 +322,6 @@
             >
           </div>
 
-          <!-- MODE SELECTOR OPTION -->
           <div>
             <label class="block text-xs text-gray-400 mb-1.5"
               >ជ្រើសរើស Option វិភាគ (Analysis Mode)</label
@@ -353,7 +350,6 @@
             </div>
           </div>
 
-          <!-- KEY LEVEL TF FILTER (Shown when Key Levels mode is active) -->
           <div
             id="keyLevelTfBox"
             class="hidden p-3 rounded-xl bg-void/90 border border-instamber/30 space-y-2"
@@ -535,7 +531,6 @@
           </div>
         </div>
 
-        <!-- Marked Screenshot + Pic Verification + Analysis Output (7 cols) -->
         <div
           class="lg:col-span-7 glass-panel neon-border rounded-2xl p-5 flex flex-col justify-between min-h-[450px]"
         >
@@ -589,19 +584,14 @@
               </p>
             </div>
 
-            <!-- PIC CHECK ALERT BANNER -->
             <div
               id="picCheckBanner"
               class="hidden rounded-xl p-3.5 text-xs"
             ></div>
-
-            <!-- ICT + SMC CONFLUENCE BADGES -->
             <div
               id="smcConfluenceRow"
               class="hidden grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono"
             ></div>
-
-            <!-- CLEAR ENTRY / SL / TP SUMMARY CARD -->
             <div
               id="signalSummaryCard"
               class="hidden rounded-xl p-3.5 bg-void/95 border border-neoncyan/30 space-y-2.5"
@@ -650,7 +640,6 @@
       </section>
     </main>
 
-    <!-- Toast -->
     <div
       id="toastBox"
       class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none"
@@ -663,7 +652,6 @@
       </div>
     </div>
 
-    <!-- Discipline Rules Modal -->
     <div
       id="rulesModal"
       class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
@@ -727,13 +715,33 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v6_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v7_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
       let uploadedImages = [];
-      let currentAnalysisMode = "signal"; // 'signal' | 'keylevels'
+      let currentAnalysisMode = "signal";
       let selectedKeyLevelTF = "ALL (1H, 4H, 1D)";
+      let loadingTickerInterval = null;
+
+      function startLoadingTimer(baseLabel) {
+        stopLoadingTimer();
+        const startedAt = Date.now();
+        const el = document.getElementById("visionLoadingText");
+        const update = () => {
+          const sec = Math.floor((Date.now() - startedAt) / 1000);
+          if (el) el.textContent = `${baseLabel} (${sec}s)`;
+        };
+        update();
+        loadingTickerInterval = setInterval(update, 1000);
+      }
+
+      function stopLoadingTimer() {
+        if (loadingTickerInterval) {
+          clearInterval(loadingTickerInterval);
+          loadingTickerInterval = null;
+        }
+      }
 
       function setAnalysisMode(mode) {
         currentAnalysisMode = mode;
@@ -1693,7 +1701,7 @@
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
-      function compressImageDataUrl(dataUrl, maxWidth = 1280, quality = 0.78) {
+      function compressImageDataUrl(dataUrl, maxWidth = 960, quality = 0.68) {
         return new Promise((resolve) => {
           const img = new Image();
           img.onload = () => {
@@ -1729,6 +1737,7 @@
       }
 
       function displayParsedResult(parsed) {
+        stopLoadingTimer();
         const loadingEl = document.getElementById("visionLoading");
         const outputEl = document.getElementById("visionOutput");
         const normalized = validateAndNormalizeSignalPrices(parsed);
@@ -1743,73 +1752,49 @@
         outputEl.classList.remove("hidden");
       }
 
-      async function callGeminiModelWithRetry(
+      async function callGeminiModelOnce(
         apiKey,
         modelName,
         parts,
         responseSchema,
-        maxRetries = 1,
-        timeoutMs = 25000,
+        timeoutMs = 14000,
       ) {
         const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-        const loadingText = document.getElementById("visionLoadingText");
+        startLoadingTimer(`កំពុងវិភាគ ICT + SMC (${modelName})`);
 
-        for (let attempt = 0; attempt <= maxRetries; attempt++) {
-          if (loadingText) {
-            loadingText.textContent =
-              attempt === 0
-                ? `កំពុង Check Pic និងវិភាគ ICT + SMC ជាមួយ ${modelName}...`
-                : `យឺត / រវល់ (${modelName}) — កំពុងព្យាយាមម្តងទៀត (${attempt}/${maxRetries})...`;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+        try {
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              contents: [{ role: "user", parts }],
+              generationConfig: {
+                temperature: 0.0,
+                maxOutputTokens: 2048,
+                responseMimeType: "application/json",
+                responseSchema,
+              },
+            }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            return data;
           }
-
-          const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-          try {
-            const res = await fetch(endpoint, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: controller.signal,
-              body: JSON.stringify({
-                contents: [{ role: "user", parts }],
-                generationConfig: {
-                  temperature: 0.0,
-                  maxOutputTokens: 4096,
-                  responseMimeType: "application/json",
-                  responseSchema,
-                },
-              }),
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-              return data;
-            }
-
-            const errMsg = data?.error?.message || `Gemini API ${res.status}`;
-            const isHighDemand =
-              res.status === 503 ||
-              res.status === 429 ||
-              /high demand|overloaded|unavailable|quota|rate/i.test(errMsg);
-
-            if (isHighDemand && attempt < maxRetries) {
-              await sleep(1000 * (attempt + 1));
-              continue;
-            }
-            throw new Error(errMsg);
-          } catch (err) {
-            const msg =
-              err?.name === "AbortError"
-                ? `Request លើស ${Math.round(timeoutMs / 1000)} វិនាទី (Timeout)`
-                : err?.message || "Network error";
-            if (attempt < maxRetries) {
-              await sleep(1000 * (attempt + 1));
-              continue;
-            }
-            throw new Error(msg);
-          } finally {
-            clearTimeout(timer);
+          throw new Error(data?.error?.message || `Gemini API ${res.status}`);
+        } catch (err) {
+          if (err?.name === "AbortError") {
+            throw new Error(
+              `Request លើស ${Math.round(timeoutMs / 1000)} វិនាទី (Timeout)`,
+            );
           }
+          throw new Error(err?.message || "Network error");
+        } finally {
+          clearTimeout(timer);
         }
       }
 
@@ -1889,15 +1874,7 @@ ${liveText} User note: "${userNote}".
 ${picCheckInstruction}
 ${scaleCalibrationInstruction}
 
-STRICT ICT + SMC KEY LEVEL RULES:
-- Distinguish between true ICT/SMC institutional levels and retail noise:
-  1. Key Reference Highs/Lows: PDH / PDL, PWH / PWL, Asian High/Low, or major swing highs/lows.
-  2. Liquidity Pools: BSL (Buy-Side Liquidity above highs / Equal Highs EqH), SSL (Sell-Side Liquidity below lows / Equal Lows EqL), or Inducement (IDM) swing points.
-  3. Order Blocks & Imbalance: Unmitigated Bullish OB (+OB) / Bearish OB (-OB) that caused a BOS/MSS, and unmitigated Fair Value Gaps (Bullish/Bearish FVG) or orderflow imbalances.
-  4. Equilibrium / Premium-Discount context relative to the dealing range.
-- Label each key level clearly with exact ICT/SMC terminology (e.g., "PDH", "PDL", "BSL / EqH", "SSL / EqL", "+OB (BOS)", "-OB (MSS)", "Bullish FVG", "Bearish FVG") and numeric price.
-- Provide up to 6 key levels visible on Image #1 with numeric price and y_ratio (0.08 to 0.92).
-- In "khmer_summary_markdown", explain each level in clear Khmer: តួនាទី (Liquidity vs. OB/FVG vs. PDH/PDL), ស្ថានភាព (Unmitigated / Swept / Mitigated), និងរបៀបប្រើពេលតម្លៃមកដល់ (Reaction / Rejection / Sweep & MSS)។`;
+Provide up to 6 key levels visible on Image #1 with numeric price and y_ratio (0.08 to 0.92), and concise Khmer summary in "khmer_summary_markdown".`;
 
           responseSchema = {
             type: "OBJECT",
@@ -1967,21 +1944,11 @@ STRICT ICT + SMC KEY LEVEL RULES:
             ],
           };
         } else {
-          promptText = `You are a disciplined, practical ICT + SMC Gold (XAUUSD) trading analyst.
-Analyze the chart(s) across 4H, 1H, 30m, and 15m using genuine ICT + SMC principles:
-1. MULTI-TIMEFRAME ICT + SMC BREAKDOWN (4H, 1H, 30m, 15m):
-   - Market Structure: BOS / MSS / CHoCH and dealing range high-to-low.
-   - Liquidity & Inducement (IDM): Identify BSL/SSL, Equal Highs/Lows, whether liquidity was swept or inducement formed before the POI.
-   - Premium vs. Discount: State whether the pullback zone sits in Discount (<50% eq, preferred for BUY LIMIT) or Premium (>50% eq, preferred for SELL LIMIT).
-   - POI & Draw on Liquidity (DOL): Unmitigated +OB / -OB / FVG and the logical DOL target for TP.
-2. PULLBACK LIMIT SETUP ("ចាប់ Pullback Limit តាម ICT + SMC"):
-   - Output ONE setup ("has_setup": true, "direction": "BUY LIMIT" or "SELL LIMIT") when there is a clear directional impulse/structure with a valid nearby Pullback POI (+OB / Bullish FVG / Discount for BUY LIMIT, or -OB / Bearish FVG / Supply & Liquidity sweep zone for SELL LIMIT) that is visible on or alignable with Image #1's price scale.
-   - Set "has_setup": false and "direction": "NONE" when price is in heavy choppy/sideway consolidation without a clean POI or when structure/POI is ambiguous.
-   - Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10.0 to 13.0 gold points) with BE target at 1:1 to 1:1.5.
-3. ACCURATE CHART #1 OVERLAY MAPPING:
-   - Populate "chart1_price_scale" accurately from Image #1's price axis, and set numeric "entry_price", "sl_price", "tp_price" plus accurate "entry_y_ratio", "sl_y_ratio", "tp_y_ratio" (0.08 to 0.92) matching Image #1.
-4. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER ("khmer_summary_markdown"):
-   - Cover 4-TF SMC/ICT Analysis, Liquidity & Premium/Discount Check, Primary Pullback Limit Setup (0.01 lot, SL $10–$13, BE 1:1–1:1.5, DOL TP), and Conditional Watchlist / Risk Notes. Avoid unescaped double quotes inside strings.
+          promptText = `You are a disciplined ICT + SMC Gold (XAUUSD) trading analyst.
+Analyze the chart(s) across 4H, 1H, 30m, and 15m using ICT + SMC (BOS/MSS, Liquidity/IDM, Premium/Discount, +OB/-OB/FVG, DOL).
+Output ONE Pullback Limit setup ("BUY LIMIT" or "SELL LIMIT") when clear, or "has_setup": false / "NONE" when choppy/sideway.
+Keep SL realistic (~$10–$13 on 0.01 lot) with BE at 1:1–1:1.5.
+Provide concise Khmer explanation in "khmer_summary_markdown".
 
 ${liveText} User note: "${userNote}".
 ${picCheckInstruction}
@@ -2086,35 +2053,32 @@ ${scaleCalibrationInstruction}`;
         ];
 
         const modelsToTry = [
+          "gemini-2.0-flash",
           "gemini-2.5-flash",
           "gemini-3.5-flash-lite",
-          "gemini-2.0-flash",
         ];
 
         try {
           let data = null;
-          let lastError = null;
+          const errors = [];
 
           for (const modelName of modelsToTry) {
             try {
-              data = await callGeminiModelWithRetry(
+              data = await callGeminiModelOnce(
                 apiKey,
                 modelName,
                 parts,
                 responseSchema,
-                1,
-                25000,
+                14000,
               );
               break;
             } catch (err) {
-              lastError = err;
+              errors.push(`${modelName}: ${err.message}`);
             }
           }
 
           if (!data) {
-            throw (
-              lastError || new Error("Gemini models are currently unavailable.")
-            );
+            throw new Error(errors.join(" | ") || "Gemini API timeout/error");
           }
 
           const rawContent =
@@ -2127,12 +2091,15 @@ ${scaleCalibrationInstruction}`;
 
           displayParsedResult(parsed);
         } catch (err) {
+          stopLoadingTimer();
           loadingEl.classList.add("hidden");
-          outputEl.innerHTML = `<div class="p-4 rounded-xl bg-instred/15 border border-instred/40 text-instred text-xs">
-          <strong>បញ្ហាវិភាគ / Check Pic៖</strong> ${err.message}
+          outputEl.innerHTML = `<div class="p-4 rounded-xl bg-instred/15 border border-instred/40 text-instred text-xs space-y-1">
+          <div><strong>បញ្ហាវិភាគ / Check Pic៖</strong> ${err.message}</div>
+          <div class="text-red-200/80">ប្រសិនបើ Timeout លើ iPhone សូមសាក 1–2 រូបជាមុន ឬពិនិត្យអ៊ីនធឺណិត/API Key។</div>
         </div>`;
           outputEl.classList.remove("hidden");
         } finally {
+          stopLoadingTimer();
           btn.disabled = false;
           btn.classList.remove("opacity-60");
         }
