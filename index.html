@@ -503,30 +503,62 @@
           </div>
 
           <div
-            class="p-3.5 rounded-xl bg-void/90 border border-white/10 space-y-2"
+            class="p-3.5 rounded-xl bg-void/90 border border-white/10 space-y-2.5"
           >
             <div class="flex items-center justify-between text-[11px]">
               <span class="font-bold text-gray-300"
-                >⚖️ Risk &amp; Breakeven Reference (0.01 Lot)</span
+                >⚖️ Advanced Risk Management</span
               >
-              <span class="font-mono text-instgreen font-bold"
-                >$10–$13 CAP</span
-              >
+              <span class="font-mono text-instgreen font-bold">USER INPUT</span>
             </div>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="text-[10px] text-gray-400"
+                >Lot Size
+                <input
+                  id="riskLotSize"
+                  type="number"
+                  min="0.001"
+                  max="100"
+                  step="0.001"
+                  value="0.01"
+                  class="mt-1 w-full bg-obsidian border border-white/10 rounded-lg px-2.5 py-2 text-xs font-mono text-white"
+                />
+              </label>
+              <label class="text-[10px] text-gray-400"
+                >Max Risk (USD)
+                <input
+                  id="riskMaxUsd"
+                  type="number"
+                  min="0.1"
+                  max="100000"
+                  step="0.5"
+                  value="10"
+                  class="mt-1 w-full bg-obsidian border border-white/10 rounded-lg px-2.5 py-2 text-xs font-mono text-white"
+                />
+              </label>
+            </div>
+            <p class="text-[10px] text-gray-500 leading-relaxed">
+              AI នឹងយកតម្លៃទាំងនេះជាកម្រិតកំណត់។ ត្រូវផ្ទៀងផ្ទាត់ Contract Size,
+              Tick Value និង Commission របស់ Broker មុនគណនា Risk ជាក់ស្តែង។
+            </p>
             <div
-              class="grid grid-cols-3 gap-2 text-center font-mono text-[11px]"
+              class="grid grid-cols-3 gap-2 text-center font-mono text-[10px]"
             >
               <div class="p-2 rounded-lg bg-obsidian border border-white/5">
-                <div class="text-[10px] text-gray-500">Lot Size</div>
-                <div class="font-bold text-white mt-0.5">0.01 Lot</div>
+                <div class="text-gray-500">Lot</div>
+                <div id="riskLotLabel" class="font-bold text-white mt-0.5">
+                  0.01
+                </div>
               </div>
               <div class="p-2 rounded-lg bg-obsidian border border-white/5">
-                <div class="text-[10px] text-gray-500">SL Target</div>
-                <div class="font-bold text-instred mt-0.5">$10–$13</div>
+                <div class="text-gray-500">Risk Cap</div>
+                <div id="riskCapLabel" class="font-bold text-instred mt-0.5">
+                  $10
+                </div>
               </div>
               <div class="p-2 rounded-lg bg-obsidian border border-white/5">
-                <div class="text-[10px] text-gray-500">Move BE</div>
-                <div class="font-bold text-neoncyan mt-0.5">1 : 1 – 1.5</div>
+                <div class="text-gray-500">Move BE</div>
+                <div class="font-bold text-neoncyan mt-0.5">1:1–1.5</div>
               </div>
             </div>
           </div>
@@ -615,8 +647,13 @@
           >
             <span
               >Lot Standard:
-              <strong class="text-white font-mono">0.01 Lot</strong> | Risk Cap:
-              <strong class="text-white font-mono">$10–$13</strong></span
+              <strong class="text-white font-mono"
+                >User Lot / Risk Inputs</strong
+              >
+              | Risk Cap:
+              <strong class="text-white font-mono"
+                >Broker-verified only</strong
+              ></span
             >
             <span>4-TF Analysis + Pullback Limit • Auto Pic Check</span>
           </div>
@@ -664,15 +701,17 @@
         >
           <li>
             <strong class="text-white">១. ទំហំ Lot និងហានិភ័យថេរ៖</strong>
-            ប្រើប្រាស់ <code>0.01 lot</code> ជានិច្ច ដោយកំណត់ Stop Loss ចន្លោះ
-            <code>$10.00 – $13.50</code>។
+            កំណត់ Lot Size និង Max Risk តាម Input របស់អ្នក។ ត្រូវផ្ទៀងផ្ទាត់
+            Contract Size, Tick Value, Spread និង Commission របស់ Broker
+            មុនបញ្ជាក់ហានិភ័យជា USD។
           </li>
           <li>
             <strong class="text-white"
-              >២. វិភាគទាំង 4 TF + Pullback Limit៖</strong
+              >២. វិភាគទាំង 4 TF + ICT/SMC Confluence៖</strong
             >
-            វិភាគ 4H, 1H, 30m, និង 15m ដើម្បីចាប់ Pullback Limit នៅតំបន់ Zone
-            ដែលមាន Confluence ហើយបើ Sideway / Choppy គ្មាន Zone ច្បាស់ នឹងចេញ
+            វិភាគ 4H, 1H, 30m, និង 15m រួមជាមួយ Liquidity Sweep,
+            Premium/Discount, BOS/CHoCH/MSS, FVG/OB, OTE, AMD, IDM និង Session។
+            បើគ្មាន Zone ច្បាស់ នឹងចេញ
             <code>NO SETUP</code>។
           </li>
           <li>
@@ -698,7 +737,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v5_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v6_advanced_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -1094,6 +1133,34 @@
         showToast("បាន Reset រូបភាព និងលទ្ធផល!");
       }
 
+      function getRiskSettings() {
+        const lot = Number(
+          document.getElementById("riskLotSize")?.value || 0.01,
+        );
+        const maxUsd = Number(
+          document.getElementById("riskMaxUsd")?.value || 10,
+        );
+        return {
+          lot: Number.isFinite(lot) && lot > 0 ? lot : 0.01,
+          maxUsd: Number.isFinite(maxUsd) && maxUsd > 0 ? maxUsd : 10,
+        };
+      }
+
+      function updateRiskSettingsUI() {
+        const risk = getRiskSettings();
+        const lotLabel = document.getElementById("riskLotLabel");
+        const capLabel = document.getElementById("riskCapLabel");
+        if (lotLabel) lotLabel.textContent = String(risk.lot);
+        if (capLabel) capLabel.textContent = `$${risk.maxUsd.toFixed(2)}`;
+      }
+
+      document
+        .getElementById("riskLotSize")
+        ?.addEventListener("input", updateRiskSettingsUI);
+      document
+        .getElementById("riskMaxUsd")
+        ?.addEventListener("input", updateRiskSettingsUI);
+
       function computeAnalysisCacheKey(userNote) {
         const normalizedNote = (userNote || "")
           .replace(/\|\s*Live XAUUSD:\s*[\d.]+/i, "")
@@ -1107,7 +1174,8 @@
               `${img.mimeType}:${img.base64.length}:${img.base64.slice(0, 48)}:${img.base64.slice(-48)}`,
           )
           .join("||");
-        return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|${normalizedNote}|${imgSignatures}`;
+        const risk = getRiskSettings();
+        return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|lot:${risk.lot}|risk:${risk.maxUsd}|${normalizedNote}|${imgSignatures}`;
       }
 
       function parseJsonSafely(rawText) {
@@ -1279,7 +1347,7 @@
                 }
                 <span class="text-xs text-red-200 font-bold">ទីផ្សារ Sideway / Choppy ឬគ្មាន Zone ច្បាស់ — រង់ចាំ Setup ច្បាស់សិន</span>
               </div>
-              <span class="font-mono text-[11px] text-gray-300">0.01 Lot • SL $10–$13</span>
+              <span class="font-mono text-[11px] text-gray-300">Lot ${getRiskSettings().lot} • Risk Cap $${getRiskSettings().maxUsd.toFixed(2)}</span>
             </div>
             ${
               parsed?.no_setup_reason_km
@@ -1313,7 +1381,7 @@
                   : ""
               }
             </div>
-            <span class="text-[11px] font-mono text-gray-400">0.01 Lot • BE @ ${parsed.be_target || "1:1–1.5"}</span>
+            <span class="text-[11px] font-mono text-gray-400">${getRiskSettings().lot} Lot • BE @ ${parsed.be_target || "1:1–1.5"}</span>
           </div>
           <div class="grid grid-cols-3 gap-2 font-mono text-center">
             <div class="p-2 rounded-lg bg-obsidian border border-neoncyan/25">
@@ -1321,7 +1389,7 @@
               <div class="text-sm font-extrabold text-neoncyan mt-0.5">${parsed.entry_price || "N/A"}</div>
             </div>
             <div class="p-2 rounded-lg bg-obsidian border border-instred/25">
-              <div class="text-[10px] text-gray-400">STOP LOSS ($10–$13)</div>
+              <div class="text-[10px] text-gray-400">STOP LOSS</div>
               <div class="text-sm font-extrabold text-instred mt-0.5">${parsed.sl_price || "N/A"}</div>
             </div>
             <div class="p-2 rounded-lg bg-obsidian border border-instgreen/25">
@@ -1332,6 +1400,29 @@
           ${
             parsed.selection_reason_km
               ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">មូលហេតុរើស Pullback Limit Setup នេះ៖</strong> ${parsed.selection_reason_km}</p>`
+              : ""
+          }
+          ${
+            parsed.ict_validation
+              ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1 text-[10px] text-gray-300">
+            ${[
+              ["Liquidity Sweep", "liquidity_sweep"],
+              ["Premium / Discount", "premium_discount"],
+              ["BOS / CHoCH / MSS", "structure"],
+              ["FVG + Order Block", "fvg_order_block"],
+              ["OTE", "ote"],
+              ["AMD / Power of 3", "amd_power_of_three"],
+              ["Inducement / IDM", "inducement"],
+              ["Killzone + Session", "killzone_session"],
+              ["MTF Confluence", "mtf_confluence"],
+              ["Risk Management", "risk_management"],
+            ]
+              .map(
+                ([label, key]) =>
+                  `<div class="rounded-lg bg-obsidian border border-white/5 p-2"><strong class="text-neoncyan">${label}:</strong> ${parsed.ict_validation[key] || "មិនមានទិន្នន័យ"}</div>`,
+              )
+              .join("")}
+          </div>`
               : ""
           }
         `;
@@ -1685,15 +1776,32 @@ Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible
             required: ["pic_check", "key_levels", "khmer_summary_markdown"],
           };
         } else {
-          promptText = `You are a practical, structured ICT + SMC Gold (XAUUSD) trading analyst matching the style of our direct chat analysis.
-Analyze the chart(s) across 4H, 1H, 30m, and 15m:
-1. INSPECT EACH TIMEFRAME (4H, 1H, 30m, 15m): Identify market structure (BOS / MSS / CHoCH), unmitigated Order Blocks (+OB / -OB), Fair Value Gaps (FVG), liquidity sweeps/pools, and current price location.
-2. PRACTICAL PULLBACK / LIMIT SETUP ("ចាប់ Pullback Limit ដូចក្នុង Chat"):
-   - When there is a clear directional impulse/momentum on 1H/30m/15m with identifiable nearby Pullback/Limit zones (such as Bullish FVG / +OB / Discount pullback for BUY LIMIT, or Bearish FVG / -OB / Supply/Liquidity rejection zone for SELL LIMIT), output ONE actionable setup ("has_setup": true, "direction": "BUY LIMIT" or "SELL LIMIT") targeting that pullback zone rather than chasing the extreme top/bottom!
-   - Also clearly document both the primary Pullback Limit plan and any alternative/conditional zone (Buy pullback or Sell rejection zone) inside "khmer_summary_markdown".
-   - Set "has_setup": false and "direction": "NONE" ONLY when price is in heavy choppy/sideway range with no clear zone or extreme conflicting structure.
-   - Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10.0 to 13.0 gold points) with BE around 1:1 to 1:1.5, and align entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) accurately with image #1.
-3. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER: Write clean, practical Khmer markdown ("khmer_summary_markdown") with Multi-Timeframe analysis, Primary Setup (Entry / SL / TP on 0.01 lot), and Conditional Watchlist / Risk Notes. Avoid unescaped double quotes inside strings.
+          const riskSettings = getRiskSettings();
+          promptText = `You are an advanced, disciplined ICT + SMC Gold (XAUUSD) analyst. Perform evidence-based visual chart analysis only; do not invent candle prices, levels, sweeps, or confirmations that are not visible.
+Analyze the provided charts in 4H, 1H, 30m, and 15m. Respect the uploaded timeframe labels and explain uncertainty whenever a chart is cropped, unclear, or missing.
+
+ADVANCED ICT + SMC FRAMEWORK — evaluate every item:
+A) MARKET STRUCTURE: Mark external and internal swing highs/lows; distinguish BOS (continuation close beyond a meaningful swing), CHoCH (first meaningful shift against prior structure), and MSS (structure shift supported by displacement). Do not label a wick-only breach as confirmed BOS/MSS without explaining it.
+B) LIQUIDITY: Identify BSL/SSL, EQH/EQL, obvious resting liquidity, previous day/week highs/lows when visible, and whether a sweep actually occurred. A sweep requires taking liquidity and a meaningful rejection/close back; distinguish sweep from a clean breakout. Record the swept level and timeframe.
+C) PREMIUM / DISCOUNT: Define the relevant dealing range from a defensible swing low to swing high; calculate/estimate 50% equilibrium. State whether current price and proposed entry are in Premium, Discount, or near Equilibrium. Do not invent range boundaries.
+D) FVG + ORDER BLOCK: Locate bullish/bearish FVGs and OBs, note timeframe, bounds, mitigation/invalidity, and whether displacement created the imbalance. Prefer confluence; do not treat every candle as an OB.
+E) OTE: If a valid impulse leg is identifiable, map the 62%-79% retracement (include 70.5% when useful), state anchor swing points and whether OTE overlaps FVG/OB and premium/discount. If anchors are unclear, report OTE unavailable rather than guessing.
+F) AMD / POWER OF 3: Assess Accumulation, Manipulation (liquidity raid), and Distribution sequence. Identify the evidence and phase; do not force an AMD label if the sequence is not visible.
+G) INDUCEMENT (IDM): Identify a plausible inducement swing/liquidity point before the intended POI. Explain what liquidity may be taken before price reaches the true POI; mark uncertain IDM as unconfirmed.
+H) KILLZONE + SESSION: Assess Asian range, London, and New York session context. Use chart timestamps if visible. The app clock is Cambodia time (UTC+7); do not equate fixed Cambodia hours with London/New York killzones because DST shifts. If chart time or date is unavailable, say session confirmation is unavailable.
+I) MULTI-TIMEFRAME CONFLUENCE: Use 4H for external bias/dealing range, 1H for structure and POIs, 30m for setup development, and 15m for trigger. State alignment/conflict per timeframe. A lower-TF signal must not override a clearly opposing HTF context without an explicit countertrend warning.
+
+STRICT SETUP SEQUENCE:
+Require a coherent narrative where applicable: HTF bias + Premium/Discount -> liquidity sweep (BSL for shorts / SSL for longs) -> displacement + MSS/CHoCH -> FVG/OB/OTE confluence -> entry trigger. Inducement and AMD are supporting context, not mandatory labels. Give ONE best pullback/limit setup only when evidence is sufficient; otherwise return NO SETUP. Never chase price. Distinguish confirmed evidence from anticipated/conditional evidence.
+
+RISK MANAGEMENT:
+User inputs: lot size ${riskSettings.lot}; maximum planned monetary risk USD ${riskSettings.maxUsd}. These are user-defined limits, not guaranteed broker risk calculations. Do NOT assume a universal XAUUSD contract size or that a $10-$13 price move equals a fixed USD loss. Explain that exact cash risk requires broker contract size, tick value, account currency, spread, commission and slippage. Place SL beyond structural invalidation (sweep extreme / OB boundary / swing), not at an arbitrary fixed distance. If structural SL exceeds the user's risk cap, reduce lot size or reject the trade; never squeeze SL inside invalidation just to fit risk. State R:R, TP at opposing liquidity/next HTF level, and BE condition (normally after 1R or 1R-1.5R only when structure supports it). If broker contract details are unknown, provide price-distance risk only and label USD risk as NOT VERIFIED.
+
+OUTPUT:
+- Return has_setup=false and direction=NONE if there is no complete, defensible setup, chart mismatch, unclear key prices, conflicting structure, or risk cap cannot be respected.
+- In Khmer markdown include: chart validation; HTF/MTF bias; BOS/CHoCH/MSS; liquidity pools and sweep; dealing range + Premium/Discount; FVG/OB; OTE; AMD/Power of 3; IDM; session/Killzone confidence; MTF confluence matrix; primary entry/SL/TP and invalidation; R:R and risk caveat; alternative scenario and NO-TRADE conditions.
+- Provide entry_y_ratio, sl_y_ratio, tp_y_ratio only when levels are clearly visible on image #1; ratios run top-to-bottom from 0.08 to 0.92. If no valid setup, use 0.5 for all ratios.
+- Avoid certainty language. This is chart interpretation, not a guaranteed signal or financial advice. Never claim a concept is confirmed if the image does not support it.
 
 ${liveText} User note: "${userNote}".
 ${picCheckInstruction}`;
@@ -1733,6 +1841,33 @@ ${picCheckInstruction}`;
               entry_y_ratio: { type: "NUMBER" },
               sl_y_ratio: { type: "NUMBER" },
               tp_y_ratio: { type: "NUMBER" },
+              ict_validation: {
+                type: "OBJECT",
+                properties: {
+                  liquidity_sweep: { type: "STRING" },
+                  premium_discount: { type: "STRING" },
+                  structure: { type: "STRING" },
+                  fvg_order_block: { type: "STRING" },
+                  ote: { type: "STRING" },
+                  amd_power_of_three: { type: "STRING" },
+                  inducement: { type: "STRING" },
+                  killzone_session: { type: "STRING" },
+                  mtf_confluence: { type: "STRING" },
+                  risk_management: { type: "STRING" },
+                },
+                required: [
+                  "liquidity_sweep",
+                  "premium_discount",
+                  "structure",
+                  "fvg_order_block",
+                  "ote",
+                  "amd_power_of_three",
+                  "inducement",
+                  "killzone_session",
+                  "mtf_confluence",
+                  "risk_management",
+                ],
+              },
               khmer_summary_markdown: { type: "STRING" },
             },
             required: [
@@ -1751,6 +1886,7 @@ ${picCheckInstruction}`;
               "entry_y_ratio",
               "sl_y_ratio",
               "tp_y_ratio",
+              "ict_validation",
               "khmer_summary_markdown",
             ],
           };
@@ -1816,6 +1952,7 @@ ${picCheckInstruction}`;
 
       function startEngineApp() {
         loadSavedGeminiKey();
+        updateRiskSettingsUI();
         updateCambodiaKillzoneClock();
         fetchLiveGoldPrice(true);
         initTradingViewWidget(currentTVInterval);
