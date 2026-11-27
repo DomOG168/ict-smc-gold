@@ -144,7 +144,7 @@
               </h1>
               <span
                 class="px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-full bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
-                >4-TF + KEY LEVELS</span
+                >4-TF + ICT/SMC KEY LEVELS</span
               >
             </div>
             <p class="text-[11px] sm:text-xs text-gray-400">
@@ -362,7 +362,9 @@
               <span class="text-[11px] font-bold text-instamber"
                 >🎯 ជ្រើសរើស Timeframe សម្រាប់រក Key Levels</span
               >
-              <span class="text-[10px] font-mono text-gray-400">HTF ZONES</span>
+              <span class="text-[10px] font-mono text-gray-400"
+                >ICT/SMC HTF</span
+              >
             </div>
             <div class="grid grid-cols-4 gap-1.5">
               <button
@@ -455,7 +457,8 @@
               ចុចជ្រើសរើសរូបភាព Chart (រហូតដល់ 4 រូប) ឬ Paste (Ctrl+V)
             </p>
             <p id="dropZoneHint" class="text-xs text-gray-400 mt-1">
-              វិភាគទាំង 4 Timeframe + ចាប់ Pullback Limit ឬ NO SETUP
+              ដាក់រូប #1 ជា Chart ដែលចង់គូស Entry/SL/TP ឬ Key Levels
+              ឱ្យច្បាស់បំផុត
             </p>
           </label>
 
@@ -566,7 +569,7 @@
                 class="w-10 h-10 border-4 border-neoncyan/20 border-t-neoncyan rounded-full animate-spin"
               ></div>
               <p id="visionLoadingText" class="text-sm font-bold text-neoncyan">
-                កំពុង Check Pic និងវិភាគទាំង 4 Timeframe...
+                កំពុង Check Pic និងវិភាគ ICT + SMC...
               </p>
             </div>
 
@@ -580,8 +583,9 @@
               <p class="text-xs max-w-md mx-auto">
                 ជ្រើសរើស Mode (<strong>4-TF Signal</strong> ឬ
                 <strong>Key Levels 1H/4H/1D</strong>) រួច Upload/Paste រូបភាព
-                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹងវិភាគទាំង 4 TF និងចាប់ Pullback Limit
-                Setup!
+                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹងវិភាគ ICT + SMC (Sweep/IDM,
+                Premium/Discount, DOL) និងគូស Entry / SL / TP ឬ Key Levels
+                ឱ្យចំតម្លៃលើរូប #1!
               </p>
             </div>
 
@@ -589,6 +593,12 @@
             <div
               id="picCheckBanner"
               class="hidden rounded-xl p-3.5 text-xs"
+            ></div>
+
+            <!-- ICT + SMC CONFLUENCE BADGES -->
+            <div
+              id="smcConfluenceRow"
+              class="hidden grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono"
             ></div>
 
             <!-- CLEAR ENTRY / SL / TP SUMMARY CARD -->
@@ -599,8 +609,21 @@
 
             <div
               id="markedCanvasWrap"
-              class="hidden rounded-xl overflow-hidden border border-white/15 bg-black"
+              class="hidden rounded-xl overflow-hidden border border-white/15 bg-black space-y-2"
             >
+              <div
+                id="overlayScaleNote"
+                class="px-3 py-1.5 bg-obsidian/90 border-b border-white/10 text-[11px] text-gray-300 flex flex-wrap items-center justify-between gap-2"
+              >
+                <span>
+                  📍 <strong class="text-neoncyan">Chart Overlay (#1):</strong>
+                  បន្ទាត់ត្រូវបានគណនាតាមតម្លៃ Price Axis (High–Low) លើរូបភាព #1
+                </span>
+                <span
+                  id="overlayAxisBadge"
+                  class="font-mono text-[10px] text-instamber"
+                ></span>
+              </div>
               <canvas id="signalCanvas" class="w-full h-auto block"></canvas>
             </div>
 
@@ -618,7 +641,10 @@
               <strong class="text-white font-mono">0.01 Lot</strong> | Risk Cap:
               <strong class="text-white font-mono">$10–$13</strong></span
             >
-            <span>4-TF Analysis + Pullback Limit • Auto Pic Check</span>
+            <span
+              >ICT + SMC Pullback Limit • Price-Mapped Overlay • Auto Pic
+              Check</span
+            >
           </div>
         </div>
       </section>
@@ -665,20 +691,23 @@
           <li>
             <strong class="text-white">១. ទំហំ Lot និងហានិភ័យថេរ៖</strong>
             ប្រើប្រាស់ <code>0.01 lot</code> ជានិច្ច ដោយកំណត់ Stop Loss ចន្លោះ
-            <code>$10.00 – $13.50</code>។
+            <code>$10.00 – $13.00</code> (~10.0–13.0 ពិន្ទុមាស)។
           </li>
           <li>
             <strong class="text-white"
-              >២. វិភាគទាំង 4 TF + Pullback Limit៖</strong
+              >២. ICT + SMC Confluence (Sweep/IDM + Premium/Discount +
+              DOL)៖</strong
             >
-            វិភាគ 4H, 1H, 30m, និង 15m ដើម្បីចាប់ Pullback Limit នៅតំបន់ Zone
-            ដែលមាន Confluence ហើយបើ Sideway / Choppy គ្មាន Zone ច្បាស់ នឹងចេញ
-            <code>NO SETUP</code>។
+            ពិនិត្យ Liquidity Sweep/Inducement, ទីតាំង Premium (&gt;50%) ឬ
+            Discount (&lt;50%), Zone (`+OB`, `-OB`, `FVG`), និង Draw on
+            Liquidity មុនចាប់ Pullback Limit។
           </li>
           <li>
-            <strong class="text-white">៣. Pic Check Validation៖</strong>
-            ផ្ទៀងផ្ទាត់ជានិច្ចថា រូប Chart ត្រូវ Symbol (<code>XAUUSD</code>)
-            និង Timeframe មុនចូល Order។
+            <strong class="text-white"
+              >៣. Pic Check &amp; Chart #1 Scale៖</strong
+            >
+            ផ្ទៀងផ្ទាត់ Symbol/TF និងគណនា Entry/SL/TP/Key Levels ដោយផ្អែកលើ
+            High–Low Price Axis នៃរូប Chart #1។
           </li>
           <li>
             <strong class="text-white">៤. Breakeven (BE)：</strong> រំកិល SL មក
@@ -698,7 +727,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v5_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v6_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -723,10 +752,10 @@
           klBox.classList.remove("hidden");
           headerTitle.textContent =
             "Upload Screenshot (1H / 4H / 1D Key Levels)";
-          analyzeLabel.textContent = "រក Key Levels & Check Pic";
+          analyzeLabel.textContent = "រក ICT/SMC Key Levels";
           if (noteInput) {
             noteInput.placeholder =
-              "ឧ. #1=1H, #2=4H, #3=1D — រក PDH/PDL, OB, FVG, Liquidity";
+              "ឧ. #1=1H, #2=4H, #3=1D — រក PDH/PDL, BSL/SSL, +OB/-OB, FVG, EqH/EqL";
           }
         } else {
           btnSignal.className =
@@ -1052,7 +1081,7 @@
             (img, i) => `
         <div class="relative rounded-xl overflow-hidden border border-white/15 aspect-video bg-black group">
           <img src="${img.dataUrl}" class="w-full h-full object-cover" alt="Chart ${i + 1}" />
-          <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/85 text-[10px] font-mono text-neoncyan">#${i + 1}</span>
+          <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/85 text-[10px] font-mono text-neoncyan">#${i + 1}${i === 0 ? " (OVERLAY)" : ""}</span>
           <button type="button" onclick="deleteSingleImage(${i})" title="លុបរូបភាពនេះ" aria-label="Delete image ${i + 1}" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/85 hover:bg-instred text-white text-xs font-bold flex items-center justify-center border border-white/20 transition">&times;</button>
         </div>
       `,
@@ -1070,6 +1099,12 @@
         document.getElementById("btnDownloadMarked").classList.add("hidden");
         document.getElementById("picCheckBanner").classList.add("hidden");
         document.getElementById("picCheckBanner").innerHTML = "";
+        const confRow = document.getElementById("smcConfluenceRow");
+        if (confRow) {
+          confRow.classList.add("hidden");
+          confRow.classList.remove("grid");
+          confRow.innerHTML = "";
+        }
         document.getElementById("signalSummaryCard").classList.add("hidden");
         document.getElementById("signalSummaryCard").innerHTML = "";
         document.getElementById("visionOutput").classList.add("hidden");
@@ -1198,6 +1233,9 @@
               },
               htf_bias: "PULLBACK",
               mtf_alignment: "PULLBACK ZONE",
+              liquidity_status: "CHECK SWEEP/IDM",
+              pd_location: "CHECK 50% EQ",
+              dol_target: "OPPOSING LIQUIDITY",
               has_setup: false,
               direction: "NONE",
               setup_quality: "NONE",
@@ -1207,6 +1245,80 @@
           }
           throw new Error("មិនអាចអានទិន្នន័យ JSON ពី AI បានត្រឹមត្រូវ។");
         }
+      }
+
+      // Parse numeric price safely from strings like "3615.00" or "$3,615.50"
+      function parsePriceNumber(val) {
+        if (typeof val === "number") return Number.isFinite(val) ? val : null;
+        if (!val) return null;
+        const m = String(val)
+          .replace(/,/g, "")
+          .match(/(\d{3,5}(?:\.\d+)?)/);
+        if (!m) return null;
+        const num = parseFloat(m[1]);
+        return Number.isFinite(num) && num > 100 ? num : null;
+      }
+
+      // Compute y_ratio (0.08..0.92) from price using chart #1 visible high/low scale when available
+      function computeYRatioFromScale(priceVal, scaleObj, fallbackRatio) {
+        const p = parsePriceNumber(priceVal);
+        const topP = parsePriceNumber(scaleObj?.top_price);
+        const botP = parsePriceNumber(scaleObj?.bottom_price);
+        const topY =
+          Number.isFinite(scaleObj?.top_y_ratio) &&
+          scaleObj.top_y_ratio >= 0.03 &&
+          scaleObj.top_y_ratio <= 0.45
+            ? scaleObj.top_y_ratio
+            : 0.08;
+        const botY =
+          Number.isFinite(scaleObj?.bottom_y_ratio) &&
+          scaleObj.bottom_y_ratio >= 0.55 &&
+          scaleObj.bottom_y_ratio <= 0.97
+            ? scaleObj.bottom_y_ratio
+            : 0.92;
+
+        if (p !== null && topP !== null && botP !== null && topP > botP) {
+          const frac = (topP - p) / (topP - botP);
+          const mapped = topY + frac * (botY - topY);
+          return Math.min(0.92, Math.max(0.08, mapped));
+        }
+        return Number.isFinite(fallbackRatio)
+          ? Math.min(0.92, Math.max(0.08, fallbackRatio))
+          : 0.5;
+      }
+
+      // Enforce realistic SL distance (~$10.00 to $13.00 on 0.01 lot) when numerical prices exist
+      function validateAndNormalizeSignalPrices(parsed) {
+        if (!parsed || !parsed.has_setup || parsed.direction === "NONE") {
+          return parsed;
+        }
+        const entryNum = parsePriceNumber(parsed.entry_price);
+        const slNum = parsePriceNumber(parsed.sl_price);
+        const tpNum = parsePriceNumber(parsed.tp_price);
+        const isBuy = String(parsed.direction).toUpperCase().includes("BUY");
+
+        if (entryNum !== null && slNum !== null) {
+          const diff = Math.abs(entryNum - slNum);
+          // If SL distance is way off (< 5.0 or > 18.0 points), clamp to realistic ~$11.00 (11.0 pts)
+          if (diff < 5.0 || diff > 18.0) {
+            const targetDist = 11.0;
+            const fixedSl = isBuy
+              ? Number((entryNum - targetDist).toFixed(2))
+              : Number((entryNum + targetDist).toFixed(2));
+            parsed.sl_price = fixedSl.toFixed(2);
+            parsed._slAdjusted = true;
+          }
+        }
+
+        if (entryNum !== null && tpNum !== null) {
+          if (isBuy && tpNum <= entryNum) {
+            parsed.tp_price = Number((entryNum + 22.0).toFixed(2)).toFixed(2);
+          } else if (!isBuy && tpNum >= entryNum) {
+            parsed.tp_price = Number((entryNum - 22.0).toFixed(2)).toFixed(2);
+          }
+        }
+
+        return parsed;
       }
 
       function renderPicCheckBanner(picCheck) {
@@ -1248,6 +1360,47 @@
             ${detectedList ? `<span class="font-mono text-[11px] px-2 py-0.5 rounded bg-black/40 text-neoncyan">${detectedList}</span>` : ""}
           `;
         }
+      }
+
+      function renderSmcConfluenceRow(parsed) {
+        const row = document.getElementById("smcConfluenceRow");
+        if (!row) return;
+
+        const items = [
+          {
+            label: "LIQUIDITY / IDM",
+            val: parsed.liquidity_status || "SWEEP / POOL",
+            cls: "text-neoncyan border-neoncyan/25",
+          },
+          {
+            label: "P&D LOCATION",
+            val: parsed.pd_location || "PREMIUM / DISCOUNT",
+            cls: "text-instamber border-instamber/25",
+          },
+          {
+            label: "DRAW ON LIQ (DOL)",
+            val: parsed.dol_target || "TARGET POOL",
+            cls: "text-instgreen border-instgreen/25",
+          },
+          {
+            label: "HTF BIAS",
+            val: parsed.htf_bias || "MULTI-TF",
+            cls: "text-white border-white/15",
+          },
+        ];
+
+        row.classList.remove("hidden");
+        row.classList.add("grid");
+        row.innerHTML = items
+          .map(
+            (it) => `
+          <div class="p-2.5 rounded-xl bg-void/90 border ${it.cls}">
+            <div class="text-[9px] text-gray-400 tracking-wider">${it.label}</div>
+            <div class="text-[11px] font-bold mt-0.5 truncate">${it.val}</div>
+          </div>
+        `,
+          )
+          .join("");
       }
 
       function renderSignalSummaryCard(parsed) {
@@ -1330,8 +1483,13 @@
             </div>
           </div>
           ${
+            parsed._slAdjusted
+              ? `<div class="text-[11px] text-instamber">⚠️ SL ត្រូវបានកែសម្រួលដោយស្វ័យប្រវត្តិឱ្យនៅក្នុងដែន ~$11.00 (0.01 lot) ដើម្បីកុំឱ្យ SL វែងពេក។</div>`
+              : ""
+          }
+          ${
             parsed.selection_reason_km
-              ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">មូលហេតុរើស Pullback Limit Setup នេះ៖</strong> ${parsed.selection_reason_km}</p>`
+              ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">មូលហេតុរើស Pullback Limit Setup នេះ (ICT + SMC)：</strong> ${parsed.selection_reason_km}</p>`
               : ""
           }
         `;
@@ -1341,6 +1499,7 @@
         const canvas = document.getElementById("signalCanvas");
         const wrap = document.getElementById("markedCanvasWrap");
         const dlBtn = document.getElementById("btnDownloadMarked");
+        const axisBadge = document.getElementById("overlayAxisBadge");
         if (!canvas || !wrap) return;
 
         const img = new Image();
@@ -1352,13 +1511,15 @@
 
           const h = canvas.height;
           const w = canvas.width;
+          const scaleObj = parsedData?.chart1_price_scale || {};
 
-          const clampY = (ratio) => {
-            const r = Number.isFinite(ratio)
-              ? Math.min(0.92, Math.max(0.08, ratio))
-              : 0.5;
-            return Math.round(r * h);
-          };
+          if (axisBadge) {
+            if (scaleObj.top_price && scaleObj.bottom_price) {
+              axisBadge.textContent = `Scale #1: ${scaleObj.top_price} → ${scaleObj.bottom_price}`;
+            } else {
+              axisBadge.textContent = "Scale #1: Relative Chart Mapping";
+            }
+          }
 
           const drawPriceLine = (y, color, label, alignLeft = false) => {
             ctx.save();
@@ -1389,7 +1550,7 @@
             ctx.restore();
           };
 
-          // MODE 2: KEY LEVELS (1H / 4H / 1D)
+          // MODE 2: ICT + SMC KEY LEVELS (1H / 4H / 1D)
           if (currentAnalysisMode === "keylevels") {
             const levels = Array.isArray(parsedData.key_levels)
               ? parsedData.key_levels
@@ -1406,7 +1567,12 @@
               );
             } else {
               levels.slice(0, 6).forEach((lvl, idx) => {
-                const y = clampY(lvl.y_ratio);
+                const ratio = computeYRatioFromScale(
+                  lvl.price,
+                  scaleObj,
+                  lvl.y_ratio,
+                );
+                const y = Math.round(ratio * h);
                 const typeUpper = (lvl.type || "").toUpperCase();
                 let color = "#ffb703";
                 if (
@@ -1414,6 +1580,8 @@
                   typeUpper.includes("SUPPLY") ||
                   typeUpper.includes("PDH") ||
                   typeUpper.includes("PWH") ||
+                  typeUpper.includes("BSL") ||
+                  typeUpper.includes("EQH") ||
                   typeUpper.includes("OB-")
                 ) {
                   color = "#ff3b5c";
@@ -1422,6 +1590,8 @@
                   typeUpper.includes("DEMAND") ||
                   typeUpper.includes("PDL") ||
                   typeUpper.includes("PWL") ||
+                  typeUpper.includes("SSL") ||
+                  typeUpper.includes("EQL") ||
                   typeUpper.includes("OB+")
                 ) {
                   color = "#00e676";
@@ -1459,9 +1629,25 @@
             return;
           }
 
-          const entryY = clampY(parsedData.entry_y_ratio);
-          const slY = clampY(parsedData.sl_y_ratio);
-          const tpY = clampY(parsedData.tp_y_ratio);
+          const entryRatio = computeYRatioFromScale(
+            parsedData.entry_price,
+            scaleObj,
+            parsedData.entry_y_ratio,
+          );
+          const slRatio = computeYRatioFromScale(
+            parsedData.sl_price,
+            scaleObj,
+            parsedData.sl_y_ratio,
+          );
+          const tpRatio = computeYRatioFromScale(
+            parsedData.tp_price,
+            scaleObj,
+            parsedData.tp_y_ratio,
+          );
+
+          const entryY = Math.round(entryRatio * h);
+          const slY = Math.round(slRatio * h);
+          const tpY = Math.round(tpRatio * h);
 
           ctx.fillStyle = "rgba(255, 59, 92, 0.22)";
           ctx.fillRect(
@@ -1503,8 +1689,8 @@
         const link = document.createElement("a");
         link.download =
           currentAnalysisMode === "keylevels"
-            ? "xauusd-key-levels.png"
-            : "xauusd-signal-chart.png";
+            ? "xauusd-ict-smc-key-levels.png"
+            : "xauusd-ict-smc-signal.png";
         link.href = canvas.toDataURL("image/png");
         link.click();
       }
@@ -1516,11 +1702,13 @@
       function displayParsedResult(parsed) {
         const loadingEl = document.getElementById("visionLoading");
         const outputEl = document.getElementById("visionOutput");
-        renderPicCheckBanner(parsed.pic_check);
-        renderSignalSummaryCard(parsed);
-        drawOverlayOnCanvas(uploadedImages[0].dataUrl, parsed);
+        const normalized = validateAndNormalizeSignalPrices(parsed);
+        renderPicCheckBanner(normalized.pic_check);
+        renderSmcConfluenceRow(normalized);
+        renderSignalSummaryCard(normalized);
+        drawOverlayOnCanvas(uploadedImages[0].dataUrl, normalized);
         outputEl.innerHTML = marked.parse(
-          parsed.khmer_summary_markdown || "គ្មានសេចក្តីសង្ខេប",
+          normalized.khmer_summary_markdown || "គ្មានសេចក្តីសង្ខេប",
         );
         loadingEl.classList.add("hidden");
         outputEl.classList.remove("hidden");
@@ -1540,7 +1728,7 @@
           if (loadingText) {
             loadingText.textContent =
               attempt === 0
-                ? `កំពុង Check Pic និងវិភាគទាំង 4 Timeframe ជាមួយ ${modelName}...`
+                ? `កំពុង Check Pic និងវិភាគ ICT + SMC ជាមួយ ${modelName}...`
                 : `Server រវល់ (${modelName}) — កំពុងព្យាយាមម្តងទៀត (${attempt}/${maxRetries})...`;
           }
 
@@ -1594,6 +1782,7 @@
         const emptyEl = document.getElementById("visionEmptyState");
         const outputEl = document.getElementById("visionOutput");
         const bannerEl = document.getElementById("picCheckBanner");
+        const confRowEl = document.getElementById("smcConfluenceRow");
         const summaryCardEl = document.getElementById("signalSummaryCard");
         const btn = document.getElementById("btnAnalyzeVision");
         const userNote = document.getElementById("visionUserNote").value.trim();
@@ -1615,6 +1804,10 @@
         emptyEl.classList.add("hidden");
         outputEl.classList.add("hidden");
         bannerEl.classList.add("hidden");
+        if (confRowEl) {
+          confRowEl.classList.add("hidden");
+          confRowEl.classList.remove("grid");
+        }
         summaryCardEl.classList.add("hidden");
         document.getElementById("markedCanvasWrap").classList.add("hidden");
         loadingEl.classList.remove("hidden");
@@ -1633,17 +1826,30 @@ MANDATORY IMAGE VERIFICATION ("pic_check"):
    - Does the uploaded image match the user's note/expected timeframes, and is the chart price consistent with ${liveText || "current market price"}?
 2. If ANY image is NOT a trading chart, is the wrong symbol, has duplicate/wrong timeframes compared to what was requested or noted, or shows an outdated/mismatched price, set "has_mismatch": true (and "is_valid_chart": false if not a chart) and clearly explain in Khmer in "message_km" what is wrong or mismatched!`;
 
+        const scaleCalibrationInstruction = `
+CHART #1 PRICE AXIS CALIBRATION ("chart1_price_scale"):
+- Read the top-most visible price level ("top_price") and bottom-most visible price level ("bottom_price") along the right price axis of Image #1, along with their vertical fractions ("top_y_ratio" near top, "bottom_y_ratio" near bottom).
+- Every price level or entry/SL/TP drawn on Image #1 must correspond accurately to its numeric price value on Image #1's price axis!`;
+
         let promptText = "";
         let responseSchema = null;
 
         if (currentAnalysisMode === "keylevels") {
-          promptText = `You are an institutional ICT + SMC Gold (XAUUSD) analyst.
-Task: Identify major institutional KEY LEVELS on timeframes: ${selectedKeyLevelTF} (specifically looking across 1H, 4H, and 1D charts provided).
+          promptText = `You are a strict institutional ICT + SMC Gold (XAUUSD) analyst.
+Task: Identify high-probability ICT + SMC KEY LEVELS on timeframes: ${selectedKeyLevelTF} (specifically 1H, 4H, 1D).
 ${liveText} User note: "${userNote}".
 ${picCheckInstruction}
+${scaleCalibrationInstruction}
 
-Find the most important Key Levels (e.g., Previous Day High/Low PDH/PDL, Previous Week High/Low PWH/PWL, 1D/4H/1H Unmitigated Order Blocks, 1D/4H/1H Fair Value Gaps FVG, Major Liquidity Pools / Equal Highs & Lows).
-Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible on image #1 so we can draw them on image #1. Keep text concise, clear, and well-formatted in Khmer markdown.`;
+STRICT ICT + SMC KEY LEVEL RULES:
+- Distinguish between true ICT/SMC institutional levels and retail noise:
+  1. Key Reference Highs/Lows: PDH / PDL, PWH / PWL, Asian High/Low, or major swing highs/lows.
+  2. Liquidity Pools: BSL (Buy-Side Liquidity above highs / Equal Highs EqH), SSL (Sell-Side Liquidity below lows / Equal Lows EqL), or Inducement (IDM) swing points.
+  3. Order Blocks & Imbalance: Unmitigated Bullish OB (+OB) / Bearish OB (-OB) that caused a BOS/MSS, and unmitigated Fair Value Gaps (Bullish/Bearish FVG) or orderflow imbalances.
+  4. Equilibrium / Premium-Discount context relative to the dealing range.
+- Label each key level clearly with exact ICT/SMC terminology (e.g., "PDH", "PDL", "BSL / EqH", "SSL / EqL", "+OB (BOS)", "-OB (MSS)", "Bullish FVG", "Bearish FVG") and numeric price.
+- Provide up to 6 key levels visible on Image #1 with numeric price and y_ratio (0.08 to 0.92).
+- In "khmer_summary_markdown", explain each level in clear Khmer: តួនាទី (Liquidity vs. OB/FVG vs. PDH/PDL), ស្ថានភាព (Unmitigated / Swept / Mitigated), និងរបៀបប្រើពេលតម្លៃមកដល់ (Reaction / Rejection / Sweep & MSS)។`;
 
           responseSchema = {
             type: "OBJECT",
@@ -1666,6 +1872,25 @@ Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible
                   "message_km",
                 ],
               },
+              liquidity_status: { type: "STRING" },
+              pd_location: { type: "STRING" },
+              dol_target: { type: "STRING" },
+              htf_bias: { type: "STRING" },
+              chart1_price_scale: {
+                type: "OBJECT",
+                properties: {
+                  top_price: { type: "STRING" },
+                  bottom_price: { type: "STRING" },
+                  top_y_ratio: { type: "NUMBER" },
+                  bottom_y_ratio: { type: "NUMBER" },
+                },
+                required: [
+                  "top_price",
+                  "bottom_price",
+                  "top_y_ratio",
+                  "bottom_y_ratio",
+                ],
+              },
               key_levels: {
                 type: "ARRAY",
                 items: {
@@ -1682,21 +1907,37 @@ Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible
               },
               khmer_summary_markdown: { type: "STRING" },
             },
-            required: ["pic_check", "key_levels", "khmer_summary_markdown"],
+            required: [
+              "pic_check",
+              "liquidity_status",
+              "pd_location",
+              "dol_target",
+              "htf_bias",
+              "chart1_price_scale",
+              "key_levels",
+              "khmer_summary_markdown",
+            ],
           };
         } else {
-          promptText = `You are a practical, structured ICT + SMC Gold (XAUUSD) trading analyst matching the style of our direct chat analysis.
-Analyze the chart(s) across 4H, 1H, 30m, and 15m:
-1. INSPECT EACH TIMEFRAME (4H, 1H, 30m, 15m): Identify market structure (BOS / MSS / CHoCH), unmitigated Order Blocks (+OB / -OB), Fair Value Gaps (FVG), liquidity sweeps/pools, and current price location.
-2. PRACTICAL PULLBACK / LIMIT SETUP ("ចាប់ Pullback Limit ដូចក្នុង Chat"):
-   - When there is a clear directional impulse/momentum on 1H/30m/15m with identifiable nearby Pullback/Limit zones (such as Bullish FVG / +OB / Discount pullback for BUY LIMIT, or Bearish FVG / -OB / Supply/Liquidity rejection zone for SELL LIMIT), output ONE actionable setup ("has_setup": true, "direction": "BUY LIMIT" or "SELL LIMIT") targeting that pullback zone rather than chasing the extreme top/bottom!
-   - Also clearly document both the primary Pullback Limit plan and any alternative/conditional zone (Buy pullback or Sell rejection zone) inside "khmer_summary_markdown".
-   - Set "has_setup": false and "direction": "NONE" ONLY when price is in heavy choppy/sideway range with no clear zone or extreme conflicting structure.
-   - Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10.0 to 13.0 gold points) with BE around 1:1 to 1:1.5, and align entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) accurately with image #1.
-3. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER: Write clean, practical Khmer markdown ("khmer_summary_markdown") with Multi-Timeframe analysis, Primary Setup (Entry / SL / TP on 0.01 lot), and Conditional Watchlist / Risk Notes. Avoid unescaped double quotes inside strings.
+          promptText = `You are a disciplined, practical ICT + SMC Gold (XAUUSD) trading analyst.
+Analyze the chart(s) across 4H, 1H, 30m, and 15m using genuine ICT + SMC principles:
+1. MULTI-TIMEFRAME ICT + SMC BREAKDOWN (4H, 1H, 30m, 15m):
+   - Market Structure: BOS / MSS / CHoCH and dealing range high-to-low.
+   - Liquidity & Inducement (IDM): Identify BSL/SSL, Equal Highs/Lows, whether liquidity was swept or inducement formed before the POI.
+   - Premium vs. Discount: State whether the pullback zone sits in Discount (<50% eq, preferred for BUY LIMIT) or Premium (>50% eq, preferred for SELL LIMIT).
+   - POI & Draw on Liquidity (DOL): Unmitigated +OB / -OB / FVG and the logical DOL target for TP.
+2. PULLBACK LIMIT SETUP ("ចាប់ Pullback Limit តាម ICT + SMC"):
+   - Output ONE setup ("has_setup": true, "direction": "BUY LIMIT" or "SELL LIMIT") when there is a clear directional impulse/structure with a valid nearby Pullback POI (+OB / Bullish FVG / Discount for BUY LIMIT, or -OB / Bearish FVG / Supply & Liquidity sweep zone for SELL LIMIT) that is visible on or alignable with Image #1's price scale.
+   - Set "has_setup": false and "direction": "NONE" when price is in heavy choppy/sideway consolidation without a clean POI or when structure/POI is ambiguous.
+   - Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10.0 to 13.0 gold points) with BE target at 1:1 to 1:1.5.
+3. ACCURATE CHART #1 OVERLAY MAPPING:
+   - Populate "chart1_price_scale" accurately from Image #1's price axis, and set numeric "entry_price", "sl_price", "tp_price" plus accurate "entry_y_ratio", "sl_y_ratio", "tp_y_ratio" (0.08 to 0.92) matching Image #1.
+4. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER ("khmer_summary_markdown"):
+   - Cover 4-TF SMC/ICT Analysis, Liquidity & Premium/Discount Check, Primary Pullback Limit Setup (0.01 lot, SL $10–$13, BE 1:1–1:1.5, DOL TP), and Conditional Watchlist / Risk Notes. Avoid unescaped double quotes inside strings.
 
 ${liveText} User note: "${userNote}".
-${picCheckInstruction}`;
+${picCheckInstruction}
+${scaleCalibrationInstruction}`;
 
           responseSchema = {
             type: "OBJECT",
@@ -1721,6 +1962,9 @@ ${picCheckInstruction}`;
               },
               htf_bias: { type: "STRING" },
               mtf_alignment: { type: "STRING" },
+              liquidity_status: { type: "STRING" },
+              pd_location: { type: "STRING" },
+              dol_target: { type: "STRING" },
               has_setup: { type: "BOOLEAN" },
               direction: { type: "STRING" },
               setup_quality: { type: "STRING" },
@@ -1730,6 +1974,21 @@ ${picCheckInstruction}`;
               sl_price: { type: "STRING" },
               tp_price: { type: "STRING" },
               be_target: { type: "STRING" },
+              chart1_price_scale: {
+                type: "OBJECT",
+                properties: {
+                  top_price: { type: "STRING" },
+                  bottom_price: { type: "STRING" },
+                  top_y_ratio: { type: "NUMBER" },
+                  bottom_y_ratio: { type: "NUMBER" },
+                },
+                required: [
+                  "top_price",
+                  "bottom_price",
+                  "top_y_ratio",
+                  "bottom_y_ratio",
+                ],
+              },
               entry_y_ratio: { type: "NUMBER" },
               sl_y_ratio: { type: "NUMBER" },
               tp_y_ratio: { type: "NUMBER" },
@@ -1739,6 +1998,9 @@ ${picCheckInstruction}`;
               "pic_check",
               "htf_bias",
               "mtf_alignment",
+              "liquidity_status",
+              "pd_location",
+              "dol_target",
               "has_setup",
               "direction",
               "setup_quality",
@@ -1748,6 +2010,7 @@ ${picCheckInstruction}`;
               "sl_price",
               "tp_price",
               "be_target",
+              "chart1_price_scale",
               "entry_y_ratio",
               "sl_y_ratio",
               "tp_y_ratio",
@@ -1766,7 +2029,7 @@ ${picCheckInstruction}`;
           })),
         ];
 
-        const modelsToTry = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
 
         try {
           let data = null;
