@@ -144,7 +144,7 @@
               </h1>
               <span
                 class="px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-full bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
-                >4-TF + ICT/SMC KEY LEVELS</span
+                >4-TF + KEY LEVELS</span
               >
             </div>
             <p class="text-[11px] sm:text-xs text-gray-400">
@@ -362,9 +362,7 @@
               <span class="text-[11px] font-bold text-instamber"
                 >🎯 ជ្រើសរើស Timeframe សម្រាប់រក Key Levels</span
               >
-              <span class="text-[10px] font-mono text-gray-400"
-                >ICT/SMC HTF</span
-              >
+              <span class="text-[10px] font-mono text-gray-400">HTF ZONES</span>
             </div>
             <div class="grid grid-cols-4 gap-1.5">
               <button
@@ -457,8 +455,7 @@
               ចុចជ្រើសរើសរូបភាព Chart (រហូតដល់ 4 រូប) ឬ Paste (Ctrl+V)
             </p>
             <p id="dropZoneHint" class="text-xs text-gray-400 mt-1">
-              ដាក់រូប #1 ជា Chart ដែលចង់គូស Entry/SL/TP ឬ Key Levels
-              ឱ្យច្បាស់បំផុត
+              វិភាគទាំង 4 Timeframe + ចាប់ Pullback Limit ឬ NO SETUP
             </p>
           </label>
 
@@ -569,7 +566,7 @@
                 class="w-10 h-10 border-4 border-neoncyan/20 border-t-neoncyan rounded-full animate-spin"
               ></div>
               <p id="visionLoadingText" class="text-sm font-bold text-neoncyan">
-                កំពុង Check Pic និងវិភាគ ICT + SMC...
+                កំពុង Check Pic និងវិភាគទាំង 4 Timeframe...
               </p>
             </div>
 
@@ -583,9 +580,8 @@
               <p class="text-xs max-w-md mx-auto">
                 ជ្រើសរើស Mode (<strong>4-TF Signal</strong> ឬ
                 <strong>Key Levels 1H/4H/1D</strong>) រួច Upload/Paste រូបភាព
-                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹងវិភាគ ICT + SMC (Sweep/IDM,
-                Premium/Discount, DOL) និងគូស Entry / SL / TP ឬ Key Levels
-                ឱ្យចំតម្លៃលើរូប #1!
+                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹងវិភាគទាំង 4 TF និងចាប់ Pullback Limit
+                Setup!
               </p>
             </div>
 
@@ -593,12 +589,6 @@
             <div
               id="picCheckBanner"
               class="hidden rounded-xl p-3.5 text-xs"
-            ></div>
-
-            <!-- ICT + SMC CONFLUENCE ROW -->
-            <div
-              id="smcConfluenceRow"
-              class="hidden grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono"
             ></div>
 
             <!-- CLEAR ENTRY / SL / TP SUMMARY CARD -->
@@ -609,21 +599,8 @@
 
             <div
               id="markedCanvasWrap"
-              class="hidden rounded-xl overflow-hidden border border-white/15 bg-black space-y-2"
+              class="hidden rounded-xl overflow-hidden border border-white/15 bg-black"
             >
-              <div
-                id="overlayScaleNote"
-                class="px-3 py-1.5 bg-obsidian/90 border-b border-white/10 text-[11px] text-gray-300 flex flex-wrap items-center justify-between gap-2"
-              >
-                <span>
-                  📍 <strong class="text-neoncyan">Chart Overlay (#1):</strong>
-                  បន្ទាត់ត្រូវបានគណនាតាមតម្លៃ Price Axis (High–Low) លើរូបភាព #1
-                </span>
-                <span
-                  id="overlayAxisBadge"
-                  class="font-mono text-[10px] text-instamber"
-                ></span>
-              </div>
               <canvas id="signalCanvas" class="w-full h-auto block"></canvas>
             </div>
 
@@ -641,10 +618,7 @@
               <strong class="text-white font-mono">0.01 Lot</strong> | Risk Cap:
               <strong class="text-white font-mono">$10–$13</strong></span
             >
-            <span
-              >ICT + SMC Pullback Limit • Price-Mapped Overlay • Auto Pic
-              Check</span
-            >
+            <span>4-TF Analysis + Pullback Limit • Auto Pic Check</span>
           </div>
         </div>
       </section>
@@ -663,7 +637,7 @@
       </div>
     </div>
 
-    <!-- Discipline Rules Modal (Updated ICT + SMC Lessons) -->
+    <!-- Discipline Rules Modal -->
     <div
       id="rulesModal"
       class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
@@ -676,7 +650,7 @@
         >
           <h3 class="text-base font-bold text-neoncyan flex items-center gap-2">
             <span>🛡️</span>
-            <span>វិន័យជួញដូរ Set &amp; Forget (ICT + SMC Lessons)</span>
+            <span>វិន័យជួញដូរ Set &amp; Forget (ICT + SMC Rules)</span>
           </h3>
           <button
             onclick="toggleRulesModal(false)"
@@ -691,38 +665,24 @@
           <li>
             <strong class="text-white">១. ទំហំ Lot និងហានិភ័យថេរ៖</strong>
             ប្រើប្រាស់ <code>0.01 lot</code> ជានិច្ច ដោយកំណត់ Stop Loss ចន្លោះ
-            <code>$10.00 – $13.00</code> (~10.0–13.0 ពិន្ទុមាស) និងរំកិល SL មក
-            Breakeven (BE) នៅ <code>1:1 ឬ 1:1.5</code>។
+            <code>$10.00 – $13.50</code>។
           </li>
           <li>
             <strong class="text-white"
-              >២. រចនាសម្ព័ន្ធទីផ្សារ និង Liquidity / Inducement (ICT +
-              SMC)៖</strong
+              >២. វិភាគទាំង 4 TF + Pullback Limit៖</strong
             >
-            ពិនិត្យ Trend / Structure (<code>BOS</code>, <code>MSS</code>,
-            <code>CHoCH</code>) ឆ្លងកាត់ 4H, 1H, 30m, និង 15m ព្រមទាំង Liquidity
-            Sweep / Inducement (<code>IDM</code>) និង Draw on Liquidity
-            (<code>DOL</code>) មុនចូល Pullback Limit។
+            វិភាគ 4H, 1H, 30m, និង 15m ដើម្បីចាប់ Pullback Limit នៅតំបន់ Zone
+            ដែលមាន Confluence ហើយបើ Sideway / Choppy គ្មាន Zone ច្បាស់ នឹងចេញ
+            <code>NO SETUP</code>។
           </li>
           <li>
-            <strong class="text-white"
-              >៣. Premium &amp; Discount (50%) និង Key Zones៖</strong
-            >
-            រកចំណុច <code>BUY LIMIT</code> នៅតំបន់ Discount (&lt;50%) លើ
-            <code>+OB</code> ឬ Bullish <code>FVG</code> និង
-            <code>SELL LIMIT</code> នៅតំបន់ Premium (&gt;50%) លើ
-            <code>-OB</code> ឬ Bearish <code>FVG</code>។ បើទីផ្សារ Sideway /
-            Choppy គ្មាន Zone ច្បាស់ ត្រូវកំណត់ <code>NO SETUP</code>។
+            <strong class="text-white">៣. Pic Check Validation៖</strong>
+            ផ្ទៀងផ្ទាត់ជានិច្ចថា រូប Chart ត្រូវ Symbol (<code>XAUUSD</code>)
+            និង Timeframe មុនចូល Order។
           </li>
           <li>
-            <strong class="text-white"
-              >៤. Killzones, Pic Check និង Key Levels (1H/4H/1D)៖</strong
-            >
-            ផ្តល់អាទិភាពពេល London / NY Killzones ពិនិត្យ Symbol
-            (<code>XAUUSD</code>) និង Timeframe ឱ្យត្រូវមុន trade ហើយកំណត់ Key
-            Levels ដូចជា
-            <code>PDH/PDL</code>, <code>PWH/PWL</code>, <code>BSL/SSL</code>,
-            <code>OB</code>, និង <code>FVG</code>។
+            <strong class="text-white">៤. Breakeven (BE)：</strong> រំកិល SL មក
+            BE នៅ <code>1:1 ឬ 1:1.5</code>។
           </li>
         </ul>
         <div class="pt-2 flex justify-end">
@@ -738,33 +698,13 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v12_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v5_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
       let uploadedImages = [];
       let currentAnalysisMode = "signal"; // 'signal' | 'keylevels'
       let selectedKeyLevelTF = "ALL (1H, 4H, 1D)";
-      let loadingTickerInterval = null;
-
-      function startLoadingTimer(baseLabel) {
-        stopLoadingTimer();
-        const startedAt = Date.now();
-        const el = document.getElementById("visionLoadingText");
-        const update = () => {
-          const sec = Math.floor((Date.now() - startedAt) / 1000);
-          if (el) el.textContent = `${baseLabel} (${sec}s)`;
-        };
-        update();
-        loadingTickerInterval = setInterval(update, 1000);
-      }
-
-      function stopLoadingTimer() {
-        if (loadingTickerInterval) {
-          clearInterval(loadingTickerInterval);
-          loadingTickerInterval = null;
-        }
-      }
 
       function setAnalysisMode(mode) {
         currentAnalysisMode = mode;
@@ -783,10 +723,10 @@
           klBox.classList.remove("hidden");
           headerTitle.textContent =
             "Upload Screenshot (1H / 4H / 1D Key Levels)";
-          analyzeLabel.textContent = "រក ICT/SMC Key Levels";
+          analyzeLabel.textContent = "រក Key Levels & Check Pic";
           if (noteInput) {
             noteInput.placeholder =
-              "ឧ. #1=1H, #2=4H, #3=1D — រក PDH/PDL, BSL/SSL, +OB/-OB, FVG";
+              "ឧ. #1=1H, #2=4H, #3=1D — រក PDH/PDL, OB, FVG, Liquidity";
           }
         } else {
           btnSignal.className =
@@ -962,7 +902,7 @@
           }
         } catch (_) {}
 
-        const referenceSpot = liveGoldPrice || 3663.2;
+        const referenceSpot = liveGoldPrice || 3574.0;
         applyGoldPriceUI(referenceSpot, "REF SPOT", false);
         if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
       }
@@ -1091,13 +1031,11 @@
           );
           if (pastedImgs.length > 0) {
             handleFiles(pastedImgs);
-            const expectedCount = Math.min(
+            const actualCount = Math.min(
               MAX_IMAGES,
               uploadedImages.length + pastedImgs.length,
             );
-            showToast(
-              `បានបន្ថែមរូបភាព Chart (${expectedCount}/${MAX_IMAGES})!`,
-            );
+            showToast(`បានបន្ថែមរូបភាព Chart (${actualCount}/${MAX_IMAGES})!`);
           }
         }
       });
@@ -1114,7 +1052,7 @@
             (img, i) => `
         <div class="relative rounded-xl overflow-hidden border border-white/15 aspect-video bg-black group">
           <img src="${img.dataUrl}" class="w-full h-full object-cover" alt="Chart ${i + 1}" />
-          <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/85 text-[10px] font-mono text-neoncyan">#${i + 1}${i === 0 ? " (OVERLAY)" : ""}</span>
+          <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/85 text-[10px] font-mono text-neoncyan">#${i + 1}</span>
           <button type="button" onclick="deleteSingleImage(${i})" title="លុបរូបភាពនេះ" aria-label="Delete image ${i + 1}" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/85 hover:bg-instred text-white text-xs font-bold flex items-center justify-center border border-white/20 transition">&times;</button>
         </div>
       `,
@@ -1132,12 +1070,6 @@
         document.getElementById("btnDownloadMarked").classList.add("hidden");
         document.getElementById("picCheckBanner").classList.add("hidden");
         document.getElementById("picCheckBanner").innerHTML = "";
-        const confRow = document.getElementById("smcConfluenceRow");
-        if (confRow) {
-          confRow.classList.add("hidden");
-          confRow.classList.remove("grid");
-          confRow.innerHTML = "";
-        }
         document.getElementById("signalSummaryCard").classList.add("hidden");
         document.getElementById("signalSummaryCard").innerHTML = "";
         document.getElementById("visionOutput").classList.add("hidden");
@@ -1178,60 +1110,238 @@
         return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|${normalizedNote}|${imgSignatures}`;
       }
 
-      function parsePriceNumber(val) {
-        if (typeof val === "number") return Number.isFinite(val) ? val : null;
-        if (!val) return null;
-        const m = String(val)
-          .replace(/,/g, "")
-          .match(/(\d{3,5}(?:\.\d+)?)/);
-        if (!m) return null;
-        const num = parseFloat(m[1]);
-        return Number.isFinite(num) && num > 100 ? num : null;
-      }
+      function parseJsonSafely(rawText) {
+        const cleaned = (rawText || "")
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/i, "")
+          .trim();
 
-      function computeYRatioFromScale(priceVal, scaleObj, fallbackRatio) {
-        const p = parsePriceNumber(priceVal);
-        const topP = parsePriceNumber(scaleObj?.top_price);
-        const botP = parsePriceNumber(scaleObj?.bottom_price);
-        const topY =
-          Number.isFinite(scaleObj?.top_y_ratio) &&
-          scaleObj.top_y_ratio >= 0.03 &&
-          scaleObj.top_y_ratio <= 0.45
-            ? scaleObj.top_y_ratio
-            : 0.08;
-        const botY =
-          Number.isFinite(scaleObj?.bottom_y_ratio) &&
-          scaleObj.bottom_y_ratio >= 0.55 &&
-          scaleObj.bottom_y_ratio <= 0.97
-            ? scaleObj.bottom_y_ratio
-            : 0.92;
+        const firstBrace = cleaned.indexOf("{");
+        const candidate =
+          firstBrace !== -1 ? cleaned.slice(firstBrace) : cleaned;
 
-        if (p !== null && topP !== null && botP !== null && topP > botP) {
-          const frac = (topP - p) / (topP - botP);
-          const mapped = topY + frac * (botY - topY);
-          return Math.min(0.92, Math.max(0.08, mapped));
-        }
-        return Number.isFinite(fallbackRatio)
-          ? Math.min(0.92, Math.max(0.08, fallbackRatio))
-          : 0.5;
-      }
-
-      function extractJsonBlock(text) {
-        const match = (text || "").match(/\{[\s\S]*\}/);
-        if (!match) return null;
         try {
-          return JSON.parse(match[0]);
-        } catch (_) {
-          return null;
+          return JSON.parse(candidate);
+        } catch (_) {}
+
+        let repaired = candidate;
+        let inString = false;
+        let escaped = false;
+        for (let i = 0; i < repaired.length; i++) {
+          const ch = repaired[i];
+          if (escaped) {
+            escaped = false;
+            continue;
+          }
+          if (ch === "\\") {
+            escaped = true;
+            continue;
+          }
+          if (ch === '"') {
+            inString = !inString;
+          }
         }
+        if (inString) {
+          repaired += '"';
+        }
+
+        const stack = [];
+        inString = false;
+        escaped = false;
+        for (let i = 0; i < repaired.length; i++) {
+          const ch = repaired[i];
+          if (escaped) {
+            escaped = false;
+            continue;
+          }
+          if (ch === "\\") {
+            escaped = true;
+            continue;
+          }
+          if (ch === '"') {
+            inString = !inString;
+            continue;
+          }
+          if (!inString) {
+            if (ch === "{") stack.push("}");
+            else if (ch === "[") stack.push("]");
+            else if ((ch === "}" || ch === "]") && stack.length > 0) {
+              stack.pop();
+            }
+          }
+        }
+
+        while (stack.length > 0) {
+          repaired += stack.pop();
+        }
+
+        try {
+          return JSON.parse(repaired);
+        } catch (_) {
+          const mdMatch = candidate.match(
+            /"khmer_summary_markdown"\s*:\s*"([\s\S]*)/,
+          );
+          if (mdMatch && mdMatch[1]) {
+            const extractedMd = mdMatch[1]
+              .replace(/"\s*,?\s*"[^"]*"\s*:[\s\S]*$/, "")
+              .replace(/"\s*\}\s*$/, "")
+              .replace(/\\n/g, "\n")
+              .replace(/\\"/g, '"');
+            return {
+              pic_check: {
+                is_valid_chart: true,
+                has_mismatch: false,
+                detected_timeframes: [],
+                message_km:
+                  "បានទាញលទ្ធផលវិភាគដោយស្វ័យប្រវត្តិ (ទម្រង់ JSON ត្រូវបានជួសជុល)។",
+              },
+              htf_bias: "PULLBACK",
+              mtf_alignment: "PULLBACK ZONE",
+              has_setup: false,
+              direction: "NONE",
+              setup_quality: "NONE",
+              no_setup_reason_km: "សូមពិនិត្យលម្អិតក្នុងសេចក្តីវិភាគខាងក្រោម។",
+              khmer_summary_markdown: extractedMd,
+            };
+          }
+          throw new Error("មិនអាចអានទិន្នន័យ JSON ពី AI បានត្រឹមត្រូវ។");
+        }
+      }
+
+      function renderPicCheckBanner(picCheck) {
+        const banner = document.getElementById("picCheckBanner");
+        if (!banner || !picCheck) return;
+
+        const isValid = picCheck.is_valid_chart !== false;
+        const hasMismatch = Boolean(picCheck.has_mismatch);
+        const messageKm =
+          picCheck.message_km ||
+          (isValid && !hasMismatch
+            ? "រូបភាពត្រឹមត្រូវតាមលក្ខខណ្ឌ Chart XAUUSD និង Timeframe។"
+            : "រកឃើញភាពខុសគ្នានៅលើរូបភាព Chart សូមពិនិត្យមើលខាងក្រោម!");
+        const detectedList = Array.isArray(picCheck.detected_timeframes)
+          ? picCheck.detected_timeframes.join(" | ")
+          : "";
+
+        banner.classList.remove("hidden");
+
+        if (!isValid || hasMismatch) {
+          banner.className =
+            "rounded-xl p-3.5 text-xs bg-instamber/15 border border-instamber/50 text-amber-200 space-y-1.5";
+          banner.innerHTML = `
+            <div class="flex items-center gap-2 font-bold text-instamber text-sm">
+              <span>⚠️</span>
+              <span>បញ្ជាក់ការពិនិត្យរូបភាព (Pic Check Warning)</span>
+            </div>
+            <p class="leading-relaxed">${messageKm}</p>
+            ${detectedList ? `<div class="font-mono text-[11px] text-white/90 bg-black/40 px-2.5 py-1 rounded-lg">Timeframes ដែលរកឃើញលើរូប៖ ${detectedList}</div>` : ""}
+          `;
+        } else {
+          banner.className =
+            "rounded-xl p-3 text-xs bg-instgreen/10 border border-instgreen/35 text-emerald-200 flex flex-wrap items-center justify-between gap-2";
+          banner.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-instgreen font-bold">✓ Pic Check ត្រឹមត្រូវ៖</span>
+              <span>${messageKm}</span>
+            </div>
+            ${detectedList ? `<span class="font-mono text-[11px] px-2 py-0.5 rounded bg-black/40 text-neoncyan">${detectedList}</span>` : ""}
+          `;
+        }
+      }
+
+      function renderSignalSummaryCard(parsed) {
+        const card = document.getElementById("signalSummaryCard");
+        if (!card || currentAnalysisMode === "keylevels") {
+          if (card) card.classList.add("hidden");
+          return;
+        }
+
+        const hasSignal =
+          parsed &&
+          parsed.has_setup &&
+          parsed.direction &&
+          parsed.direction !== "NONE";
+
+        card.classList.remove("hidden");
+
+        if (!hasSignal) {
+          card.className =
+            "rounded-xl p-3.5 bg-instred/10 border border-instred/40 space-y-1.5";
+          card.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2.5 py-1 rounded-lg bg-instred text-white font-mono font-extrabold text-xs">NO SETUP</span>
+                ${
+                  parsed?.mtf_alignment
+                    ? `<span class="px-2 py-0.5 rounded bg-black/40 border border-white/15 text-[10px] font-mono text-instamber">${parsed.mtf_alignment}</span>`
+                    : ""
+                }
+                <span class="text-xs text-red-200 font-bold">ទីផ្សារ Sideway / Choppy ឬគ្មាន Zone ច្បាស់ — រង់ចាំ Setup ច្បាស់សិន</span>
+              </div>
+              <span class="font-mono text-[11px] text-gray-300">0.01 Lot • SL $10–$13</span>
+            </div>
+            ${
+              parsed?.no_setup_reason_km
+                ? `<p class="text-[11px] text-red-200/85 leading-relaxed">${parsed.no_setup_reason_km}</p>`
+                : ""
+            }
+          `;
+          return;
+        }
+
+        const isBuy = String(parsed.direction).toUpperCase().includes("BUY");
+        const dirBadgeClass = isBuy
+          ? "bg-instgreen/20 text-instgreen border border-instgreen/40"
+          : "bg-instred/20 text-instred border border-instred/40";
+
+        card.className =
+          "rounded-xl p-3.5 bg-void/95 border border-neoncyan/35 space-y-2.5";
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-1 rounded-lg font-mono font-extrabold text-xs ${dirBadgeClass}">${parsed.direction}</span>
+              <span class="text-xs font-bold text-white">HTF Bias: <span class="text-neoncyan">${parsed.htf_bias || "LOCKED"}</span></span>
+              ${
+                parsed.mtf_alignment
+                  ? `<span class="px-2 py-0.5 rounded bg-neoncyan/10 border border-neoncyan/30 text-[10px] font-mono text-neoncyan">${parsed.mtf_alignment}</span>`
+                  : ""
+              }
+              ${
+                parsed.setup_quality
+                  ? `<span class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-instamber">QUALITY: ${parsed.setup_quality}</span>`
+                  : ""
+              }
+            </div>
+            <span class="text-[11px] font-mono text-gray-400">0.01 Lot • BE @ ${parsed.be_target || "1:1–1.5"}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 font-mono text-center">
+            <div class="p-2 rounded-lg bg-obsidian border border-neoncyan/25">
+              <div class="text-[10px] text-gray-400">ENTRY PRICE</div>
+              <div class="text-sm font-extrabold text-neoncyan mt-0.5">${parsed.entry_price || "N/A"}</div>
+            </div>
+            <div class="p-2 rounded-lg bg-obsidian border border-instred/25">
+              <div class="text-[10px] text-gray-400">STOP LOSS ($10–$13)</div>
+              <div class="text-sm font-extrabold text-instred mt-0.5">${parsed.sl_price || "N/A"}</div>
+            </div>
+            <div class="p-2 rounded-lg bg-obsidian border border-instgreen/25">
+              <div class="text-[10px] text-gray-400">TAKE PROFIT</div>
+              <div class="text-sm font-extrabold text-instgreen mt-0.5">${parsed.tp_price || "N/A"}</div>
+            </div>
+          </div>
+          ${
+            parsed.selection_reason_km
+              ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">មូលហេតុរើស Pullback Limit Setup នេះ៖</strong> ${parsed.selection_reason_km}</p>`
+              : ""
+          }
+        `;
       }
 
       function drawOverlayOnCanvas(dataUrl, parsedData) {
         const canvas = document.getElementById("signalCanvas");
         const wrap = document.getElementById("markedCanvasWrap");
         const dlBtn = document.getElementById("btnDownloadMarked");
-        const axisBadge = document.getElementById("overlayAxisBadge");
-        if (!canvas || !wrap || !parsedData) return;
+        if (!canvas || !wrap) return;
 
         const img = new Image();
         img.onload = () => {
@@ -1242,15 +1352,13 @@
 
           const h = canvas.height;
           const w = canvas.width;
-          const scaleObj = parsedData?.chart1_price_scale || {};
 
-          if (axisBadge) {
-            if (scaleObj.top_price && scaleObj.bottom_price) {
-              axisBadge.textContent = `Scale #1: ${scaleObj.top_price} → ${scaleObj.bottom_price}`;
-            } else {
-              axisBadge.textContent = "Scale #1: Relative Mapping";
-            }
-          }
+          const clampY = (ratio) => {
+            const r = Number.isFinite(ratio)
+              ? Math.min(0.92, Math.max(0.08, ratio))
+              : 0.5;
+            return Math.round(r * h);
+          };
 
           const drawPriceLine = (y, color, label, alignLeft = false) => {
             ctx.save();
@@ -1281,59 +1389,106 @@
             ctx.restore();
           };
 
+          // MODE 2: KEY LEVELS (1H / 4H / 1D)
           if (currentAnalysisMode === "keylevels") {
             const levels = Array.isArray(parsedData.key_levels)
               ? parsedData.key_levels
               : [];
-            levels.slice(0, 6).forEach((lvl, idx) => {
-              const ratio = computeYRatioFromScale(
-                lvl.price,
-                scaleObj,
-                lvl.y_ratio,
+            if (levels.length === 0) {
+              ctx.fillStyle = "rgba(255, 183, 3, 0.22)";
+              ctx.fillRect(0, h * 0.12, w, h * 0.09);
+              ctx.fillStyle = "#ffb703";
+              ctx.font = `bold ${Math.max(16, Math.round(w * 0.022))}px sans-serif`;
+              ctx.fillText(
+                "NO CLEAR KEY LEVELS DETECTED",
+                Math.round(w * 0.04),
+                Math.round(h * 0.18),
               );
-              const y = Math.round(ratio * h);
-              const labelText = `[${lvl.timeframe || "HTF"}] ${lvl.label || lvl.type || "LEVEL"}: ${lvl.price || ""}`;
-              drawPriceLine(y, "#ffb703", labelText, idx % 2 === 1);
-            });
+            } else {
+              levels.slice(0, 6).forEach((lvl, idx) => {
+                const y = clampY(lvl.y_ratio);
+                const typeUpper = (lvl.type || "").toUpperCase();
+                let color = "#ffb703";
+                if (
+                  typeUpper.includes("RESISTANCE") ||
+                  typeUpper.includes("SUPPLY") ||
+                  typeUpper.includes("PDH") ||
+                  typeUpper.includes("PWH") ||
+                  typeUpper.includes("OB-")
+                ) {
+                  color = "#ff3b5c";
+                } else if (
+                  typeUpper.includes("SUPPORT") ||
+                  typeUpper.includes("DEMAND") ||
+                  typeUpper.includes("PDL") ||
+                  typeUpper.includes("PWL") ||
+                  typeUpper.includes("OB+")
+                ) {
+                  color = "#00e676";
+                } else if (typeUpper.includes("FVG")) {
+                  color = "#00f0ff";
+                }
+                const tfTag = lvl.timeframe ? `[${lvl.timeframe}] ` : "";
+                const labelText = `${tfTag}${lvl.label || lvl.type || "KEY LEVEL"}: ${lvl.price || ""}`;
+                drawPriceLine(y, color, labelText, idx % 2 === 1);
+              });
+            }
             wrap.classList.remove("hidden");
             dlBtn.classList.remove("hidden");
             return;
           }
 
-          const dir = String(parsedData.direction || "").toUpperCase();
-          if (!dir || dir === "NONE" || dir === "NO SETUP") {
-            wrap.classList.add("hidden");
+          // MODE 1: 4-TF SIGNAL OVERLAY
+          const hasSignal =
+            parsedData &&
+            parsedData.has_setup &&
+            parsedData.direction &&
+            parsedData.direction !== "NONE";
+          if (!hasSignal) {
+            ctx.fillStyle = "rgba(255, 59, 92, 0.22)";
+            ctx.fillRect(0, h * 0.12, w, h * 0.1);
+            ctx.fillStyle = "#ff3b5c";
+            ctx.font = `bold ${Math.max(18, Math.round(w * 0.024))}px sans-serif`;
+            ctx.fillText(
+              "NO SETUP (SIDEWAY / NO CLEAR ZONE)",
+              Math.round(w * 0.04),
+              Math.round(h * 0.18),
+            );
+            wrap.classList.remove("hidden");
+            dlBtn.classList.remove("hidden");
             return;
           }
 
-          const entryY = Math.round(
-            computeYRatioFromScale(
-              parsedData.entry_price,
-              scaleObj,
-              parsedData.entry_y_ratio,
-            ) * h,
+          const entryY = clampY(parsedData.entry_y_ratio);
+          const slY = clampY(parsedData.sl_y_ratio);
+          const tpY = clampY(parsedData.tp_y_ratio);
+
+          ctx.fillStyle = "rgba(255, 59, 92, 0.22)";
+          ctx.fillRect(
+            0,
+            Math.min(entryY, slY),
+            w,
+            Math.max(12, Math.abs(slY - entryY)),
           );
-          const slY = Math.round(
-            computeYRatioFromScale(
-              parsedData.sl_price,
-              scaleObj,
-              parsedData.sl_y_ratio,
-            ) * h,
-          );
-          const tpY = Math.round(
-            computeYRatioFromScale(
-              parsedData.tp_price,
-              scaleObj,
-              parsedData.tp_y_ratio,
-            ) * h,
+
+          ctx.fillStyle = "rgba(0, 230, 118, 0.16)";
+          ctx.fillRect(
+            0,
+            Math.min(entryY, tpY),
+            w,
+            Math.max(12, Math.abs(tpY - entryY)),
           );
 
           drawPriceLine(
             entryY,
             "#00f0ff",
-            `${dir} ENTRY: ${parsedData.entry_price || "N/A"}`,
+            `${parsedData.direction} ENTRY: ${parsedData.entry_price || "N/A"} (0.01)`,
           );
-          drawPriceLine(slY, "#ff3b5c", `SL: ${parsedData.sl_price || "N/A"}`);
+          drawPriceLine(
+            slY,
+            "#ff3b5c",
+            `SL: ${parsedData.sl_price || "N/A"} ($10-$13)`,
+          );
           drawPriceLine(tpY, "#00e676", `TP: ${parsedData.tp_price || "N/A"}`);
 
           wrap.classList.remove("hidden");
@@ -1342,179 +1497,83 @@
         img.src = dataUrl;
       }
 
-      function renderMarkdownResult(rawText) {
-        stopLoadingTimer();
+      function downloadMarkedChart() {
+        const canvas = document.getElementById("signalCanvas");
+        if (!canvas) return;
+        const link = document.createElement("a");
+        link.download =
+          currentAnalysisMode === "keylevels"
+            ? "xauusd-key-levels.png"
+            : "xauusd-signal-chart.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      function displayParsedResult(parsed) {
         const loadingEl = document.getElementById("visionLoading");
         const outputEl = document.getElementById("visionOutput");
-        const banner = document.getElementById("picCheckBanner");
-        const confRow = document.getElementById("smcConfluenceRow");
-        const card = document.getElementById("signalSummaryCard");
-        const jsonObj = extractJsonBlock(rawText);
-
-        if (jsonObj) {
-          if (banner && jsonObj.pic_check_km) {
-            banner.className =
-              "rounded-xl p-3 text-xs bg-neoncyan/10 border border-neoncyan/30 text-gray-200";
-            banner.innerHTML = `<strong>Pic Check:</strong> ${jsonObj.pic_check_km}`;
-            banner.classList.remove("hidden");
-          }
-
-          if (confRow) {
-            const items = [
-              {
-                label: "LIQUIDITY / IDM",
-                val: jsonObj.liquidity_status || "SWEEP / POOL",
-                cls: "text-neoncyan border-neoncyan/25",
-              },
-              {
-                label: "P&D LOCATION",
-                val: jsonObj.pd_location || "P&D ZONE",
-                cls: "text-instamber border-instamber/25",
-              },
-              {
-                label: "DRAW ON LIQ",
-                val: jsonObj.dol_target || "DOL",
-                cls: "text-instgreen border-instgreen/25",
-              },
-              {
-                label: "HTF BIAS",
-                val: jsonObj.htf_bias || "MULTI-TF",
-                cls: "text-white border-white/15",
-              },
-            ];
-            confRow.classList.remove("hidden");
-            confRow.classList.add("grid");
-            confRow.innerHTML = items
-              .map(
-                (it) => `
-              <div class="p-2.5 rounded-xl bg-void/90 border ${it.cls}">
-                <div class="text-[9px] text-gray-400">${it.label}</div>
-                <div class="text-[11px] font-bold mt-0.5 truncate">${it.val}</div>
-              </div>
-            `,
-              )
-              .join("");
-          }
-
-          if (card && currentAnalysisMode === "signal") {
-            const dir = String(jsonObj.direction || "NO SETUP").toUpperCase();
-            const isBuy = dir.includes("BUY");
-            card.classList.remove("hidden");
-            card.innerHTML = `
-              <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-                <span class="px-2.5 py-1 rounded ${isBuy ? "bg-instgreen/20 text-instgreen" : "bg-instred/20 text-instred"} font-extrabold">${dir}</span>
-                <span class="text-gray-300">0.01 Lot • SL $10–$13 • BE 1:1–1.5</span>
-              </div>
-              <div class="grid grid-cols-3 gap-2 font-mono text-center text-xs mt-2">
-                <div class="p-2 rounded bg-obsidian"><div class="text-[10px] text-gray-400">ENTRY</div><div class="font-bold text-neoncyan">${jsonObj.entry_price || "N/A"}</div></div>
-                <div class="p-2 rounded bg-obsidian"><div class="text-[10px] text-gray-400">SL</div><div class="font-bold text-instred">${jsonObj.sl_price || "N/A"}</div></div>
-                <div class="p-2 rounded bg-obsidian"><div class="text-[10px] text-gray-400">TP</div><div class="font-bold text-instgreen">${jsonObj.tp_price || "N/A"}</div></div>
-              </div>
-            `;
-          }
-
-          if (uploadedImages[0]?.dataUrl) {
-            drawOverlayOnCanvas(uploadedImages[0].dataUrl, jsonObj);
-          }
-        }
-
-        const cleanMd =
-          (rawText || "").replace(/```json[\s\S]*?```/g, "").trim() || rawText;
-        outputEl.innerHTML = marked.parse(cleanMd || "គ្មានលទ្ធផល");
+        renderPicCheckBanner(parsed.pic_check);
+        renderSignalSummaryCard(parsed);
+        drawOverlayOnCanvas(uploadedImages[0].dataUrl, parsed);
+        outputEl.innerHTML = marked.parse(
+          parsed.khmer_summary_markdown || "គ្មានសេចក្តីសង្ខេប",
+        );
         loadingEl.classList.add("hidden");
         outputEl.classList.remove("hidden");
       }
 
-      function compressImageDataUrl(dataUrl, maxWidth = 640, quality = 0.58) {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.onload = () => {
-            const scale = Math.min(1, maxWidth / (img.width || maxWidth));
-            const targetW = Math.max(
-              1,
-              Math.round((img.width || maxWidth) * scale),
-            );
-            const targetH = Math.max(
-              1,
-              Math.round((img.height || maxWidth) * scale),
-            );
-            const canvas = document.createElement("canvas");
-            canvas.width = targetW;
-            canvas.height = targetH;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, targetW, targetH);
-            const outUrl = canvas.toDataURL("image/jpeg", quality);
-            resolve({
-              base64: outUrl.split(",")[1],
-              mimeType: "image/jpeg",
-            });
-          };
-          img.onerror = () => {
-            const parts = (dataUrl || "").split(",");
-            resolve({
-              base64: parts[1] || "",
-              mimeType: "image/jpeg",
-            });
-          };
-          img.src = dataUrl;
-        });
-      }
-
-      async function callGeminiModelOnce(
+      async function callGeminiModelWithRetry(
         apiKey,
         modelName,
         parts,
-        timeoutMs = 22000,
+        responseSchema,
+        maxRetries = 2,
       ) {
-        const cleanKey = String(apiKey || "").trim();
-        const cleanModel = String(modelName || "").trim();
-        const endpoint =
-          "https://generativelanguage.googleapis.com/v1beta/models/" +
-          encodeURIComponent(cleanModel) +
-          ":generateContent?key=" +
-          encodeURIComponent(cleanKey);
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const loadingText = document.getElementById("visionLoadingText");
 
-        startLoadingTimer(`កំពុងវិភាគ ICT + SMC (${cleanModel})`);
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+          if (loadingText) {
+            loadingText.textContent =
+              attempt === 0
+                ? `កំពុង Check Pic និងវិភាគទាំង 4 Timeframe ជាមួយ ${modelName}...`
+                : `Server រវល់ (${modelName}) — កំពុងព្យាយាមម្តងទៀត (${attempt}/${maxRetries})...`;
+          }
 
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-        try {
           const res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            signal: controller.signal,
             body: JSON.stringify({
               contents: [{ role: "user", parts }],
               generationConfig: {
-                temperature: 0.1,
-                maxOutputTokens: 1792,
+                temperature: 0.0,
+                maxOutputTokens: 4096,
+                responseMimeType: "application/json",
+                responseSchema,
               },
             }),
           });
 
-          const rawBody = await res.text();
-          let data = null;
-          try {
-            data = JSON.parse(rawBody);
-          } catch (_) {
-            throw new Error(`Invalid response (${res.status})`);
+          const data = await res.json();
+          if (res.ok) {
+            return data;
           }
 
-          if (!res.ok) {
-            throw new Error(data?.error?.message || `Gemini API ${res.status}`);
-          }
+          const errMsg = data?.error?.message || `Gemini API ${res.status}`;
+          const isHighDemand =
+            res.status === 503 ||
+            res.status === 429 ||
+            /high demand|overloaded|unavailable|quota|rate/i.test(errMsg);
 
-          return data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        } catch (err) {
-          if (err?.name === "AbortError") {
-            throw new Error(
-              `Request លើស ${Math.round(timeoutMs / 1000)} វិនាទី (Timeout)`,
-            );
+          if (isHighDemand && attempt < maxRetries) {
+            await sleep(1200 * (attempt + 1));
+            continue;
           }
-          throw new Error(err?.message || "Network error");
-        } finally {
-          clearTimeout(timer);
+          throw new Error(errMsg);
         }
       }
 
@@ -1535,7 +1594,6 @@
         const emptyEl = document.getElementById("visionEmptyState");
         const outputEl = document.getElementById("visionOutput");
         const bannerEl = document.getElementById("picCheckBanner");
-        const confRowEl = document.getElementById("smcConfluenceRow");
         const summaryCardEl = document.getElementById("signalSummaryCard");
         const btn = document.getElementById("btnAnalyzeVision");
         const userNote = document.getElementById("visionUserNote").value.trim();
@@ -1545,8 +1603,9 @@
           try {
             const cachedRaw = sessionStorage.getItem(cacheKey);
             if (cachedRaw) {
+              const cachedParsed = JSON.parse(cachedRaw);
               emptyEl.classList.add("hidden");
-              renderMarkdownResult(cachedRaw);
+              displayParsedResult(cachedParsed);
               showToast("បង្ហាញលទ្ធផលដើមដែលថេរសម្រាប់រូបភាពនេះ!");
               return;
             }
@@ -1556,10 +1615,6 @@
         emptyEl.classList.add("hidden");
         outputEl.classList.add("hidden");
         bannerEl.classList.add("hidden");
-        if (confRowEl) {
-          confRowEl.classList.add("hidden");
-          confRowEl.classList.remove("grid");
-        }
         summaryCardEl.classList.add("hidden");
         document.getElementById("markedCanvasWrap").classList.add("hidden");
         loadingEl.classList.remove("hidden");
@@ -1567,111 +1622,196 @@
         btn.classList.add("opacity-60");
 
         const liveText = liveGoldPrice
-          ? `Live XAUUSD reference price is ~${liveGoldPrice.toFixed(2)}. `
+          ? `Live XAUUSD reference price is ~${liveGoldPrice.toFixed(2)}.`
           : "";
 
-        const lessonRulesText =
-          "ICT + SMC Lesson Rules: check BOS/MSS/CHoCH across 4H/1H/30m/15m, Liquidity Sweep / Inducement (IDM), Premium (>50%) vs Discount (<50%), +OB/-OB/FVG zones, and Draw on Liquidity (DOL). ";
+        const picCheckInstruction = `
+MANDATORY IMAGE VERIFICATION ("pic_check"):
+1. Check every uploaded image (#1 to #${uploadedImages.length}) to verify:
+   - Is it actually a financial candlestick/trading chart (specifically XAUUSD / Gold)?
+   - What exact timeframe(s) are visible on each image (e.g., 15m, 30m, 1H, 4H, 1D)?
+   - Does the uploaded image match the user's note/expected timeframes, and is the chart price consistent with ${liveText || "current market price"}?
+2. If ANY image is NOT a trading chart, is the wrong symbol, has duplicate/wrong timeframes compared to what was requested or noted, or shows an outdated/mismatched price, set "has_mismatch": true (and "is_valid_chart": false if not a chart) and clearly explain in Khmer in "message_km" what is wrong or mismatched!`;
 
-        const taskText =
-          currentAnalysisMode === "keylevels"
-            ? `${lessonRulesText}Identify ICT/SMC key levels (PDH/PDL, PWH/PWL, BSL/SSL, +OB/-OB, FVG) on ${selectedKeyLevelTF} using Image #1 price axis.`
-            : `${lessonRulesText}Give ONE Pullback Limit setup (BUY LIMIT / SELL LIMIT / NO SETUP) with 0.01 lot, SL ~$11 ($10-$13), BE at 1:1-1.5.`;
+        let promptText = "";
+        let responseSchema = null;
 
-        const promptText = `${liveText}${taskText} User note: "${userNote}".
-First return a JSON block:
-\`\`\`json
-{
-  "pic_check_km": "...",
-  "htf_bias": "...",
-  "liquidity_status": "...",
-  "pd_location": "...",
-  "dol_target": "...",
-  "direction": "BUY LIMIT|SELL LIMIT|NO SETUP",
-  "entry_price": "...",
-  "sl_price": "...",
-  "tp_price": "...",
-  "chart1_price_scale": {"top_price": "...", "bottom_price": "...", "top_y_ratio": 0.08, "bottom_y_ratio": 0.92},
-  "entry_y_ratio": 0.5,
-  "sl_y_ratio": 0.65,
-  "tp_y_ratio": 0.25,
-  "key_levels": []
-}
-\`\`\`
-Then write a concise summary in Khmer.`;
+        if (currentAnalysisMode === "keylevels") {
+          promptText = `You are an institutional ICT + SMC Gold (XAUUSD) analyst.
+Task: Identify major institutional KEY LEVELS on timeframes: ${selectedKeyLevelTF} (specifically looking across 1H, 4H, and 1D charts provided).
+${liveText} User note: "${userNote}".
+${picCheckInstruction}
 
-        const preparedImages = await Promise.all(
-          uploadedImages
-            .slice(0, MAX_IMAGES)
-            .map((img) => compressImageDataUrl(img.dataUrl)),
-        );
+Find the most important Key Levels (e.g., Previous Day High/Low PDH/PDL, Previous Week High/Low PWH/PWL, 1D/4H/1H Unmitigated Order Blocks, 1D/4H/1H Fair Value Gaps FVG, Major Liquidity Pools / Equal Highs & Lows).
+Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible on image #1 so we can draw them on image #1. Keep text concise, clear, and well-formatted in Khmer markdown.`;
+
+          responseSchema = {
+            type: "OBJECT",
+            properties: {
+              pic_check: {
+                type: "OBJECT",
+                properties: {
+                  is_valid_chart: { type: "BOOLEAN" },
+                  has_mismatch: { type: "BOOLEAN" },
+                  detected_timeframes: {
+                    type: "ARRAY",
+                    items: { type: "STRING" },
+                  },
+                  message_km: { type: "STRING" },
+                },
+                required: [
+                  "is_valid_chart",
+                  "has_mismatch",
+                  "detected_timeframes",
+                  "message_km",
+                ],
+              },
+              key_levels: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    timeframe: { type: "STRING" },
+                    type: { type: "STRING" },
+                    label: { type: "STRING" },
+                    price: { type: "STRING" },
+                    y_ratio: { type: "NUMBER" },
+                  },
+                  required: ["timeframe", "type", "label", "price", "y_ratio"],
+                },
+              },
+              khmer_summary_markdown: { type: "STRING" },
+            },
+            required: ["pic_check", "key_levels", "khmer_summary_markdown"],
+          };
+        } else {
+          promptText = `You are a practical, structured ICT + SMC Gold (XAUUSD) trading analyst matching the style of our direct chat analysis.
+Analyze the chart(s) across 4H, 1H, 30m, and 15m:
+1. INSPECT EACH TIMEFRAME (4H, 1H, 30m, 15m): Identify market structure (BOS / MSS / CHoCH), unmitigated Order Blocks (+OB / -OB), Fair Value Gaps (FVG), liquidity sweeps/pools, and current price location.
+2. PRACTICAL PULLBACK / LIMIT SETUP ("ចាប់ Pullback Limit ដូចក្នុង Chat"):
+   - When there is a clear directional impulse/momentum on 1H/30m/15m with identifiable nearby Pullback/Limit zones (such as Bullish FVG / +OB / Discount pullback for BUY LIMIT, or Bearish FVG / -OB / Supply/Liquidity rejection zone for SELL LIMIT), output ONE actionable setup ("has_setup": true, "direction": "BUY LIMIT" or "SELL LIMIT") targeting that pullback zone rather than chasing the extreme top/bottom!
+   - Also clearly document both the primary Pullback Limit plan and any alternative/conditional zone (Buy pullback or Sell rejection zone) inside "khmer_summary_markdown".
+   - Set "has_setup": false and "direction": "NONE" ONLY when price is in heavy choppy/sideway range with no clear zone or extreme conflicting structure.
+   - Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10.0 to 13.0 gold points) with BE around 1:1 to 1:1.5, and align entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) accurately with image #1.
+3. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER: Write clean, practical Khmer markdown ("khmer_summary_markdown") with Multi-Timeframe analysis, Primary Setup (Entry / SL / TP on 0.01 lot), and Conditional Watchlist / Risk Notes. Avoid unescaped double quotes inside strings.
+
+${liveText} User note: "${userNote}".
+${picCheckInstruction}`;
+
+          responseSchema = {
+            type: "OBJECT",
+            properties: {
+              pic_check: {
+                type: "OBJECT",
+                properties: {
+                  is_valid_chart: { type: "BOOLEAN" },
+                  has_mismatch: { type: "BOOLEAN" },
+                  detected_timeframes: {
+                    type: "ARRAY",
+                    items: { type: "STRING" },
+                  },
+                  message_km: { type: "STRING" },
+                },
+                required: [
+                  "is_valid_chart",
+                  "has_mismatch",
+                  "detected_timeframes",
+                  "message_km",
+                ],
+              },
+              htf_bias: { type: "STRING" },
+              mtf_alignment: { type: "STRING" },
+              has_setup: { type: "BOOLEAN" },
+              direction: { type: "STRING" },
+              setup_quality: { type: "STRING" },
+              selection_reason_km: { type: "STRING" },
+              no_setup_reason_km: { type: "STRING" },
+              entry_price: { type: "STRING" },
+              sl_price: { type: "STRING" },
+              tp_price: { type: "STRING" },
+              be_target: { type: "STRING" },
+              entry_y_ratio: { type: "NUMBER" },
+              sl_y_ratio: { type: "NUMBER" },
+              tp_y_ratio: { type: "NUMBER" },
+              khmer_summary_markdown: { type: "STRING" },
+            },
+            required: [
+              "pic_check",
+              "htf_bias",
+              "mtf_alignment",
+              "has_setup",
+              "direction",
+              "setup_quality",
+              "selection_reason_km",
+              "no_setup_reason_km",
+              "entry_price",
+              "sl_price",
+              "tp_price",
+              "be_target",
+              "entry_y_ratio",
+              "sl_y_ratio",
+              "tp_y_ratio",
+              "khmer_summary_markdown",
+            ],
+          };
+        }
 
         const parts = [
           { text: promptText },
-          ...preparedImages
-            .filter((p) => p.base64)
-            .map((p) => ({
-              inlineData: {
-                mimeType: p.mimeType,
-                data: p.base64,
-              },
-            })),
+          ...uploadedImages.slice(0, MAX_IMAGES).map((img) => ({
+            inlineData: {
+              mimeType: img.mimeType,
+              data: img.base64,
+            },
+          })),
         ];
 
-        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+        const modelsToTry = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
 
         try {
-          let rawContent = "";
-          const errors = [];
+          let data = null;
+          let lastError = null;
 
           for (const modelName of modelsToTry) {
             try {
-              rawContent = await callGeminiModelOnce(
+              data = await callGeminiModelWithRetry(
                 apiKey,
                 modelName,
                 parts,
-                22000,
+                responseSchema,
+                2,
               );
-              if (rawContent) break;
+              break;
             } catch (err) {
-              errors.push(`${modelName}: ${err.message}`);
+              lastError = err;
             }
           }
 
-          if (!rawContent) {
-            throw new Error(errors.join(" | ") || "Gemini API timeout/error");
+          if (!data) {
+            throw (
+              lastError || new Error("Gemini models are currently unavailable.")
+            );
           }
 
+          const rawContent =
+            data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          const parsed = parseJsonSafely(rawContent);
+
           try {
-            sessionStorage.setItem(cacheKey, rawContent);
+            sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
           } catch (_) {}
 
-          renderMarkdownResult(rawContent);
+          displayParsedResult(parsed);
         } catch (err) {
-          stopLoadingTimer();
           loadingEl.classList.add("hidden");
-          outputEl.innerHTML = `<div class="p-4 rounded-xl bg-instred/15 border border-instred/40 text-instred text-xs space-y-1">
-          <div><strong>បញ្ហាវិភាគ / Check Pic៖</strong> ${err.message}</div>
-          <div class="text-red-200/80">ប្រសិនបើ Load failed / Timeout លើ iPhone សូមប្តូរពី 4G/5G ទៅ Wi-Fi ឬសាក 1–2 រូបជាមុន។</div>
+          outputEl.innerHTML = `<div class="p-4 rounded-xl bg-instred/15 border border-instred/40 text-instred text-xs">
+          <strong>បញ្ហាវិភាគ / Check Pic៖</strong> ${err.message}
         </div>`;
           outputEl.classList.remove("hidden");
         } finally {
-          stopLoadingTimer();
           btn.disabled = false;
           btn.classList.remove("opacity-60");
         }
-      }
-
-      function downloadMarkedChart() {
-        const canvas = document.getElementById("signalCanvas");
-        if (!canvas) return;
-        const link = document.createElement("a");
-        link.download =
-          currentAnalysisMode === "keylevels"
-            ? "xauusd-ict-smc-key-levels.png"
-            : "xauusd-ict-smc-signal.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
       }
 
       function startEngineApp() {
