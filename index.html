@@ -455,7 +455,7 @@
               ចុចជ្រើសរើសរូបភាព Chart (រហូតដល់ 4 រូប) ឬ Paste (Ctrl+V)
             </p>
             <p id="dropZoneHint" class="text-xs text-gray-400 mt-1">
-              វិភាគទាំង 4 Timeframe + ចូលគ្នា (រើសតែ 1 Setup ឬ NO SETUP)
+              វិភាគទាំង 4 Timeframe + ចាប់ Pullback Limit ឬ NO SETUP
             </p>
           </label>
 
@@ -580,8 +580,8 @@
               <p class="text-xs max-w-md mx-auto">
                 ជ្រើសរើស Mode (<strong>4-TF Signal</strong> ឬ
                 <strong>Key Levels 1H/4H/1D</strong>) រួច Upload/Paste រូបភាព
-                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹងវិភាគទាំង 4 TF និងរើសតែ 1 Setup ឬ NO
-                SETUP!
+                ហើយចុចវិភាគ។ ប្រព័ន្ធនឹងវិភាគទាំង 4 TF និងចាប់ Pullback Limit
+                Setup!
               </p>
             </div>
 
@@ -618,7 +618,7 @@
               <strong class="text-white font-mono">0.01 Lot</strong> | Risk Cap:
               <strong class="text-white font-mono">$10–$13</strong></span
             >
-            <span>4-TF Analysis + Alignment • Auto Pic Check</span>
+            <span>4-TF Analysis + Pullback Limit • Auto Pic Check</span>
           </div>
         </div>
       </section>
@@ -668,9 +668,12 @@
             <code>$10.00 – $13.50</code>។
           </li>
           <li>
-            <strong class="text-white">២. វិភាគទាំង 4 TF + ចូលគ្នា៖</strong>
-            ចេញ Signal តែពេល 4H, 1H, 30m, និង 15m ចូលគ្នា ហើយបើមិនចូលគ្នា ឬគ្មាន
-            Zone ច្បាស់ នឹងចេញ <code>NO SETUP</code>។
+            <strong class="text-white"
+              >២. វិភាគទាំង 4 TF + Pullback Limit៖</strong
+            >
+            វិភាគ 4H, 1H, 30m, និង 15m ដើម្បីចាប់ Pullback Limit នៅតំបន់ Zone
+            ដែលមាន Confluence ហើយបើ Sideway / Choppy គ្មាន Zone ច្បាស់ នឹងចេញ
+            <code>NO SETUP</code>។
           </li>
           <li>
             <strong class="text-white">៣. Pic Check Validation៖</strong>
@@ -695,7 +698,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v4_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v5_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -1193,8 +1196,8 @@
                 message_km:
                   "បានទាញលទ្ធផលវិភាគដោយស្វ័យប្រវត្តិ (ទម្រង់ JSON ត្រូវបានជួសជុល)។",
               },
-              htf_bias: "RANGE",
-              mtf_alignment: "PARTIAL (ចូលគ្នាមួយផ្នែក)",
+              htf_bias: "PULLBACK",
+              mtf_alignment: "PULLBACK ZONE",
               has_setup: false,
               direction: "NONE",
               setup_quality: "NONE",
@@ -1274,7 +1277,7 @@
                     ? `<span class="px-2 py-0.5 rounded bg-black/40 border border-white/15 text-[10px] font-mono text-instamber">${parsed.mtf_alignment}</span>`
                     : ""
                 }
-                <span class="text-xs text-red-200 font-bold">Timeframe មិនទាន់ចូលគ្នា ឬគ្មានកន្លែងចូលសមរម្យ — រង់ចាំ Setup ច្បាស់សិន</span>
+                <span class="text-xs text-red-200 font-bold">ទីផ្សារ Sideway / Choppy ឬគ្មាន Zone ច្បាស់ — រង់ចាំ Setup ច្បាស់សិន</span>
               </div>
               <span class="font-mono text-[11px] text-gray-300">0.01 Lot • SL $10–$13</span>
             </div>
@@ -1328,7 +1331,7 @@
           </div>
           ${
             parsed.selection_reason_km
-              ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">ការចូលគ្នា &amp; មូលហេតុរើស Setup នេះ៖</strong> ${parsed.selection_reason_km}</p>`
+              ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">មូលហេតុរើស Pullback Limit Setup នេះ៖</strong> ${parsed.selection_reason_km}</p>`
               : ""
           }
         `;
@@ -1447,7 +1450,7 @@
             ctx.fillStyle = "#ff3b5c";
             ctx.font = `bold ${Math.max(18, Math.round(w * 0.024))}px sans-serif`;
             ctx.fillText(
-              "NO SETUP (NOT ALIGNED / NO FOMO)",
+              "NO SETUP (SIDEWAY / NO CLEAR ZONE)",
               Math.round(w * 0.04),
               Math.round(h * 0.18),
             );
@@ -1682,14 +1685,15 @@ Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible
             required: ["pic_check", "key_levels", "khmer_summary_markdown"],
           };
         } else {
-          promptText = `You are a high-discipline ICT + SMC Gold (XAUUSD) institutional trading analyst.
-Analyze the chart(s) with the exact depth, structure, caution, and clarity of a disciplined ICT/SMC trader:
-1. INSPECT EACH TIMEFRAME (4H, 1H, 30m, 15m): Look at market structure (BOS / MSS / CHoCH), premium/discount & Fibonacci reaction levels (0.618 / 0.705), unmitigated Order Blocks (+OB / -OB), Fair Value Gaps (FVG), liquidity sweeps, and current price position relative to HTF supply/demand or FVG zones.
-2. CHECK ALIGNMENT ("ចូលគ្នា") & MID-RANGE TRAP:
-   - Explicitly assess alignment ("ALIGNED (ចូលគ្នាល្អ)", "PARTIAL (ចូលគ្នាមួយផ្នែក)", or "CONFLICT (ផ្ទុយគ្នា)").
-   - If HTF (4H) is strongly bearish/bullish while LTF (1H/30m/15m) is pulling back inside a fib/liquidity zone or sitting under a heavy HTF FVG/OB without clear LTF confirmation, or if price is in choppy/indecisive mid-range where a tight SL (~$10-$13 on 0.01 lot) could easily get wicked/swept, set "has_setup": false and "direction": "NONE", and provide actionable conditional waiting zones (SELL zone on rally/rejection into supply/FVG, BUY zone on pullback/confirmation into demand/+OB) inside "khmer_summary_markdown".
-3. SINGLE BEST SETUP ONLY (WHEN HIGH CONFLUENCE & ALIGNED): Output AT MOST ONE setup ("BUY LIMIT" or "SELL LIMIT"). Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10 to 13 gold dollars/points) and align entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) accurately with image #1.
-4. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER: Write thorough yet concise, practical Khmer analysis ("khmer_summary_markdown") with sections for Multi-Timeframe breakdown, Alignment & Decision, and Conditional Watchlist / Risk Notes. Avoid unescaped double quotes inside strings.
+          promptText = `You are a practical, structured ICT + SMC Gold (XAUUSD) trading analyst matching the style of our direct chat analysis.
+Analyze the chart(s) across 4H, 1H, 30m, and 15m:
+1. INSPECT EACH TIMEFRAME (4H, 1H, 30m, 15m): Identify market structure (BOS / MSS / CHoCH), unmitigated Order Blocks (+OB / -OB), Fair Value Gaps (FVG), liquidity sweeps/pools, and current price location.
+2. PRACTICAL PULLBACK / LIMIT SETUP ("ចាប់ Pullback Limit ដូចក្នុង Chat"):
+   - When there is a clear directional impulse/momentum on 1H/30m/15m with identifiable nearby Pullback/Limit zones (such as Bullish FVG / +OB / Discount pullback for BUY LIMIT, or Bearish FVG / -OB / Supply/Liquidity rejection zone for SELL LIMIT), output ONE actionable setup ("has_setup": true, "direction": "BUY LIMIT" or "SELL LIMIT") targeting that pullback zone rather than chasing the extreme top/bottom!
+   - Also clearly document both the primary Pullback Limit plan and any alternative/conditional zone (Buy pullback or Sell rejection zone) inside "khmer_summary_markdown".
+   - Set "has_setup": false and "direction": "NONE" ONLY when price is in heavy choppy/sideway range with no clear zone or extreme conflicting structure.
+   - Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10.0 to 13.0 gold points) with BE around 1:1 to 1:1.5, and align entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) accurately with image #1.
+3. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER: Write clean, practical Khmer markdown ("khmer_summary_markdown") with Multi-Timeframe analysis, Primary Setup (Entry / SL / TP on 0.01 lot), and Conditional Watchlist / Risk Notes. Avoid unescaped double quotes inside strings.
 
 ${liveText} User note: "${userNote}".
 ${picCheckInstruction}`;
