@@ -1721,7 +1721,7 @@
         responseSchema,
         maxRetries = 2,
       ) {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
         const loadingText = document.getElementById("visionLoadingText");
 
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -2029,7 +2029,11 @@ ${scaleCalibrationInstruction}`;
           })),
         ];
 
-        const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+        const modelsToTry = [
+          "gemini-2.5-flash",
+          "gemini-3.5-flash-lite",
+          "gemini-2.0-flash",
+        ];
 
         try {
           let data = null;
