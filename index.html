@@ -7,6 +7,7 @@
       ICT + SMC Institutional Gold Engine (4-TF Signal & Key Levels)
     </title>
 
+    <!-- Custom App / Home Screen Icon (PNG + SVG fallback, No "I" fallback) -->
     <link rel="icon" type="image/png" href="./icon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icon.png" />
     <link rel="apple-touch-icon" sizes="512x512" href="./icon.png" />
@@ -300,6 +301,7 @@
 
       <!-- GEMINI VISION SCREENSHOT SIGNAL & KEY LEVEL OVERLAY SECTION -->
       <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Upload & Key Zone (5 cols) -->
         <div
           class="lg:col-span-5 glass-panel rounded-2xl p-5 flex flex-col gap-4"
         >
@@ -322,6 +324,7 @@
             >
           </div>
 
+          <!-- MODE SELECTOR OPTION -->
           <div>
             <label class="block text-xs text-gray-400 mb-1.5"
               >ជ្រើសរើស Option វិភាគ (Analysis Mode)</label
@@ -350,6 +353,7 @@
             </div>
           </div>
 
+          <!-- KEY LEVEL TF FILTER (Shown when Key Levels mode is active) -->
           <div
             id="keyLevelTfBox"
             class="hidden p-3 rounded-xl bg-void/90 border border-instamber/30 space-y-2"
@@ -531,6 +535,7 @@
           </div>
         </div>
 
+        <!-- Marked Screenshot + Pic Verification + Analysis Output (7 cols) -->
         <div
           class="lg:col-span-7 glass-panel neon-border rounded-2xl p-5 flex flex-col justify-between min-h-[450px]"
         >
@@ -584,14 +589,19 @@
               </p>
             </div>
 
+            <!-- PIC CHECK ALERT BANNER -->
             <div
               id="picCheckBanner"
               class="hidden rounded-xl p-3.5 text-xs"
             ></div>
+
+            <!-- ICT + SMC CONFLUENCE ROW -->
             <div
               id="smcConfluenceRow"
               class="hidden grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono"
             ></div>
+
+            <!-- CLEAR ENTRY / SL / TP SUMMARY CARD -->
             <div
               id="signalSummaryCard"
               class="hidden rounded-xl p-3.5 bg-void/95 border border-neoncyan/30 space-y-2.5"
@@ -640,6 +650,7 @@
       </section>
     </main>
 
+    <!-- Toast -->
     <div
       id="toastBox"
       class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none"
@@ -652,6 +663,7 @@
       </div>
     </div>
 
+    <!-- Discipline Rules Modal (Updated ICT + SMC Lessons) -->
     <div
       id="rulesModal"
       class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
@@ -664,7 +676,7 @@
         >
           <h3 class="text-base font-bold text-neoncyan flex items-center gap-2">
             <span>🛡️</span>
-            <span>វិន័យជួញដូរ Set &amp; Forget (ICT + SMC Rules)</span>
+            <span>វិន័យជួញដូរ Set &amp; Forget (ICT + SMC Lessons)</span>
           </h3>
           <button
             onclick="toggleRulesModal(false)"
@@ -679,27 +691,38 @@
           <li>
             <strong class="text-white">១. ទំហំ Lot និងហានិភ័យថេរ៖</strong>
             ប្រើប្រាស់ <code>0.01 lot</code> ជានិច្ច ដោយកំណត់ Stop Loss ចន្លោះ
-            <code>$10.00 – $13.00</code> (~10.0–13.0 ពិន្ទុមាស)។
+            <code>$10.00 – $13.00</code> (~10.0–13.0 ពិន្ទុមាស) និងរំកិល SL មក
+            Breakeven (BE) នៅ <code>1:1 ឬ 1:1.5</code>។
           </li>
           <li>
             <strong class="text-white"
-              >២. ICT + SMC Confluence (Sweep/IDM + Premium/Discount +
-              DOL)៖</strong
+              >២. រចនាសម្ព័ន្ធទីផ្សារ និង Liquidity / Inducement (ICT +
+              SMC)៖</strong
             >
-            ពិនិត្យ Liquidity Sweep/Inducement, ទីតាំង Premium (&gt;50%) ឬ
-            Discount (&lt;50%), Zone (`+OB`, `-OB`, `FVG`), និង Draw on
-            Liquidity មុនចាប់ Pullback Limit។
+            ពិនិត្យ Trend / Structure (<code>BOS</code>, <code>MSS</code>,
+            <code>CHoCH</code>) ឆ្លងកាត់ 4H, 1H, 30m, និង 15m ព្រមទាំង Liquidity
+            Sweep / Inducement (<code>IDM</code>) និង Draw on Liquidity
+            (<code>DOL</code>) មុនចូល Pullback Limit។
           </li>
           <li>
             <strong class="text-white"
-              >៣. Pic Check &amp; Chart #1 Scale៖</strong
+              >៣. Premium &amp; Discount (50%) និង Key Zones៖</strong
             >
-            ផ្ទៀងផ្ទាត់ Symbol/TF និងគណនា Entry/SL/TP/Key Levels ដោយផ្អែកលើ
-            High–Low Price Axis នៃរូប Chart #1។
+            រកចំណុច <code>BUY LIMIT</code> នៅតំបន់ Discount (&lt;50%) លើ
+            <code>+OB</code> ឬ Bullish <code>FVG</code> និង
+            <code>SELL LIMIT</code> នៅតំបន់ Premium (&gt;50%) លើ
+            <code>-OB</code> ឬ Bearish <code>FVG</code>។ បើទីផ្សារ Sideway /
+            Choppy គ្មាន Zone ច្បាស់ ត្រូវកំណត់ <code>NO SETUP</code>។
           </li>
           <li>
-            <strong class="text-white">៤. Breakeven (BE)：</strong> រំកិល SL មក
-            BE នៅ <code>1:1 ឬ 1:1.5</code>។
+            <strong class="text-white"
+              >៤. Killzones, Pic Check និង Key Levels (1H/4H/1D)៖</strong
+            >
+            ផ្តល់អាទិភាពពេល London / NY Killzones ពិនិត្យ Symbol
+            (<code>XAUUSD</code>) និង Timeframe ឱ្យត្រូវមុន trade ហើយកំណត់ Key
+            Levels ដូចជា
+            <code>PDH/PDL</code>, <code>PWH/PWL</code>, <code>BSL/SSL</code>,
+            <code>OB</code>, និង <code>FVG</code>។
           </li>
         </ul>
         <div class="pt-2 flex justify-end">
@@ -715,12 +738,12 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v10_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v12_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
       let uploadedImages = [];
-      let currentAnalysisMode = "signal";
+      let currentAnalysisMode = "signal"; // 'signal' | 'keylevels'
       let selectedKeyLevelTF = "ALL (1H, 4H, 1D)";
       let loadingTickerInterval = null;
 
@@ -763,7 +786,7 @@
           analyzeLabel.textContent = "រក ICT/SMC Key Levels";
           if (noteInput) {
             noteInput.placeholder =
-              "ឧ. #1=1H, #2=4H, #3=1D — រក PDH/PDL, BSL/SSL, +OB/-OB, FVG, EqH/EqL";
+              "ឧ. #1=1H, #2=4H, #3=1D — រក PDH/PDL, BSL/SSL, +OB/-OB, FVG";
           }
         } else {
           btnSignal.className =
@@ -1068,11 +1091,13 @@
           );
           if (pastedImgs.length > 0) {
             handleFiles(pastedImgs);
-            const actualCount = Math.min(
+            const expectedCount = Math.min(
               MAX_IMAGES,
               uploadedImages.length + pastedImgs.length,
             );
-            showToast(`បានបន្ថែមរូបភាព Chart (${actualCount}/${MAX_IMAGES})!`);
+            showToast(
+              `បានបន្ថែមរូបភាព Chart (${expectedCount}/${MAX_IMAGES})!`,
+            );
           }
         }
       });
@@ -1463,7 +1488,7 @@
               contents: [{ role: "user", parts }],
               generationConfig: {
                 temperature: 0.1,
-                maxOutputTokens: 1024,
+                maxOutputTokens: 1792,
               },
             }),
           });
@@ -1545,10 +1570,13 @@
           ? `Live XAUUSD reference price is ~${liveGoldPrice.toFixed(2)}. `
           : "";
 
+        const lessonRulesText =
+          "ICT + SMC Lesson Rules: check BOS/MSS/CHoCH across 4H/1H/30m/15m, Liquidity Sweep / Inducement (IDM), Premium (>50%) vs Discount (<50%), +OB/-OB/FVG zones, and Draw on Liquidity (DOL). ";
+
         const taskText =
           currentAnalysisMode === "keylevels"
-            ? `Identify ICT/SMC key levels (PDH/PDL, BSL/SSL, +OB/-OB, FVG) on ${selectedKeyLevelTF} using Image #1 price axis.`
-            : `Analyze 4H/1H/30m/15m ICT+SMC. Give ONE Pullback Limit setup (BUY LIMIT / SELL LIMIT / NO SETUP) with 0.01 lot, SL ~$11 ($10-$13), BE at 1:1-1.5.`;
+            ? `${lessonRulesText}Identify ICT/SMC key levels (PDH/PDL, PWH/PWL, BSL/SSL, +OB/-OB, FVG) on ${selectedKeyLevelTF} using Image #1 price axis.`
+            : `${lessonRulesText}Give ONE Pullback Limit setup (BUY LIMIT / SELL LIMIT / NO SETUP) with 0.01 lot, SL ~$11 ($10-$13), BE at 1:1-1.5.`;
 
         const promptText = `${liveText}${taskText} User note: "${userNote}".
 First return a JSON block:
