@@ -715,7 +715,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v8_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v10_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -939,7 +939,7 @@
           }
         } catch (_) {}
 
-        const referenceSpot = liveGoldPrice || 3574.0;
+        const referenceSpot = liveGoldPrice || 3663.2;
         applyGoldPriceUI(referenceSpot, "REF SPOT", false);
         if (autoSyncOnFirstLoad) syncLivePriceToEngine(true);
       }
@@ -1153,108 +1153,6 @@
         return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|${normalizedNote}|${imgSignatures}`;
       }
 
-      function parseJsonSafely(rawText) {
-        const cleaned = (rawText || "")
-          .replace(/^```json\s*/i, "")
-          .replace(/^```\s*/i, "")
-          .replace(/\s*```$/i, "")
-          .trim();
-
-        const firstBrace = cleaned.indexOf("{");
-        const candidate =
-          firstBrace !== -1 ? cleaned.slice(firstBrace) : cleaned;
-
-        try {
-          return JSON.parse(candidate);
-        } catch (_) {}
-
-        let repaired = candidate;
-        let inString = false;
-        let escaped = false;
-        for (let i = 0; i < repaired.length; i++) {
-          const ch = repaired[i];
-          if (escaped) {
-            escaped = false;
-            continue;
-          }
-          if (ch === "\\") {
-            escaped = true;
-            continue;
-          }
-          if (ch === '"') {
-            inString = !inString;
-          }
-        }
-        if (inString) {
-          repaired += '"';
-        }
-
-        const stack = [];
-        inString = false;
-        escaped = false;
-        for (let i = 0; i < repaired.length; i++) {
-          const ch = repaired[i];
-          if (escaped) {
-            escaped = false;
-            continue;
-          }
-          if (ch === "\\") {
-            escaped = true;
-            continue;
-          }
-          if (ch === '"') {
-            inString = !inString;
-            continue;
-          }
-          if (!inString) {
-            if (ch === "{") stack.push("}");
-            else if (ch === "[") stack.push("]");
-            else if ((ch === "}" || ch === "]") && stack.length > 0) {
-              stack.pop();
-            }
-          }
-        }
-
-        while (stack.length > 0) {
-          repaired += stack.pop();
-        }
-
-        try {
-          return JSON.parse(repaired);
-        } catch (_) {
-          const mdMatch = candidate.match(
-            /"khmer_summary_markdown"\s*:\s*"([\s\S]*)/,
-          );
-          if (mdMatch && mdMatch[1]) {
-            const extractedMd = mdMatch[1]
-              .replace(/"\s*,?\s*"[^"]*"\s*:[\s\S]*$/, "")
-              .replace(/"\s*\}\s*$/, "")
-              .replace(/\\n/g, "\n")
-              .replace(/\\"/g, '"');
-            return {
-              pic_check: {
-                is_valid_chart: true,
-                has_mismatch: false,
-                detected_timeframes: [],
-                message_km:
-                  "បានទាញលទ្ធផលវិភាគដោយស្វ័យប្រវត្តិ (ទម្រង់ JSON ត្រូវបានជួសជុល)។",
-              },
-              htf_bias: "PULLBACK",
-              mtf_alignment: "PULLBACK ZONE",
-              liquidity_status: "CHECK SWEEP/IDM",
-              pd_location: "CHECK 50% EQ",
-              dol_target: "OPPOSING LIQUIDITY",
-              has_setup: false,
-              direction: "NONE",
-              setup_quality: "NONE",
-              no_setup_reason_km: "សូមពិនិត្យលម្អិតក្នុងសេចក្តីវិភាគខាងក្រោម។",
-              khmer_summary_markdown: extractedMd,
-            };
-          }
-          throw new Error("មិនអាចអានទិន្នន័យ JSON ពី AI បានត្រឹមត្រូវ។");
-        }
-      }
-
       function parsePriceNumber(val) {
         if (typeof val === "number") return Number.isFinite(val) ? val : null;
         if (!val) return null;
@@ -1293,210 +1191,14 @@
           : 0.5;
       }
 
-      function validateAndNormalizeSignalPrices(parsed) {
-        if (!parsed || !parsed.has_setup || parsed.direction === "NONE") {
-          return parsed;
+      function extractJsonBlock(text) {
+        const match = (text || "").match(/\{[\s\S]*\}/);
+        if (!match) return null;
+        try {
+          return JSON.parse(match[0]);
+        } catch (_) {
+          return null;
         }
-        const entryNum = parsePriceNumber(parsed.entry_price);
-        const slNum = parsePriceNumber(parsed.sl_price);
-        const tpNum = parsePriceNumber(parsed.tp_price);
-        const isBuy = String(parsed.direction).toUpperCase().includes("BUY");
-
-        if (entryNum !== null && slNum !== null) {
-          const diff = Math.abs(entryNum - slNum);
-          if (diff < 5.0 || diff > 18.0) {
-            const targetDist = 11.0;
-            const fixedSl = isBuy
-              ? Number((entryNum - targetDist).toFixed(2))
-              : Number((entryNum + targetDist).toFixed(2));
-            parsed.sl_price = fixedSl.toFixed(2);
-            parsed._slAdjusted = true;
-          }
-        }
-
-        if (entryNum !== null && tpNum !== null) {
-          if (isBuy && tpNum <= entryNum) {
-            parsed.tp_price = Number((entryNum + 22.0).toFixed(2)).toFixed(2);
-          } else if (!isBuy && tpNum >= entryNum) {
-            parsed.tp_price = Number((entryNum - 22.0).toFixed(2)).toFixed(2);
-          }
-        }
-
-        return parsed;
-      }
-
-      function renderPicCheckBanner(picCheck) {
-        const banner = document.getElementById("picCheckBanner");
-        if (!banner || !picCheck) return;
-
-        const isValid = picCheck.is_valid_chart !== false;
-        const hasMismatch = Boolean(picCheck.has_mismatch);
-        const messageKm =
-          picCheck.message_km ||
-          (isValid && !hasMismatch
-            ? "រូបភាពត្រឹមត្រូវតាមលក្ខខណ្ឌ Chart XAUUSD និង Timeframe។"
-            : "រកឃើញភាពខុសគ្នានៅលើរូបភាព Chart សូមពិនិត្យមើលខាងក្រោម!");
-        const detectedList = Array.isArray(picCheck.detected_timeframes)
-          ? picCheck.detected_timeframes.join(" | ")
-          : "";
-
-        banner.classList.remove("hidden");
-
-        if (!isValid || hasMismatch) {
-          banner.className =
-            "rounded-xl p-3.5 text-xs bg-instamber/15 border border-instamber/50 text-amber-200 space-y-1.5";
-          banner.innerHTML = `
-            <div class="flex items-center gap-2 font-bold text-instamber text-sm">
-              <span>⚠️</span>
-              <span>បញ្ជាក់ការពិនិត្យរូបភាព (Pic Check Warning)</span>
-            </div>
-            <p class="leading-relaxed">${messageKm}</p>
-            ${detectedList ? `<div class="font-mono text-[11px] text-white/90 bg-black/40 px-2.5 py-1 rounded-lg">Timeframes ដែលរកឃើញលើរូប៖ ${detectedList}</div>` : ""}
-          `;
-        } else {
-          banner.className =
-            "rounded-xl p-3 text-xs bg-instgreen/10 border border-instgreen/35 text-emerald-200 flex flex-wrap items-center justify-between gap-2";
-          banner.innerHTML = `
-            <div class="flex items-center gap-2">
-              <span class="text-instgreen font-bold">✓ Pic Check ត្រឹមត្រូវ៖</span>
-              <span>${messageKm}</span>
-            </div>
-            ${detectedList ? `<span class="font-mono text-[11px] px-2 py-0.5 rounded bg-black/40 text-neoncyan">${detectedList}</span>` : ""}
-          `;
-        }
-      }
-
-      function renderSmcConfluenceRow(parsed) {
-        const row = document.getElementById("smcConfluenceRow");
-        if (!row) return;
-
-        const items = [
-          {
-            label: "LIQUIDITY / IDM",
-            val: parsed.liquidity_status || "SWEEP / POOL",
-            cls: "text-neoncyan border-neoncyan/25",
-          },
-          {
-            label: "P&D LOCATION",
-            val: parsed.pd_location || "PREMIUM / DISCOUNT",
-            cls: "text-instamber border-instamber/25",
-          },
-          {
-            label: "DRAW ON LIQ (DOL)",
-            val: parsed.dol_target || "TARGET POOL",
-            cls: "text-instgreen border-instgreen/25",
-          },
-          {
-            label: "HTF BIAS",
-            val: parsed.htf_bias || "MULTI-TF",
-            cls: "text-white border-white/15",
-          },
-        ];
-
-        row.classList.remove("hidden");
-        row.classList.add("grid");
-        row.innerHTML = items
-          .map(
-            (it) => `
-          <div class="p-2.5 rounded-xl bg-void/90 border ${it.cls}">
-            <div class="text-[9px] text-gray-400 tracking-wider">${it.label}</div>
-            <div class="text-[11px] font-bold mt-0.5 truncate">${it.val}</div>
-          </div>
-        `,
-          )
-          .join("");
-      }
-
-      function renderSignalSummaryCard(parsed) {
-        const card = document.getElementById("signalSummaryCard");
-        if (!card || currentAnalysisMode === "keylevels") {
-          if (card) card.classList.add("hidden");
-          return;
-        }
-
-        const hasSignal =
-          parsed &&
-          parsed.has_setup &&
-          parsed.direction &&
-          parsed.direction !== "NONE";
-
-        card.classList.remove("hidden");
-
-        if (!hasSignal) {
-          card.className =
-            "rounded-xl p-3.5 bg-instred/10 border border-instred/40 space-y-1.5";
-          card.innerHTML = `
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="px-2.5 py-1 rounded-lg bg-instred text-white font-mono font-extrabold text-xs">NO SETUP</span>
-                ${
-                  parsed?.mtf_alignment
-                    ? `<span class="px-2 py-0.5 rounded bg-black/40 border border-white/15 text-[10px] font-mono text-instamber">${parsed.mtf_alignment}</span>`
-                    : ""
-                }
-                <span class="text-xs text-red-200 font-bold">ទីផ្សារ Sideway / Choppy ឬគ្មាន Zone ច្បាស់ — រង់ចាំ Setup ច្បាស់សិន</span>
-              </div>
-              <span class="font-mono text-[11px] text-gray-300">0.01 Lot • SL $10–$13</span>
-            </div>
-            ${
-              parsed?.no_setup_reason_km
-                ? `<p class="text-[11px] text-red-200/85 leading-relaxed">${parsed.no_setup_reason_km}</p>`
-                : ""
-            }
-          `;
-          return;
-        }
-
-        const isBuy = String(parsed.direction).toUpperCase().includes("BUY");
-        const dirBadgeClass = isBuy
-          ? "bg-instgreen/20 text-instgreen border border-instgreen/40"
-          : "bg-instred/20 text-instred border border-instred/40";
-
-        card.className =
-          "rounded-xl p-3.5 bg-void/95 border border-neoncyan/35 space-y-2.5";
-        card.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-2.5 py-1 rounded-lg font-mono font-extrabold text-xs ${dirBadgeClass}">${parsed.direction}</span>
-              <span class="text-xs font-bold text-white">HTF Bias: <span class="text-neoncyan">${parsed.htf_bias || "LOCKED"}</span></span>
-              ${
-                parsed.mtf_alignment
-                  ? `<span class="px-2 py-0.5 rounded bg-neoncyan/10 border border-neoncyan/30 text-[10px] font-mono text-neoncyan">${parsed.mtf_alignment}</span>`
-                  : ""
-              }
-              ${
-                parsed.setup_quality
-                  ? `<span class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-instamber">QUALITY: ${parsed.setup_quality}</span>`
-                  : ""
-              }
-            </div>
-            <span class="text-[11px] font-mono text-gray-400">0.01 Lot • BE @ ${parsed.be_target || "1:1–1.5"}</span>
-          </div>
-          <div class="grid grid-cols-3 gap-2 font-mono text-center">
-            <div class="p-2 rounded-lg bg-obsidian border border-neoncyan/25">
-              <div class="text-[10px] text-gray-400">ENTRY PRICE</div>
-              <div class="text-sm font-extrabold text-neoncyan mt-0.5">${parsed.entry_price || "N/A"}</div>
-            </div>
-            <div class="p-2 rounded-lg bg-obsidian border border-instred/25">
-              <div class="text-[10px] text-gray-400">STOP LOSS ($10–$13)</div>
-              <div class="text-sm font-extrabold text-instred mt-0.5">${parsed.sl_price || "N/A"}</div>
-            </div>
-            <div class="p-2 rounded-lg bg-obsidian border border-instgreen/25">
-              <div class="text-[10px] text-gray-400">TAKE PROFIT</div>
-              <div class="text-sm font-extrabold text-instgreen mt-0.5">${parsed.tp_price || "N/A"}</div>
-            </div>
-          </div>
-          ${
-            parsed._slAdjusted
-              ? `<div class="text-[11px] text-instamber">⚠️ SL ត្រូវបានកែសម្រួលដោយស្វ័យប្រវត្តិឱ្យនៅក្នុងដែន ~$11.00 (0.01 lot) ដើម្បីកុំឱ្យ SL វែងពេក។</div>`
-              : ""
-          }
-          ${
-            parsed.selection_reason_km
-              ? `<p class="text-[11px] text-gray-300 leading-relaxed"><strong class="text-neoncyan">មូលហេតុរើស Pullback Limit Setup នេះ (ICT + SMC)：</strong> ${parsed.selection_reason_km}</p>`
-              : ""
-          }
-        `;
       }
 
       function drawOverlayOnCanvas(dataUrl, parsedData) {
@@ -1504,7 +1206,7 @@
         const wrap = document.getElementById("markedCanvasWrap");
         const dlBtn = document.getElementById("btnDownloadMarked");
         const axisBadge = document.getElementById("overlayAxisBadge");
-        if (!canvas || !wrap) return;
+        if (!canvas || !wrap || !parsedData) return;
 
         const img = new Image();
         img.onload = () => {
@@ -1521,7 +1223,7 @@
             if (scaleObj.top_price && scaleObj.bottom_price) {
               axisBadge.textContent = `Scale #1: ${scaleObj.top_price} → ${scaleObj.bottom_price}`;
             } else {
-              axisBadge.textContent = "Scale #1: Relative Chart Mapping";
+              axisBadge.textContent = "Scale #1: Relative Mapping";
             }
           }
 
@@ -1558,125 +1260,55 @@
             const levels = Array.isArray(parsedData.key_levels)
               ? parsedData.key_levels
               : [];
-            if (levels.length === 0) {
-              ctx.fillStyle = "rgba(255, 183, 3, 0.22)";
-              ctx.fillRect(0, h * 0.12, w, h * 0.09);
-              ctx.fillStyle = "#ffb703";
-              ctx.font = `bold ${Math.max(16, Math.round(w * 0.022))}px sans-serif`;
-              ctx.fillText(
-                "NO CLEAR KEY LEVELS DETECTED",
-                Math.round(w * 0.04),
-                Math.round(h * 0.18),
+            levels.slice(0, 6).forEach((lvl, idx) => {
+              const ratio = computeYRatioFromScale(
+                lvl.price,
+                scaleObj,
+                lvl.y_ratio,
               );
-            } else {
-              levels.slice(0, 6).forEach((lvl, idx) => {
-                const ratio = computeYRatioFromScale(
-                  lvl.price,
-                  scaleObj,
-                  lvl.y_ratio,
-                );
-                const y = Math.round(ratio * h);
-                const typeUpper = (lvl.type || "").toUpperCase();
-                let color = "#ffb703";
-                if (
-                  typeUpper.includes("RESISTANCE") ||
-                  typeUpper.includes("SUPPLY") ||
-                  typeUpper.includes("PDH") ||
-                  typeUpper.includes("PWH") ||
-                  typeUpper.includes("BSL") ||
-                  typeUpper.includes("EQH") ||
-                  typeUpper.includes("OB-")
-                ) {
-                  color = "#ff3b5c";
-                } else if (
-                  typeUpper.includes("SUPPORT") ||
-                  typeUpper.includes("DEMAND") ||
-                  typeUpper.includes("PDL") ||
-                  typeUpper.includes("PWL") ||
-                  typeUpper.includes("SSL") ||
-                  typeUpper.includes("EQL") ||
-                  typeUpper.includes("OB+")
-                ) {
-                  color = "#00e676";
-                } else if (typeUpper.includes("FVG")) {
-                  color = "#00f0ff";
-                }
-                const tfTag = lvl.timeframe ? `[${lvl.timeframe}] ` : "";
-                const labelText = `${tfTag}${lvl.label || lvl.type || "KEY LEVEL"}: ${lvl.price || ""}`;
-                drawPriceLine(y, color, labelText, idx % 2 === 1);
-              });
-            }
+              const y = Math.round(ratio * h);
+              const labelText = `[${lvl.timeframe || "HTF"}] ${lvl.label || lvl.type || "LEVEL"}: ${lvl.price || ""}`;
+              drawPriceLine(y, "#ffb703", labelText, idx % 2 === 1);
+            });
             wrap.classList.remove("hidden");
             dlBtn.classList.remove("hidden");
             return;
           }
 
-          const hasSignal =
-            parsedData &&
-            parsedData.has_setup &&
-            parsedData.direction &&
-            parsedData.direction !== "NONE";
-          if (!hasSignal) {
-            ctx.fillStyle = "rgba(255, 59, 92, 0.22)";
-            ctx.fillRect(0, h * 0.12, w, h * 0.1);
-            ctx.fillStyle = "#ff3b5c";
-            ctx.font = `bold ${Math.max(18, Math.round(w * 0.024))}px sans-serif`;
-            ctx.fillText(
-              "NO SETUP (SIDEWAY / NO CLEAR ZONE)",
-              Math.round(w * 0.04),
-              Math.round(h * 0.18),
-            );
-            wrap.classList.remove("hidden");
-            dlBtn.classList.remove("hidden");
+          const dir = String(parsedData.direction || "").toUpperCase();
+          if (!dir || dir === "NONE" || dir === "NO SETUP") {
+            wrap.classList.add("hidden");
             return;
           }
 
-          const entryRatio = computeYRatioFromScale(
-            parsedData.entry_price,
-            scaleObj,
-            parsedData.entry_y_ratio,
+          const entryY = Math.round(
+            computeYRatioFromScale(
+              parsedData.entry_price,
+              scaleObj,
+              parsedData.entry_y_ratio,
+            ) * h,
           );
-          const slRatio = computeYRatioFromScale(
-            parsedData.sl_price,
-            scaleObj,
-            parsedData.sl_y_ratio,
+          const slY = Math.round(
+            computeYRatioFromScale(
+              parsedData.sl_price,
+              scaleObj,
+              parsedData.sl_y_ratio,
+            ) * h,
           );
-          const tpRatio = computeYRatioFromScale(
-            parsedData.tp_price,
-            scaleObj,
-            parsedData.tp_y_ratio,
-          );
-
-          const entryY = Math.round(entryRatio * h);
-          const slY = Math.round(slRatio * h);
-          const tpY = Math.round(tpRatio * h);
-
-          ctx.fillStyle = "rgba(255, 59, 92, 0.22)";
-          ctx.fillRect(
-            0,
-            Math.min(entryY, slY),
-            w,
-            Math.max(12, Math.abs(slY - entryY)),
-          );
-
-          ctx.fillStyle = "rgba(0, 230, 118, 0.16)";
-          ctx.fillRect(
-            0,
-            Math.min(entryY, tpY),
-            w,
-            Math.max(12, Math.abs(tpY - entryY)),
+          const tpY = Math.round(
+            computeYRatioFromScale(
+              parsedData.tp_price,
+              scaleObj,
+              parsedData.tp_y_ratio,
+            ) * h,
           );
 
           drawPriceLine(
             entryY,
             "#00f0ff",
-            `${parsedData.direction} ENTRY: ${parsedData.entry_price || "N/A"} (0.01)`,
+            `${dir} ENTRY: ${parsedData.entry_price || "N/A"}`,
           );
-          drawPriceLine(
-            slY,
-            "#ff3b5c",
-            `SL: ${parsedData.sl_price || "N/A"} ($10-$13)`,
-          );
+          drawPriceLine(slY, "#ff3b5c", `SL: ${parsedData.sl_price || "N/A"}`);
           drawPriceLine(tpY, "#00e676", `TP: ${parsedData.tp_price || "N/A"}`);
 
           wrap.classList.remove("hidden");
@@ -1685,19 +1317,90 @@
         img.src = dataUrl;
       }
 
-      function downloadMarkedChart() {
-        const canvas = document.getElementById("signalCanvas");
-        if (!canvas) return;
-        const link = document.createElement("a");
-        link.download =
-          currentAnalysisMode === "keylevels"
-            ? "xauusd-ict-smc-key-levels.png"
-            : "xauusd-ict-smc-signal.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
+      function renderMarkdownResult(rawText) {
+        stopLoadingTimer();
+        const loadingEl = document.getElementById("visionLoading");
+        const outputEl = document.getElementById("visionOutput");
+        const banner = document.getElementById("picCheckBanner");
+        const confRow = document.getElementById("smcConfluenceRow");
+        const card = document.getElementById("signalSummaryCard");
+        const jsonObj = extractJsonBlock(rawText);
+
+        if (jsonObj) {
+          if (banner && jsonObj.pic_check_km) {
+            banner.className =
+              "rounded-xl p-3 text-xs bg-neoncyan/10 border border-neoncyan/30 text-gray-200";
+            banner.innerHTML = `<strong>Pic Check:</strong> ${jsonObj.pic_check_km}`;
+            banner.classList.remove("hidden");
+          }
+
+          if (confRow) {
+            const items = [
+              {
+                label: "LIQUIDITY / IDM",
+                val: jsonObj.liquidity_status || "SWEEP / POOL",
+                cls: "text-neoncyan border-neoncyan/25",
+              },
+              {
+                label: "P&D LOCATION",
+                val: jsonObj.pd_location || "P&D ZONE",
+                cls: "text-instamber border-instamber/25",
+              },
+              {
+                label: "DRAW ON LIQ",
+                val: jsonObj.dol_target || "DOL",
+                cls: "text-instgreen border-instgreen/25",
+              },
+              {
+                label: "HTF BIAS",
+                val: jsonObj.htf_bias || "MULTI-TF",
+                cls: "text-white border-white/15",
+              },
+            ];
+            confRow.classList.remove("hidden");
+            confRow.classList.add("grid");
+            confRow.innerHTML = items
+              .map(
+                (it) => `
+              <div class="p-2.5 rounded-xl bg-void/90 border ${it.cls}">
+                <div class="text-[9px] text-gray-400">${it.label}</div>
+                <div class="text-[11px] font-bold mt-0.5 truncate">${it.val}</div>
+              </div>
+            `,
+              )
+              .join("");
+          }
+
+          if (card && currentAnalysisMode === "signal") {
+            const dir = String(jsonObj.direction || "NO SETUP").toUpperCase();
+            const isBuy = dir.includes("BUY");
+            card.classList.remove("hidden");
+            card.innerHTML = `
+              <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                <span class="px-2.5 py-1 rounded ${isBuy ? "bg-instgreen/20 text-instgreen" : "bg-instred/20 text-instred"} font-extrabold">${dir}</span>
+                <span class="text-gray-300">0.01 Lot • SL $10–$13 • BE 1:1–1.5</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 font-mono text-center text-xs mt-2">
+                <div class="p-2 rounded bg-obsidian"><div class="text-[10px] text-gray-400">ENTRY</div><div class="font-bold text-neoncyan">${jsonObj.entry_price || "N/A"}</div></div>
+                <div class="p-2 rounded bg-obsidian"><div class="text-[10px] text-gray-400">SL</div><div class="font-bold text-instred">${jsonObj.sl_price || "N/A"}</div></div>
+                <div class="p-2 rounded bg-obsidian"><div class="text-[10px] text-gray-400">TP</div><div class="font-bold text-instgreen">${jsonObj.tp_price || "N/A"}</div></div>
+              </div>
+            `;
+          }
+
+          if (uploadedImages[0]?.dataUrl) {
+            drawOverlayOnCanvas(uploadedImages[0].dataUrl, jsonObj);
+          }
+        }
+
+        const cleanMd =
+          (rawText || "").replace(/```json[\s\S]*?```/g, "").trim() || rawText;
+        outputEl.innerHTML = marked.parse(cleanMd || "គ្មានលទ្ធផល");
+        loadingEl.classList.add("hidden");
+        outputEl.classList.remove("hidden");
       }
 
-      function compressImageDataUrl(dataUrl, maxWidth = 800, quality = 0.62) {
+      function compressImageDataUrl(dataUrl, maxWidth = 640, quality = 0.58) {
         return new Promise((resolve) => {
           const img = new Image();
           img.onload = () => {
@@ -1732,33 +1435,16 @@
         });
       }
 
-      function displayParsedResult(parsed) {
-        stopLoadingTimer();
-        const loadingEl = document.getElementById("visionLoading");
-        const outputEl = document.getElementById("visionOutput");
-        const normalized = validateAndNormalizeSignalPrices(parsed);
-        renderPicCheckBanner(normalized.pic_check);
-        renderSmcConfluenceRow(normalized);
-        renderSignalSummaryCard(normalized);
-        drawOverlayOnCanvas(uploadedImages[0].dataUrl, normalized);
-        outputEl.innerHTML = marked.parse(
-          normalized.khmer_summary_markdown || "គ្មានសេចក្តីសង្ខេប",
-        );
-        loadingEl.classList.add("hidden");
-        outputEl.classList.remove("hidden");
-      }
-
       async function callGeminiModelOnce(
         apiKey,
         modelName,
         parts,
-        responseSchema,
-        timeoutMs = 30000,
+        timeoutMs = 22000,
       ) {
         const cleanKey = String(apiKey || "").trim();
         const cleanModel = String(modelName || "").trim();
         const endpoint =
-          "[https://generativelanguage.googleapis.com/v1beta/models/](https://generativelanguage.googleapis.com/v1beta/models/)" +
+          "https://generativelanguage.googleapis.com/v1beta/models/" +
           encodeURIComponent(cleanModel) +
           ":generateContent?key=" +
           encodeURIComponent(cleanKey);
@@ -1776,10 +1462,8 @@
             body: JSON.stringify({
               contents: [{ role: "user", parts }],
               generationConfig: {
-                temperature: 0.0,
-                maxOutputTokens: 1536,
-                responseMimeType: "application/json",
-                responseSchema,
+                temperature: 0.1,
+                maxOutputTokens: 1024,
               },
             }),
           });
@@ -1789,13 +1473,14 @@
           try {
             data = JSON.parse(rawBody);
           } catch (_) {
-            throw new Error(`Invalid JSON response (${res.status})`);
+            throw new Error(`Invalid response (${res.status})`);
           }
 
-          if (res.ok) {
-            return data;
+          if (!res.ok) {
+            throw new Error(data?.error?.message || `Gemini API ${res.status}`);
           }
-          throw new Error(data?.error?.message || `Gemini API ${res.status}`);
+
+          return data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
         } catch (err) {
           if (err?.name === "AbortError") {
             throw new Error(
@@ -1835,9 +1520,8 @@
           try {
             const cachedRaw = sessionStorage.getItem(cacheKey);
             if (cachedRaw) {
-              const cachedParsed = JSON.parse(cachedRaw);
               emptyEl.classList.add("hidden");
-              displayParsedResult(cachedParsed);
+              renderMarkdownResult(cachedRaw);
               showToast("បង្ហាញលទ្ធផលដើមដែលថេរសម្រាប់រូបភាពនេះ!");
               return;
             }
@@ -1858,191 +1542,35 @@
         btn.classList.add("opacity-60");
 
         const liveText = liveGoldPrice
-          ? `Live XAUUSD reference price is ~${liveGoldPrice.toFixed(2)}.`
+          ? `Live XAUUSD reference price is ~${liveGoldPrice.toFixed(2)}. `
           : "";
 
-        const picCheckInstruction = `
-MANDATORY IMAGE VERIFICATION ("pic_check"):
-1. Check every uploaded image (#1 to #${uploadedImages.length}) to verify:
-   - Is it actually a financial candlestick/trading chart (specifically XAUUSD / Gold)?
-   - What exact timeframe(s) are visible on each image (e.g., 15m, 30m, 1H, 4H, 1D)?
-   - Does the uploaded image match the user's note/expected timeframes, and is the chart price consistent with ${liveText || "current market price"}?
-2. If ANY image is NOT a trading chart, is the wrong symbol, has duplicate/wrong timeframes compared to what was requested or noted, or shows an outdated/mismatched price, set "has_mismatch": true (and "is_valid_chart": false if not a chart) and clearly explain in Khmer in "message_km" what is wrong or mismatched!`;
+        const taskText =
+          currentAnalysisMode === "keylevels"
+            ? `Identify ICT/SMC key levels (PDH/PDL, BSL/SSL, +OB/-OB, FVG) on ${selectedKeyLevelTF} using Image #1 price axis.`
+            : `Analyze 4H/1H/30m/15m ICT+SMC. Give ONE Pullback Limit setup (BUY LIMIT / SELL LIMIT / NO SETUP) with 0.01 lot, SL ~$11 ($10-$13), BE at 1:1-1.5.`;
 
-        const scaleCalibrationInstruction = `
-CHART #1 PRICE AXIS CALIBRATION ("chart1_price_scale"):
-- Read the top-most visible price level ("top_price") and bottom-most visible price level ("bottom_price") along the right price axis of Image #1, along with their vertical fractions ("top_y_ratio" near top, "bottom_y_ratio" near bottom).
-- Every price level or entry/SL/TP drawn on Image #1 must correspond accurately to its numeric price value on Image #1's price axis!`;
-
-        let promptText = "";
-        let responseSchema = null;
-
-        if (currentAnalysisMode === "keylevels") {
-          promptText = `You are a strict institutional ICT + SMC Gold (XAUUSD) analyst.
-Task: Identify high-probability ICT + SMC KEY LEVELS on timeframes: ${selectedKeyLevelTF} (specifically 1H, 4H, 1D).
-${liveText} User note: "${userNote}".
-${picCheckInstruction}
-${scaleCalibrationInstruction}
-
-Provide up to 6 key levels visible on Image #1 with numeric price and y_ratio (0.08 to 0.92), and concise Khmer summary in "khmer_summary_markdown".`;
-
-          responseSchema = {
-            type: "OBJECT",
-            properties: {
-              pic_check: {
-                type: "OBJECT",
-                properties: {
-                  is_valid_chart: { type: "BOOLEAN" },
-                  has_mismatch: { type: "BOOLEAN" },
-                  detected_timeframes: {
-                    type: "ARRAY",
-                    items: { type: "STRING" },
-                  },
-                  message_km: { type: "STRING" },
-                },
-                required: [
-                  "is_valid_chart",
-                  "has_mismatch",
-                  "detected_timeframes",
-                  "message_km",
-                ],
-              },
-              liquidity_status: { type: "STRING" },
-              pd_location: { type: "STRING" },
-              dol_target: { type: "STRING" },
-              htf_bias: { type: "STRING" },
-              chart1_price_scale: {
-                type: "OBJECT",
-                properties: {
-                  top_price: { type: "STRING" },
-                  bottom_price: { type: "STRING" },
-                  top_y_ratio: { type: "NUMBER" },
-                  bottom_y_ratio: { type: "NUMBER" },
-                },
-                required: [
-                  "top_price",
-                  "bottom_price",
-                  "top_y_ratio",
-                  "bottom_y_ratio",
-                ],
-              },
-              key_levels: {
-                type: "ARRAY",
-                items: {
-                  type: "OBJECT",
-                  properties: {
-                    timeframe: { type: "STRING" },
-                    type: { type: "STRING" },
-                    label: { type: "STRING" },
-                    price: { type: "STRING" },
-                    y_ratio: { type: "NUMBER" },
-                  },
-                  required: ["timeframe", "type", "label", "price", "y_ratio"],
-                },
-              },
-              khmer_summary_markdown: { type: "STRING" },
-            },
-            required: [
-              "pic_check",
-              "liquidity_status",
-              "pd_location",
-              "dol_target",
-              "htf_bias",
-              "chart1_price_scale",
-              "key_levels",
-              "khmer_summary_markdown",
-            ],
-          };
-        } else {
-          promptText = `You are a disciplined ICT + SMC Gold (XAUUSD) trading analyst.
-Analyze the chart(s) across 4H, 1H, 30m, and 15m using ICT + SMC (BOS/MSS, Liquidity/IDM, Premium/Discount, +OB/-OB/FVG, DOL).
-Output ONE Pullback Limit setup ("BUY LIMIT" or "SELL LIMIT") when clear, or "has_setup": false / "NONE" when choppy/sideway.
-Keep SL realistic (~$10–$13 on 0.01 lot) with BE at 1:1–1:1.5.
-Provide concise Khmer explanation in "khmer_summary_markdown".
-
-${liveText} User note: "${userNote}".
-${picCheckInstruction}
-${scaleCalibrationInstruction}`;
-
-          responseSchema = {
-            type: "OBJECT",
-            properties: {
-              pic_check: {
-                type: "OBJECT",
-                properties: {
-                  is_valid_chart: { type: "BOOLEAN" },
-                  has_mismatch: { type: "BOOLEAN" },
-                  detected_timeframes: {
-                    type: "ARRAY",
-                    items: { type: "STRING" },
-                  },
-                  message_km: { type: "STRING" },
-                },
-                required: [
-                  "is_valid_chart",
-                  "has_mismatch",
-                  "detected_timeframes",
-                  "message_km",
-                ],
-              },
-              htf_bias: { type: "STRING" },
-              mtf_alignment: { type: "STRING" },
-              liquidity_status: { type: "STRING" },
-              pd_location: { type: "STRING" },
-              dol_target: { type: "STRING" },
-              has_setup: { type: "BOOLEAN" },
-              direction: { type: "STRING" },
-              setup_quality: { type: "STRING" },
-              selection_reason_km: { type: "STRING" },
-              no_setup_reason_km: { type: "STRING" },
-              entry_price: { type: "STRING" },
-              sl_price: { type: "STRING" },
-              tp_price: { type: "STRING" },
-              be_target: { type: "STRING" },
-              chart1_price_scale: {
-                type: "OBJECT",
-                properties: {
-                  top_price: { type: "STRING" },
-                  bottom_price: { type: "STRING" },
-                  top_y_ratio: { type: "NUMBER" },
-                  bottom_y_ratio: { type: "NUMBER" },
-                },
-                required: [
-                  "top_price",
-                  "bottom_price",
-                  "top_y_ratio",
-                  "bottom_y_ratio",
-                ],
-              },
-              entry_y_ratio: { type: "NUMBER" },
-              sl_y_ratio: { type: "NUMBER" },
-              tp_y_ratio: { type: "NUMBER" },
-              khmer_summary_markdown: { type: "STRING" },
-            },
-            required: [
-              "pic_check",
-              "htf_bias",
-              "mtf_alignment",
-              "liquidity_status",
-              "pd_location",
-              "dol_target",
-              "has_setup",
-              "direction",
-              "setup_quality",
-              "selection_reason_km",
-              "no_setup_reason_km",
-              "entry_price",
-              "sl_price",
-              "tp_price",
-              "be_target",
-              "chart1_price_scale",
-              "entry_y_ratio",
-              "sl_y_ratio",
-              "tp_y_ratio",
-              "khmer_summary_markdown",
-            ],
-          };
-        }
+        const promptText = `${liveText}${taskText} User note: "${userNote}".
+First return a JSON block:
+\`\`\`json
+{
+  "pic_check_km": "...",
+  "htf_bias": "...",
+  "liquidity_status": "...",
+  "pd_location": "...",
+  "dol_target": "...",
+  "direction": "BUY LIMIT|SELL LIMIT|NO SETUP",
+  "entry_price": "...",
+  "sl_price": "...",
+  "tp_price": "...",
+  "chart1_price_scale": {"top_price": "...", "bottom_price": "...", "top_y_ratio": 0.08, "bottom_y_ratio": 0.92},
+  "entry_y_ratio": 0.5,
+  "sl_y_ratio": 0.65,
+  "tp_y_ratio": 0.25,
+  "key_levels": []
+}
+\`\`\`
+Then write a concise summary in Khmer.`;
 
         const preparedImages = await Promise.all(
           uploadedImages
@@ -2062,44 +1590,35 @@ ${scaleCalibrationInstruction}`;
             })),
         ];
 
-        const modelsToTry = [
-          "gemini-2.5-flash",
-          "gemini-2.5-flash-lite",
-          "gemini-2.0-flash",
-        ];
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
 
         try {
-          let data = null;
+          let rawContent = "";
           const errors = [];
 
           for (const modelName of modelsToTry) {
             try {
-              data = await callGeminiModelOnce(
+              rawContent = await callGeminiModelOnce(
                 apiKey,
                 modelName,
                 parts,
-                responseSchema,
-                30000,
+                22000,
               );
-              break;
+              if (rawContent) break;
             } catch (err) {
               errors.push(`${modelName}: ${err.message}`);
             }
           }
 
-          if (!data) {
+          if (!rawContent) {
             throw new Error(errors.join(" | ") || "Gemini API timeout/error");
           }
 
-          const rawContent =
-            data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          const parsed = parseJsonSafely(rawContent);
-
           try {
-            sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
+            sessionStorage.setItem(cacheKey, rawContent);
           } catch (_) {}
 
-          displayParsedResult(parsed);
+          renderMarkdownResult(rawContent);
         } catch (err) {
           stopLoadingTimer();
           loadingEl.classList.add("hidden");
@@ -2113,6 +1632,18 @@ ${scaleCalibrationInstruction}`;
           btn.disabled = false;
           btn.classList.remove("opacity-60");
         }
+      }
+
+      function downloadMarkedChart() {
+        const canvas = document.getElementById("signalCanvas");
+        if (!canvas) return;
+        const link = document.createElement("a");
+        link.download =
+          currentAnalysisMode === "keylevels"
+            ? "xauusd-ict-smc-key-levels.png"
+            : "xauusd-ict-smc-signal.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
       }
 
       function startEngineApp() {
