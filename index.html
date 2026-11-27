@@ -348,7 +348,7 @@
                 class="py-2 px-2.5 rounded-lg text-xs font-bold text-gray-300 hover:text-white transition flex items-center justify-center gap-1.5"
               >
                 <span>🎯</span>
-                <span>Key Levels (1H/4H/1D)</span>
+                <span>Key Levels (All TF → One Chart)</span>
               </button>
             </div>
           </div>
@@ -525,7 +525,7 @@
                 />
               </label>
               <label class="text-[10px] text-gray-400"
-                >Max Risk (USD)
+                >Risk Reference (USD) — មិនមែនជា Signal Gate
                 <input
                   id="riskMaxUsd"
                   type="number"
@@ -537,7 +537,7 @@
                 />
               </label>
               <label class="text-[10px] text-gray-400 col-span-2"
-                >Broker Contract Size (oz per 1.00 lot)
+                >Optional Broker Contract Size (oz per 1.00 lot)
                 <input
                   id="riskContractSize"
                   type="number"
@@ -550,9 +550,11 @@
               </label>
             </div>
             <p class="text-[10px] text-gray-500 leading-relaxed">
-              Risk គណនាបឋម = |Entry − SL| × Lot × Contract Size (oz/lot)។
-              បើមិនបញ្ចូល Contract Size ឬ Risk លើសកំណត់ កម្មវិធីនឹងបង្ហាញ NO
-              SETUP។ ការគណនាមិនទាន់រាប់ Spread, Commission និង Slippage ទេ។
+              SL និង TP ត្រូវកំណត់តាម Structure, Liquidity និង HTF Levels របស់
+              ICT + SMC។ Risk Reference និង Contract Size
+              គ្រាន់តែសម្រាប់ប៉ាន់ស្មានទំហំហានិភ័យប៉ុណ្ណោះ មិនមែនជាលក្ខខណ្ឌបិទ
+              Signal ទេ។ ការគណនាប៉ាន់ស្មានមិនរាប់ Spread, Commission, Swap និង
+              Slippage។
             </p>
             <div
               class="grid grid-cols-3 gap-2 text-center font-mono text-[10px]"
@@ -564,7 +566,7 @@
                 </div>
               </div>
               <div class="p-2 rounded-lg bg-obsidian border border-white/5">
-                <div class="text-gray-500">Risk Cap</div>
+                <div class="text-gray-500">Risk Ref.</div>
                 <div id="riskCapLabel" class="font-bold text-instred mt-0.5">
                   $10
                 </div>
@@ -750,7 +752,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v7_advanced_guard_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v11_keylevels_validation_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -774,11 +776,11 @@
             "py-2 px-2.5 rounded-lg text-xs font-bold bg-instamber text-void transition flex items-center justify-center gap-1.5";
           klBox.classList.remove("hidden");
           headerTitle.textContent =
-            "Upload Screenshot (1H / 4H / 1D Key Levels)";
+            "Upload Charts (first image = Master Chart for all Key Levels)";
           analyzeLabel.textContent = "រក Key Levels & Check Pic";
           if (noteInput) {
             noteInput.placeholder =
-              "ឧ. #1=1H, #2=4H, #3=1D — រក PDH/PDL, OB, FVG, Liquidity";
+              "ឧ. #1=1H Master Chart (ត្រូវមាន Price Scale ច្បាស់), #2=4H, #3=1D — បង្ហាញ Key Levels ទាំងអស់លើ #1";
           }
         } else {
           btnSignal.className =
@@ -1060,31 +1062,35 @@
       const chartFileInput = document.getElementById("chartFileInput");
       const imagePreviewGrid = document.getElementById("imagePreviewGrid");
 
-      function handleFiles(files) {
+      async function handleFiles(files) {
         const imgFiles = Array.from(files).filter((f) =>
           f.type.startsWith("image/"),
         );
         if (imgFiles.length === 0) return;
 
+        // Sequential FileReader keeps the chosen/uploaded order deterministic.
         for (const file of imgFiles) {
-          if (uploadedImages.length >= MAX_IMAGES) {
-            uploadedImages.shift();
-          }
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            const dataUrl = ev.target.result;
-            const base64 = dataUrl.split(",")[1];
+          if (uploadedImages.length >= MAX_IMAGES) uploadedImages.shift();
+          try {
+            const dataUrl = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = (ev) => resolve(ev.target.result);
+              reader.onerror = () => reject(new Error("មិនអាចអានរូបភាពបាន"));
+              reader.readAsDataURL(file);
+            });
             uploadedImages.push({
               dataUrl,
-              base64,
+              base64: dataUrl.split(",")[1],
               mimeType: file.type,
+              fileName: file.name,
             });
             if (uploadedImages.length > MAX_IMAGES) {
               uploadedImages = uploadedImages.slice(-MAX_IMAGES);
             }
             renderImagePreviews();
-          };
-          reader.readAsDataURL(file);
+          } catch (err) {
+            showToast(err.message || "មានបញ្ហាក្នុងការអានរូបភាព");
+          }
         }
       }
 
@@ -1223,7 +1229,23 @@
       }
 
       function validateSetupBeforeDisplay(parsed) {
-        if (!parsed || currentAnalysisMode === "keylevels") return parsed;
+        if (!parsed) return parsed;
+        if (currentAnalysisMode === "keylevels") {
+          const pic = parsed.pic_check;
+          const picCheckPassed =
+            !!pic &&
+            pic.is_valid_chart === true &&
+            pic.has_mismatch === false &&
+            Array.isArray(pic.detected_timeframes);
+          if (!picCheckPassed) {
+            parsed.key_levels = [];
+            parsed.key_levels_blocked = true;
+            parsed.khmer_summary_markdown =
+              "### មិនអាចបង្ហាញ Key Levels បាន\\nPic Check មិនបានបញ្ជាក់ថា Chart ត្រឹមត្រូវទាំងអស់ទេ ឬរកឃើញភាពមិនត្រូវគ្នា។ សូមពិនិត្យ Symbol, Timeframe និង Price Scale រួច Upload ម្តងទៀត។\\n\\n" +
+              (parsed.khmer_summary_markdown || "");
+          }
+          return parsed;
+        }
 
         const fail = (reasonKm) => {
           parsed.has_setup = false;
@@ -1279,10 +1301,10 @@
 
         const riskDistance = Math.abs(entry - sl);
         const rewardDistance = Math.abs(tp - entry);
-        const rr = rewardDistance / riskDistance;
-        if (!Number.isFinite(rr) || rr < 1.5) {
+        const rr = riskDistance > 0 ? rewardDistance / riskDistance : NaN;
+        if (!Number.isFinite(rr) || riskDistance <= 0) {
           return fail(
-            `Risk:Reward គឺប្រហែល 1:${Number.isFinite(rr) ? rr.toFixed(2) : "N/A"} ដែលទាបជាងកម្រិតអប្បបរមា 1:1.5។ NO SETUP។`,
+            "ចម្ងាយ Entry និង SL មិនត្រឹមត្រូវ។ សូមពិនិត្យ Structural Invalidation លើ Chart។",
           );
         }
 
@@ -1298,20 +1320,20 @@
         }
 
         const risk = getRiskSettings();
-        if (!risk.contractSize) {
-          return fail(
-            "មិនទាន់បញ្ចូល Broker Contract Size (oz per 1.00 lot)។ សូមពិនិត្យ Specification របស់ Broker រួចបញ្ចូលតម្លៃនេះ ដើម្បីអាចគណនា Risk ជា USD មុនពេលទទួល Signal។",
-          );
-        }
-
-        const estimatedGrossRisk = riskDistance * risk.lot * risk.contractSize;
-        parsed.estimated_gross_risk_usd = Number(estimatedGrossRisk.toFixed(2));
         parsed.risk_distance_price = Number(riskDistance.toFixed(2));
+        parsed.reward_distance_price = Number(rewardDistance.toFixed(2));
         parsed.risk_reward_ratio = Number(rr.toFixed(2));
-        if (estimatedGrossRisk > risk.maxUsd) {
-          return fail(
-            `ការខាតបង់ប៉ាន់ស្មានមុនថ្លៃសេវា = $${estimatedGrossRisk.toFixed(2)} លើស Risk Cap $${risk.maxUsd.toFixed(2)}។ មិនត្រូវបង្រួម SL ចូលក្នុង Structural Invalidation ទេ។ NO SETUP។`,
+        parsed.risk_reference_usd = risk.maxUsd;
+        if (risk.contractSize > 0) {
+          const estimatedGrossRisk =
+            riskDistance * risk.lot * risk.contractSize;
+          parsed.estimated_gross_risk_usd = Number(
+            estimatedGrossRisk.toFixed(2),
           );
+          parsed.risk_reference_exceeded = estimatedGrossRisk > risk.maxUsd;
+        } else {
+          parsed.estimated_gross_risk_usd = null;
+          parsed.risk_reference_exceeded = null;
         }
         return parsed;
       }
@@ -1396,11 +1418,11 @@
               .replace(/\\"/g, '"');
             return {
               pic_check: {
-                is_valid_chart: true,
-                has_mismatch: false,
+                is_valid_chart: false,
+                has_mismatch: true,
                 detected_timeframes: [],
                 message_km:
-                  "បានទាញលទ្ធផលវិភាគដោយស្វ័យប្រវត្តិ (ទម្រង់ JSON ត្រូវបានជួសជុល)។",
+                  "មិនអាចផ្ទៀងផ្ទាត់ Pic Check បាន ព្រោះទម្រង់ JSON របស់ AI មិនពេញលេញ។",
               },
               htf_bias: "PULLBACK",
               mtf_alignment: "PULLBACK ZONE",
@@ -1519,7 +1541,7 @@
                   : ""
               }
             </div>
-            <span class="text-[11px] font-mono text-gray-400">${getRiskSettings().lot} Lot • Est. Risk $${Number(parsed.estimated_gross_risk_usd || 0).toFixed(2)} • R:R 1:${Number(parsed.risk_reward_ratio || 0).toFixed(2)} • BE @ ${parsed.be_target || "1R+"}</span>
+            <span class="text-[11px] font-mono text-gray-400">${getRiskSettings().lot} Lot • ${parsed.estimated_gross_risk_usd == null ? "Cash Risk: N/A" : `Est. Risk $${Number(parsed.estimated_gross_risk_usd).toFixed(2)}${parsed.risk_reference_exceeded ? " (លើស Risk Ref.)" : ""}`} • R:R 1:${Number(parsed.risk_reward_ratio || 0).toFixed(2)} • BE @ ${parsed.be_target || "1R+"}</span>
           </div>
           <div class="grid grid-cols-3 gap-2 font-mono text-center">
             <div class="p-2 rounded-lg bg-obsidian border border-neoncyan/25">
@@ -1634,33 +1656,150 @@
                 Math.round(h * 0.18),
               );
             } else {
-              levels.slice(0, 6).forEach((lvl, idx) => {
-                const y = clampY(lvl.y_ratio);
-                const typeUpper = (lvl.type || "").toUpperCase();
+              const levelFamily = (lvl) => {
+                const s = `${lvl.type || ""} ${lvl.label || ""}`.toUpperCase();
+                if (/FVG|FAIR VALUE GAP/.test(s)) return "FVG";
+                if (/ORDER BLOCK|\bOB\b/.test(s)) return "OB";
+                if (/PDH|PDL|PWH|PWL|BSL|SSL|EQH|EQL|LIQUIDITY/.test(s))
+                  return "LIQUIDITY";
+                if (/PREMIUM|DISCOUNT|EQUILIBRIUM|50%/.test(s))
+                  return "DEALING_RANGE";
+                return s.replace(/\s+/g, " ").trim();
+              };
+              const dedupedLevels = [];
+              for (const candidate of levels) {
+                const price = Number(
+                  String(candidate.price || "").replace(/,/g, ""),
+                );
+                const family = levelFamily(candidate);
+                const duplicate = dedupedLevels.find((existing) => {
+                  const existingPrice = Number(
+                    String(existing.price || "").replace(/,/g, ""),
+                  );
+                  return (
+                    family === levelFamily(existing) &&
+                    Number.isFinite(price) &&
+                    Number.isFinite(existingPrice) &&
+                    Math.abs(price - existingPrice) <=
+                      Math.max(0.05, Math.abs(price) * 0.00002)
+                  );
+                });
+                if (duplicate) {
+                  const tfs = new Set(
+                    `${duplicate.timeframe || ""} + ${candidate.timeframe || ""}`
+                      .split("+")
+                      .map((v) => v.trim())
+                      .filter(Boolean),
+                  );
+                  duplicate.timeframe = Array.from(tfs).join(" + ");
+                  duplicate.label = `${duplicate.label || duplicate.type} / ${candidate.label || candidate.type}`;
+                } else {
+                  dedupedLevels.push({ ...candidate });
+                }
+              }
+
+              const hasValidRatio = (value) => {
+                const n = Number(value);
+                return Number.isFinite(n) && n >= 0.08 && n <= 0.92;
+              };
+              const hasValidZone = (lvl) =>
+                hasValidRatio(lvl.upper_y_ratio) &&
+                hasValidRatio(lvl.lower_y_ratio) &&
+                Math.abs(
+                  Number(lvl.lower_y_ratio) - Number(lvl.upper_y_ratio),
+                ) > 0.002;
+
+              const visibleLevels = dedupedLevels
+                .filter(
+                  (lvl) => hasValidRatio(lvl.y_ratio) || hasValidZone(lvl),
+                )
+                .sort((a, b) => {
+                  const aRatio = hasValidRatio(a.y_ratio)
+                    ? Number(a.y_ratio)
+                    : (Number(a.upper_y_ratio) + Number(a.lower_y_ratio)) / 2;
+                  const bRatio = hasValidRatio(b.y_ratio)
+                    ? Number(b.y_ratio)
+                    : (Number(b.upper_y_ratio) + Number(b.lower_y_ratio)) / 2;
+                  return aRatio - bRatio;
+                });
+
+              visibleLevels.forEach((lvl, idx) => {
+                const upperRatio = Number(lvl.upper_y_ratio);
+                const lowerRatio = Number(lvl.lower_y_ratio);
+                const zoneIsValid = hasValidZone(lvl);
+                const lineRatio = hasValidRatio(lvl.y_ratio)
+                  ? Number(lvl.y_ratio)
+                  : zoneIsValid
+                    ? (upperRatio + lowerRatio) / 2
+                    : NaN;
+                const y = clampY(lineRatio);
+                const typeUpper =
+                  `${lvl.type || ""} ${lvl.label || ""}`.toUpperCase();
                 let color = "#ffb703";
+
+                // Liquidity and HTF high/low levels
                 if (
-                  typeUpper.includes("RESISTANCE") ||
-                  typeUpper.includes("SUPPLY") ||
-                  typeUpper.includes("PDH") ||
-                  typeUpper.includes("PWH") ||
-                  typeUpper.includes("OB-")
+                  /BEARISH|SELL|BSL|EQH|PDH|PWH|RESISTANCE|SUPPLY|BEARISH OB/.test(
+                    typeUpper,
+                  )
                 ) {
                   color = "#ff3b5c";
                 } else if (
-                  typeUpper.includes("SUPPORT") ||
-                  typeUpper.includes("DEMAND") ||
-                  typeUpper.includes("PDL") ||
-                  typeUpper.includes("PWL") ||
-                  typeUpper.includes("OB+")
+                  /BULLISH|BUY|SSL|EQL|PDL|PWL|SUPPORT|DEMAND|BULLISH OB/.test(
+                    typeUpper,
+                  )
                 ) {
                   color = "#00e676";
-                } else if (typeUpper.includes("FVG")) {
-                  color = "#00f0ff";
+                } else if (/FVG|FAIR VALUE GAP/.test(typeUpper)) {
+                  color = /BEARISH|SELL/.test(typeUpper)
+                    ? "#ff8a65"
+                    : "#00f0ff";
+                } else if (/OB|ORDER BLOCK/.test(typeUpper)) {
+                  color = "#b388ff";
+                } else if (/EQUILIBRIUM|50%|MIDPOINT/.test(typeUpper)) {
+                  color = "#ffffff";
                 }
+
                 const tfTag = lvl.timeframe ? `[${lvl.timeframe}] ` : "";
-                const labelText = `${tfTag}${lvl.label || lvl.type || "KEY LEVEL"}: ${lvl.price || ""}`;
-                drawPriceLine(y, color, labelText, idx % 2 === 1);
+                const statusTag = lvl.status ? ` (${lvl.status})` : "";
+                const labelText = `${tfTag}${lvl.label || lvl.type || "KEY LEVEL"}: ${lvl.price || ""}${statusTag}`;
+                if (zoneIsValid) {
+                  const y1 = clampY(Math.min(upperRatio, lowerRatio));
+                  const y2 = clampY(Math.max(upperRatio, lowerRatio));
+                  ctx.save();
+                  ctx.fillStyle = color + "24";
+                  ctx.fillRect(0, y1, w, Math.max(3, y2 - y1));
+                  ctx.strokeStyle = color;
+                  ctx.lineWidth = Math.max(1, Math.round(w * 0.0015));
+                  ctx.strokeRect(0, y1, w, Math.max(3, y2 - y1));
+                  ctx.restore();
+                }
+                if (hasValidRatio(lvl.y_ratio)) {
+                  drawPriceLine(y, color, labelText, idx % 2 === 1);
+                } else if (zoneIsValid) {
+                  drawPriceLine(
+                    y,
+                    color,
+                    `${labelText} (ZONE MID)`,
+                    idx % 2 === 1,
+                  );
+                }
               });
+
+              const hiddenCount = dedupedLevels.length - visibleLevels.length;
+              if (hiddenCount > 0) {
+                ctx.save();
+                ctx.fillStyle = "rgba(8,11,16,0.88)";
+                ctx.fillRect(10, h - 34, Math.min(w - 20, 620), 25);
+                ctx.fillStyle = "#ffb703";
+                ctx.font = `bold ${Math.max(11, Math.round(w * 0.012))}px sans-serif`;
+                ctx.fillText(
+                  `${hiddenCount} level(s) outside master chart visible price range — not plotted`,
+                  18,
+                  h - 17,
+                );
+                ctx.restore();
+              }
             }
             wrap.classList.remove("hidden");
             dlBtn.classList.remove("hidden");
@@ -1711,13 +1850,9 @@
           drawPriceLine(
             entryY,
             "#00f0ff",
-            `${parsedData.direction} ENTRY: ${parsedData.entry_price || "N/A"} (0.01)`,
+            `${parsedData.direction} ENTRY: ${parsedData.entry_price || "N/A"} (${getRiskSettings().lot} lot)`,
           );
-          drawPriceLine(
-            slY,
-            "#ff3b5c",
-            `SL: ${parsedData.sl_price || "N/A"} ($10-$13)`,
-          );
+          drawPriceLine(slY, "#ff3b5c", `SL: ${parsedData.sl_price || "N/A"}`);
           drawPriceLine(tpY, "#00e676", `TP: ${parsedData.tp_price || "N/A"}`);
 
           wrap.classList.remove("hidden");
@@ -1868,13 +2003,31 @@ MANDATORY IMAGE VERIFICATION ("pic_check"):
         let responseSchema = null;
 
         if (currentAnalysisMode === "keylevels") {
-          promptText = `You are an institutional ICT + SMC Gold (XAUUSD) analyst.
-Task: Identify major institutional KEY LEVELS on timeframes: ${selectedKeyLevelTF} (specifically looking across 1H, 4H, and 1D charts provided).
+          promptText = `You are an institutional ICT + SMC XAUUSD Key Levels analyst.
+GOAL: Consolidate the valid 1H, 4H and 1D Key Levels onto ONE chart overlay: uploaded image #1 is the MASTER CHART and the only canvas where lines will be drawn. Images #2 onward are source/reference charts for their stated timeframes.
+Selected source timeframes: ${selectedKeyLevelTF}.
 ${liveText} User note: "${userNote}".
 ${picCheckInstruction}
 
-Find the most important Key Levels (e.g., Previous Day High/Low PDH/PDL, Previous Week High/Low PWH/PWL, 1D/4H/1H Unmitigated Order Blocks, 1D/4H/1H Fair Value Gaps FVG, Major Liquidity Pools / Equal Highs & Lows).
-Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible on image #1 so we can draw them on image #1. Keep text concise, clear, and well-formatted in Khmer markdown.`;
+MASTER-CHART RULES (CRITICAL):
+1) Read and identify the visible XAUUSD price scale on image #1 (top price, bottom price, and vertical chart plot area). Use image #1 as the only coordinate system for y_ratio.
+2) Extract real level PRICE values from all supplied 1H/4H/1D source charts. For every level from any timeframe, project its numeric price onto the price scale of MASTER image #1, then calculate y_ratio from the MASTER chart: 0.08 at top to 0.92 at bottom. Never copy a y coordinate from image #2/#3 to image #1.
+3) Only return a y_ratio for a level if its price is within the visible price range of image #1 and its price-axis mapping is clear. If a valid HTF level is outside image #1's visible price range, still include it in the written summary as OUTSIDE MASTER RANGE, but set y_ratio to -1 so the overlay will not draw it. Do not clamp out-of-range levels to the chart edge.
+4) If image #1's price scale is cropped, hidden, unreadable, or inconsistent with the source charts, do not guess coordinates. Set y_ratio=-1 and explain the limitation. Recommend using a wider-range master chart.
+5) Consolidate duplicate/nearly identical levels from different timeframes into one level with all source timeframes listed, e.g. "1H + 4H". Keep distinct levels separate. Return all meaningful non-duplicate levels; do not arbitrarily limit to six.
+6) Before returning any y_ratio, read at least two visible numeric price-axis ticks on master image #1 and map the level price against those ticks. The plot area's top/bottom must exclude chart headers, indicator panels and time axis. If the scale cannot be calibrated reliably, set y_ratio=-1; never estimate from candle position alone.
+7) For OB/FVG zones, return upper_price, lower_price, upper_y_ratio and lower_y_ratio. Both boundary ratios must be calibrated against the MASTER chart price scale. If either boundary cannot be mapped reliably, set both ratios to -1 and report the zone in text only.
+8) Never treat AI confidence as proof. Explain visible evidence and mark confidence LOW when axis/candles are unclear.
+
+FIND AND CLASSIFY:
+- Liquidity: PDH, PDL, PWH, PWL, BSL, SSL, EQH, EQL, swing highs/lows.
+- Institutional POIs: 1D/4H/1H bullish and bearish Order Blocks; bullish and bearish FVGs; breaker blocks when clearly evidenced.
+- Dealing range: Premium, Equilibrium 50%, Discount and major swing high/low.
+- For OB/FVG state whether UNMITIGATED, PARTIALLY MITIGATED, MITIGATED, INVALIDATED, or UNKNOWN. Do not claim unmitigated without checking subsequent price interaction on the supplied chart.
+- Every level must include timeframe, exact price, category/type, short evidence note and confidence. Never invent a price or infer PDH/PDL/PWH/PWL if the necessary historical candles are not visible.
+- For zones with upper/lower bounds, include both bounds; if the app can only draw one line, use the proximal edge for the line and state the full zone in the summary.
+
+Return concise Khmer markdown. Explicitly distinguish levels plotted on the master chart from valid levels outside its visible range. Add a compact legend and group levels by liquidity / OB-FVG / dealing-range.`;
 
           responseSchema = {
             type: "OBJECT",
@@ -1907,6 +2060,13 @@ Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible
                     label: { type: "STRING" },
                     price: { type: "STRING" },
                     y_ratio: { type: "NUMBER" },
+                    status: { type: "STRING" },
+                    evidence: { type: "STRING" },
+                    confidence: { type: "STRING" },
+                    upper_price: { type: "STRING" },
+                    lower_price: { type: "STRING" },
+                    upper_y_ratio: { type: "NUMBER" },
+                    lower_y_ratio: { type: "NUMBER" },
                   },
                   required: ["timeframe", "type", "label", "price", "y_ratio"],
                 },
@@ -1935,13 +2095,16 @@ STRICT SETUP SEQUENCE:
 Require a coherent narrative where applicable: HTF bias + Premium/Discount -> liquidity sweep (BSL for shorts / SSL for longs) -> displacement + MSS/CHoCH -> FVG/OB/OTE confluence -> entry trigger. Inducement and AMD are supporting context, not mandatory labels. Give ONE best pullback/limit setup only when evidence is sufficient; otherwise return NO SETUP. Never chase price. Distinguish confirmed evidence from anticipated/conditional evidence.
 IMPORTANT TEACHING RULE: The lesson cards describe definitions, not proof that a concept exists on the current chart. For every concept explicitly state CONFIRMED / NOT CONFIRMED / NOT VISIBLE / NOT APPLICABLE and cite the timeframe plus the visible swing/zone evidence. Never mark all concepts as confirmed just because the prompt asks you to assess them.
 
-RISK MANAGEMENT:
-USER RISK INPUTS: lot size ${riskSettings.lot}; maximum planned loss USD ${riskSettings.maxUsd}; broker contract size ${riskSettings.contractSize || "NOT PROVIDED"} oz per 1.00 lot.
-For XAUUSD USD-account estimate: gross price risk = abs(entry - SL) × lot × contract size (oz per 1.00 lot). This estimate excludes spread, commission, swap and slippage. Never invent contract size or claim exact broker risk without verified contract specifications.
-STRICT EXECUTION GATE: If contract size is not provided, return has_setup=false and direction=NONE; explain in Khmer that broker contract size must be entered before risk can be checked. If estimated gross risk exceeds the user's USD cap, return NO SETUP (do not silently reduce the lot or move SL). SL must remain beyond true structural invalidation (sweep extreme / OB boundary / swing), never squeeze it to fit the cap. Require minimum R:R of 1:1.5 after costs are considered; if not achievable, return NO SETUP. State price-distance risk, estimated gross USD risk, R:R, and excluded costs. BE only after at least 1R and only if structure supports it.
+STRUCTURE-LED STOP LOSS & TAKE PROFIT (HIGHEST PRIORITY):
+Do NOT use a fixed dollar distance, fixed point count, user's $10 risk reference, lot size, or a forced R:R target to choose SL/TP. Determine levels from the chart's ICT + SMC structure:
+1) STOP LOSS: For BUY, place SL below the actual sell-side liquidity sweep low / protected swing low / bullish OB invalidation boundary, with a small volatility-appropriate buffer. For SELL, place SL above the buy-side liquidity sweep high / protected swing high / bearish OB invalidation boundary, with a small volatility-appropriate buffer. Prefer the true structural invalidation level; do not put SL inside the FVG/OB or directly on an obvious liquidity pool. If no defensible invalidation point is visible, return NO SETUP rather than inventing a price.
+2) TAKE PROFIT: Target the next opposing liquidity pool and meaningful draw on liquidity. For BUY, consider internal BSL/EQH first, then external BSL, PDH/PWH or a clear HTF resistance/OB; for SELL, consider SSL/EQL first, then external SSL, PDL/PWL or a clear HTF support/OB. Use the nearest realistic target as TP1 and a farther external-liquidity target as TP2 when the schema permits. Do not place TP at an arbitrary fixed distance or beyond a major opposing barrier without evidence.
+3) ENTRY/SL/TP must align with dealing range, Premium/Discount, OTE, FVG/OB, sweep and HTF draw on liquidity. Explain the exact structural reason and timeframe for each price.
+4) Calculate and report price-distance risk, estimated cash risk only if broker contract size is supplied, and the resulting R:R. USER INPUTS (informational only): lot ${riskSettings.lot}; risk reference USD ${riskSettings.maxUsd}; optional contract size ${riskSettings.contractSize || "NOT PROVIDED"} oz per 1.00 lot. Never use these values to move structural SL/TP or suppress an otherwise valid ICT/SMC setup. If cash risk exceeds the user's reference, warn clearly and suggest the user independently reduce position size or skip the trade; do NOT distort SL to fit the reference.
+5) A low R:R is a warning to disclose, NOT an automatic NO SETUP condition, provided the setup is structurally valid. Return NO SETUP only when the chart evidence/structure/entry is invalid, unclear, or contradictory. BE only after meaningful price delivery (e.g. 1R or a new confirming structure shift), not automatically at a fixed level.
 
 OUTPUT:
-- Return has_setup=false and direction=NONE if there is no complete, defensible setup, chart mismatch, unclear key prices, conflicting structure, contract size is missing, estimated risk exceeds cap, or R:R is below 1:1.5.
+- Return has_setup=false and direction=NONE only if there is no complete, defensible ICT/SMC setup, chart mismatch, unclear key prices, or conflicting/invalid structure. Missing contract size, risk reference exceedance, or low R:R are warnings only and must NOT automatically suppress a valid setup.
 - A BUY LIMIT must be below current/live price; a SELL LIMIT must be above current/live price. If the proposed limit is on the wrong side, return NO SETUP.
 - Do not call a pullback zone a confirmed entry trigger. Separate a pending limit idea from a confirmed trigger; do not issue an actionable setup if the required sweep/displacement/structure shift is not evidenced.
 - In Khmer markdown include: chart validation; HTF/MTF bias; BOS/CHoCH/MSS; liquidity pools and sweep; dealing range + Premium/Discount; FVG/OB; OTE; AMD/Power of 3; IDM; session/Killzone confidence; MTF confluence matrix; primary entry/SL/TP and invalidation; R:R and risk caveat; alternative scenario and NO-TRADE conditions.
