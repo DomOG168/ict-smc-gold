@@ -695,7 +695,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v3_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v4_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -1107,6 +1107,105 @@
         return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|${normalizedNote}|${imgSignatures}`;
       }
 
+      function parseJsonSafely(rawText) {
+        const cleaned = (rawText || "")
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/i, "")
+          .trim();
+
+        const firstBrace = cleaned.indexOf("{");
+        const candidate =
+          firstBrace !== -1 ? cleaned.slice(firstBrace) : cleaned;
+
+        try {
+          return JSON.parse(candidate);
+        } catch (_) {}
+
+        let repaired = candidate;
+        let inString = false;
+        let escaped = false;
+        for (let i = 0; i < repaired.length; i++) {
+          const ch = repaired[i];
+          if (escaped) {
+            escaped = false;
+            continue;
+          }
+          if (ch === "\\") {
+            escaped = true;
+            continue;
+          }
+          if (ch === '"') {
+            inString = !inString;
+          }
+        }
+        if (inString) {
+          repaired += '"';
+        }
+
+        const stack = [];
+        inString = false;
+        escaped = false;
+        for (let i = 0; i < repaired.length; i++) {
+          const ch = repaired[i];
+          if (escaped) {
+            escaped = false;
+            continue;
+          }
+          if (ch === "\\") {
+            escaped = true;
+            continue;
+          }
+          if (ch === '"') {
+            inString = !inString;
+            continue;
+          }
+          if (!inString) {
+            if (ch === "{") stack.push("}");
+            else if (ch === "[") stack.push("]");
+            else if ((ch === "}" || ch === "]") && stack.length > 0) {
+              stack.pop();
+            }
+          }
+        }
+
+        while (stack.length > 0) {
+          repaired += stack.pop();
+        }
+
+        try {
+          return JSON.parse(repaired);
+        } catch (_) {
+          const mdMatch = candidate.match(
+            /"khmer_summary_markdown"\s*:\s*"([\s\S]*)/,
+          );
+          if (mdMatch && mdMatch[1]) {
+            const extractedMd = mdMatch[1]
+              .replace(/"\s*,?\s*"[^"]*"\s*:[\s\S]*$/, "")
+              .replace(/"\s*\}\s*$/, "")
+              .replace(/\\n/g, "\n")
+              .replace(/\\"/g, '"');
+            return {
+              pic_check: {
+                is_valid_chart: true,
+                has_mismatch: false,
+                detected_timeframes: [],
+                message_km:
+                  "បានទាញលទ្ធផលវិភាគដោយស្វ័យប្រវត្តិ (ទម្រង់ JSON ត្រូវបានជួសជុល)។",
+              },
+              htf_bias: "RANGE",
+              mtf_alignment: "PARTIAL (ចូលគ្នាមួយផ្នែក)",
+              has_setup: false,
+              direction: "NONE",
+              setup_quality: "NONE",
+              no_setup_reason_km: "សូមពិនិត្យលម្អិតក្នុងសេចក្តីវិភាគខាងក្រោម។",
+              khmer_summary_markdown: extractedMd,
+            };
+          }
+          throw new Error("មិនអាចអានទិន្នន័យ JSON ពី AI បានត្រឹមត្រូវ។");
+        }
+      }
+
       function renderPicCheckBanner(picCheck) {
         const banner = document.getElementById("picCheckBanner");
         if (!banner || !picCheck) return;
@@ -1428,6 +1527,7 @@
         apiKey,
         modelName,
         parts,
+        responseSchema,
         maxRetries = 2,
       ) {
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
@@ -1448,7 +1548,9 @@
               contents: [{ role: "user", parts }],
               generationConfig: {
                 temperature: 0.0,
+                maxOutputTokens: 4096,
                 responseMimeType: "application/json",
+                responseSchema,
               },
             }),
           });
@@ -1529,6 +1631,7 @@ MANDATORY IMAGE VERIFICATION ("pic_check"):
 2. If ANY image is NOT a trading chart, is the wrong symbol, has duplicate/wrong timeframes compared to what was requested or noted, or shows an outdated/mismatched price, set "has_mismatch": true (and "is_valid_chart": false if not a chart) and clearly explain in Khmer in "message_km" what is wrong or mismatched!`;
 
         let promptText = "";
+        let responseSchema = null;
 
         if (currentAnalysisMode === "keylevels") {
           promptText = `You are an institutional ICT + SMC Gold (XAUUSD) analyst.
@@ -1537,27 +1640,47 @@ ${liveText} User note: "${userNote}".
 ${picCheckInstruction}
 
 Find the most important Key Levels (e.g., Previous Day High/Low PDH/PDL, Previous Week High/Low PWH/PWL, 1D/4H/1H Unmitigated Order Blocks, 1D/4H/1H Fair Value Gaps FVG, Major Liquidity Pools / Equal Highs & Lows).
-Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible on image #1 so we can draw them on image #1.
+Provide y_ratio (0.08 to 0.92 from top to bottom of image #1) for levels visible on image #1 so we can draw them on image #1. Keep text concise, clear, and well-formatted in Khmer markdown.`;
 
-Return ONLY valid JSON:
-{
-  "pic_check": {
-    "is_valid_chart": true or false,
-    "has_mismatch": true or false,
-    "detected_timeframes": ["#1: 1H", "#2: 4H", "#3: 1D"],
-    "message_km": "បញ្ជាក់ជាភាសាខ្មែរថា រូបភាពត្រឹមត្រូវ ឬខុសត្រង់ណា..."
-  },
-  "key_levels": [
-    {
-      "timeframe": "1D" or "4H" or "1H",
-      "type": "RESISTANCE / SUPPLY / OB- / FVG / SUPPORT / DEMAND / OB+ / PDH / PDL",
-      "label": "4H Bearish OB",
-      "price": "3535.00",
-      "y_ratio": 0.32
-    }
-  ],
-  "khmer_summary_markdown": "### 🎯 វិភាគ Key Levels (1H / 4H / 1D)\n- ..."
-}`;
+          responseSchema = {
+            type: "OBJECT",
+            properties: {
+              pic_check: {
+                type: "OBJECT",
+                properties: {
+                  is_valid_chart: { type: "BOOLEAN" },
+                  has_mismatch: { type: "BOOLEAN" },
+                  detected_timeframes: {
+                    type: "ARRAY",
+                    items: { type: "STRING" },
+                  },
+                  message_km: { type: "STRING" },
+                },
+                required: [
+                  "is_valid_chart",
+                  "has_mismatch",
+                  "detected_timeframes",
+                  "message_km",
+                ],
+              },
+              key_levels: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    timeframe: { type: "STRING" },
+                    type: { type: "STRING" },
+                    label: { type: "STRING" },
+                    price: { type: "STRING" },
+                    y_ratio: { type: "NUMBER" },
+                  },
+                  required: ["timeframe", "type", "label", "price", "y_ratio"],
+                },
+              },
+              khmer_summary_markdown: { type: "STRING" },
+            },
+            required: ["pic_check", "key_levels", "khmer_summary_markdown"],
+          };
         } else {
           promptText = `You are a high-discipline ICT + SMC Gold (XAUUSD) institutional trading analyst.
 Analyze the chart(s) with the exact depth, structure, caution, and clarity of a disciplined ICT/SMC trader:
@@ -1566,35 +1689,67 @@ Analyze the chart(s) with the exact depth, structure, caution, and clarity of a 
    - Explicitly assess alignment ("ALIGNED (ចូលគ្នាល្អ)", "PARTIAL (ចូលគ្នាមួយផ្នែក)", or "CONFLICT (ផ្ទុយគ្នា)").
    - If HTF (4H) is strongly bearish/bullish while LTF (1H/30m/15m) is pulling back inside a fib/liquidity zone or sitting under a heavy HTF FVG/OB without clear LTF confirmation, or if price is in choppy/indecisive mid-range where a tight SL (~$10-$13 on 0.01 lot) could easily get wicked/swept, set "has_setup": false and "direction": "NONE", and provide actionable conditional waiting zones (SELL zone on rally/rejection into supply/FVG, BUY zone on pullback/confirmation into demand/+OB) inside "khmer_summary_markdown".
 3. SINGLE BEST SETUP ONLY (WHEN HIGH CONFLUENCE & ALIGNED): Output AT MOST ONE setup ("BUY LIMIT" or "SELL LIMIT"). Keep SL realistic (~$10.00 to $13.00 on 0.01 lot, ~10 to 13 gold dollars/points) and align entry_y_ratio, sl_y_ratio, and tp_y_ratio (0.08 to 0.92) accurately with image #1.
-4. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER: Write thorough, practical Khmer analysis ("khmer_summary_markdown") with sections for Multi-Timeframe breakdown, Alignment & Decision, and Conditional Watchlist / Risk Notes.
+4. ALL EXPLANATIONS IN CLEAR, NATURAL KHMER: Write thorough yet concise, practical Khmer analysis ("khmer_summary_markdown") with sections for Multi-Timeframe breakdown, Alignment & Decision, and Conditional Watchlist / Risk Notes. Avoid unescaped double quotes inside strings.
 
 ${liveText} User note: "${userNote}".
-${picCheckInstruction}
+${picCheckInstruction}`;
 
-Return ONLY valid JSON:
-{
-  "pic_check": {
-    "is_valid_chart": true or false,
-    "has_mismatch": true or false,
-    "detected_timeframes": ["#1: 15m", "#2: 30m", "#3: 1H", "#4: 4H"],
-    "message_km": "បញ្ជាក់ជាភាសាខ្មែរថា រូបភាពត្រឹមត្រូវ ឬខុសត្រង់ណា..."
-  },
-  "htf_bias": "BEARISH" or "BULLISH" or "RANGE",
-  "mtf_alignment": "ALIGNED (ចូលគ្នាល្អ)" or "PARTIAL (ចូលគ្នាមួយផ្នែក)" or "CONFLICT (ផ្ទុយគ្នា)",
-  "has_setup": true or false,
-  "direction": "BUY LIMIT" or "SELL LIMIT" or "NONE",
-  "setup_quality": "HIGH / A+" or "MODERATE" or "NONE",
-  "selection_reason_km": "ពន្យល់ជាភាសាខ្មែរថា ទាំង 4 Timeframe ចូលគ្នាយ៉ាងម៉េច ទើបជ្រើសរើស Setup នេះ",
-  "no_setup_reason_km": "បើ has_setup=false សូមប្រាប់មូលហេតុជាភាសាខ្មែរថា ហេតុអ្វីមិនទាន់ចូល (ឧ. មិនទាន់ចូលគ្នា នៅកណ្តាល Range / Fib ងាយត្រូវ Wick ឬរង់ចាំ Confirmation)",
-  "entry_price": "string",
-  "sl_price": "string",
-  "tp_price": "string",
-  "be_target": "1:1 – 1:1.5",
-  "entry_y_ratio": 0.55,
-  "sl_y_ratio": 0.65,
-  "tp_y_ratio": 0.35,
-  "khmer_summary_markdown": "### 📊 វិភាគ Multi-Timeframe (4H / 1H / 30m / 15m)\n- **4H:** ...\n- **1H:** ...\n- **30m:** ...\n- **15m:** ...\n### 🔗 ការចូលគ្នា & សេចក្តីសម្រេច\n- ...\n### 🎯 ផែនការរង់ចាំ Setup បន្ទាប់ (Conditional Watchlist)\n- ..."
-}`;
+          responseSchema = {
+            type: "OBJECT",
+            properties: {
+              pic_check: {
+                type: "OBJECT",
+                properties: {
+                  is_valid_chart: { type: "BOOLEAN" },
+                  has_mismatch: { type: "BOOLEAN" },
+                  detected_timeframes: {
+                    type: "ARRAY",
+                    items: { type: "STRING" },
+                  },
+                  message_km: { type: "STRING" },
+                },
+                required: [
+                  "is_valid_chart",
+                  "has_mismatch",
+                  "detected_timeframes",
+                  "message_km",
+                ],
+              },
+              htf_bias: { type: "STRING" },
+              mtf_alignment: { type: "STRING" },
+              has_setup: { type: "BOOLEAN" },
+              direction: { type: "STRING" },
+              setup_quality: { type: "STRING" },
+              selection_reason_km: { type: "STRING" },
+              no_setup_reason_km: { type: "STRING" },
+              entry_price: { type: "STRING" },
+              sl_price: { type: "STRING" },
+              tp_price: { type: "STRING" },
+              be_target: { type: "STRING" },
+              entry_y_ratio: { type: "NUMBER" },
+              sl_y_ratio: { type: "NUMBER" },
+              tp_y_ratio: { type: "NUMBER" },
+              khmer_summary_markdown: { type: "STRING" },
+            },
+            required: [
+              "pic_check",
+              "htf_bias",
+              "mtf_alignment",
+              "has_setup",
+              "direction",
+              "setup_quality",
+              "selection_reason_km",
+              "no_setup_reason_km",
+              "entry_price",
+              "sl_price",
+              "tp_price",
+              "be_target",
+              "entry_y_ratio",
+              "sl_y_ratio",
+              "tp_y_ratio",
+              "khmer_summary_markdown",
+            ],
+          };
         }
 
         const parts = [
@@ -1619,6 +1774,7 @@ Return ONLY valid JSON:
                 apiKey,
                 modelName,
                 parts,
+                responseSchema,
                 2,
               );
               break;
@@ -1635,14 +1791,7 @@ Return ONLY valid JSON:
 
           const rawContent =
             data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          const cleanedJson = rawContent.replace(/```json|```/gi, "").trim();
-          const firstBrace = cleanedJson.indexOf("{");
-          const lastBrace = cleanedJson.lastIndexOf("}");
-          const jsonSlice =
-            firstBrace !== -1 && lastBrace > firstBrace
-              ? cleanedJson.slice(firstBrace, lastBrace + 1)
-              : cleanedJson;
-          const parsed = JSON.parse(jsonSlice);
+          const parsed = parseJsonSafely(rawContent);
 
           try {
             sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
