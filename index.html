@@ -1,3 +1,4 @@
+រូប HTML index
 <!doctype html>
 <html lang="km" class="dark">
   <head>
@@ -12,6 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./icon.png" />
     <link rel="apple-touch-icon" sizes="512x512" href="./icon.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="./icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="XAU SMC" />
     <meta name="theme-color" content="#080b10" />
@@ -641,6 +643,13 @@
               <p id="visionLoadingText" class="text-sm font-bold text-neoncyan">
                 កំពុង Check Pic និងវិភាគទាំង 4 Timeframe...
               </p>
+              <button
+                type="button"
+                onclick="cancelActiveAnalysis()"
+                class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-instred/20 border border-white/15 text-xs text-gray-300 hover:text-instred font-semibold transition"
+              >
+                បោះបង់ការរង់ចាំ (Cancel)
+              </button>
             </div>
 
             <div
@@ -778,7 +787,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v12_risk_nosetup_fix_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v13_fast_timeout_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -786,6 +795,8 @@
       let currentAnalysisMode = "signal"; // 'signal' | 'keylevels'
       let selectedKeyLevelTF = "ALL (1H, 4H, 1D)";
       let lastParsedResult = null;
+      let activeAbortController = null;
+      let userCancelledAnalysis = false;
 
       function setAnalysisMode(mode) {
         currentAnalysisMode = mode;
@@ -1089,6 +1100,41 @@
       const chartFileInput = document.getElementById("chartFileInput");
       const imagePreviewGrid = document.getElementById("imagePreviewGrid");
 
+      async function compressImageForFastApi(dataUrl, mimeType) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxSide = 1400;
+            let { width, height } = img;
+            if (width > maxSide || height > maxSide) {
+              if (width >= height) {
+                height = Math.round((height * maxSide) / width);
+                width = maxSide;
+              } else {
+                width = Math.round((width * maxSide) / height);
+                height = maxSide;
+              }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedUrl = canvas.toDataURL("image/jpeg", 0.86);
+            resolve({
+              apiBase64: compressedUrl.split(",")[1],
+              apiMimeType: "image/jpeg",
+            });
+          };
+          img.onerror = () =>
+            resolve({
+              apiBase64: dataUrl.split(",")[1],
+              apiMimeType: mimeType || "image/png",
+            });
+          img.src = dataUrl;
+        });
+      }
+
       async function handleFiles(files) {
         const imgFiles = Array.from(files).filter((f) =>
           f.type.startsWith("image/"),
@@ -1104,10 +1150,16 @@
               reader.onerror = () => reject(new Error("មិនអាចអានរូបភាពបាន"));
               reader.readAsDataURL(file);
             });
+            const compressed = await compressImageForFastApi(
+              dataUrl,
+              file.type,
+            );
             uploadedImages.push({
               dataUrl,
               base64: dataUrl.split(",")[1],
               mimeType: file.type,
+              apiBase64: compressed.apiBase64,
+              apiMimeType: compressed.apiMimeType,
               fileName: file.name,
             });
             if (uploadedImages.length > MAX_IMAGES) {
@@ -1188,11 +1240,29 @@
       }
 
       function resetPictureState() {
+        cancelActiveAnalysis(true);
         uploadedImages = [];
         chartFileInput.value = "";
         renderImagePreviews();
         resetOverlayAndOutput();
         showToast("បាន Reset រូបភាព និងលទ្ធផល!");
+      }
+
+      function cancelActiveAnalysis(silent = false) {
+        userCancelledAnalysis = true;
+        if (activeAbortController) {
+          try {
+            activeAbortController.abort();
+          } catch (_) {}
+          activeAbortController = null;
+        }
+        document.getElementById("visionLoading")?.classList.add("hidden");
+        const btn = document.getElementById("btnAnalyzeVision");
+        if (btn) {
+          btn.disabled = false;
+          btn.classList.remove("opacity-60");
+        }
+        if (!silent) showToast("បានបោះបង់ការរង់ចាំ!");
       }
 
       function getRiskSettings() {
@@ -1333,7 +1403,7 @@
             parsed.key_levels = [];
             parsed.key_levels_blocked = true;
             parsed.khmer_summary_markdown =
-              "### មិនអាចបង្ហាញ Key Levels បាន\\nPic Check មិនបានបញ្ជាក់ថា Chart ត្រឹមត្រូវទាំងអស់ទេ ឬរកឃើញភាពមិនត្រូវគ្នា។ សូមពិនិត្យ Symbol, Timeframe និង Price Scale រួច Upload ម្តងទៀត។\\n\\n" +
+              "### មិនអាចបង្ហាញ Key Levels បាន\nPic Check មិនបានបញ្ជាក់ថា Chart ត្រឹមត្រូវទាំងអស់ទេ ឬរកឃើញភាពមិនត្រូវគ្នា។ សូមពិនិត្យ Symbol, Timeframe និង Price Scale រួច Upload ម្តងទៀត។\n\n" +
               (parsed.khmer_summary_markdown || "");
           }
           return parsed;
@@ -1793,7 +1863,7 @@
               const levelFamily = (lvl) => {
                 const s = `${lvl.type || ""} ${lvl.label || ""}`.toUpperCase();
                 if (/FVG|FAIR VALUE GAP/.test(s)) return "FVG";
-                if (/ORDER BLOCK|\bOB\b/.test(s)) return "OB";
+                if (/ORDER BLOCK| OB /.test(s)) return "OB";
                 if (/PDH|PDL|PWH|PWL|BSL|SSL|EQH|EQL|LIQUIDITY/.test(s))
                   return "LIQUIDITY";
                 if (/PREMIUM|DISCOUNT|EQUILIBRIUM|50%/.test(s))
@@ -2030,49 +2100,79 @@
         modelName,
         parts,
         responseSchema,
-        maxRetries = 2,
+        maxRetries = 1,
       ) {
-        const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
         const loadingText = document.getElementById("visionLoadingText");
 
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
+          if (userCancelledAnalysis) {
+            throw new Error("អ្នកប្រើប្រាស់បានបោះបង់ការវិភាគ។");
+          }
+
           if (loadingText) {
             loadingText.textContent =
               attempt === 0
-                ? `កំពុង Check Pic និងវិភាគទាំង 4 Timeframe ជាមួយ ${modelName}...`
-                : `Server រវល់ (${modelName}) — កំពុងព្យាយាមម្តងទៀត (${attempt}/${maxRetries})...`;
+                ? `កំពុង Check Pic និងវិភាគជាមួយ ${modelName} (Max 20s)...`
+                : `Server រវល់ (${modelName}) — សាកម្តងទៀត (${attempt}/${maxRetries})...`;
           }
 
-          const res = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ role: "user", parts }],
-              generationConfig: {
-                temperature: 0.0,
-                maxOutputTokens: 4096,
-                responseMimeType: "application/json",
-                responseSchema,
-              },
-            }),
-          });
+          const controller = new AbortController();
+          activeAbortController = controller;
+          const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-          const data = await res.json();
-          if (res.ok) {
-            return data;
+          try {
+            const res = await fetch(endpoint, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              signal: controller.signal,
+              body: JSON.stringify({
+                contents: [{ role: "user", parts }],
+                generationConfig: {
+                  temperature: 0.0,
+                  maxOutputTokens: 4096,
+                  responseMimeType: "application/json",
+                  responseSchema,
+                },
+              }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              return data;
+            }
+
+            const errMsg = data?.error?.message || `Gemini API ${res.status}`;
+            const isHighDemand =
+              res.status === 503 ||
+              res.status === 429 ||
+              /high demand|overloaded|unavailable|quota|rate/i.test(errMsg);
+
+            if (isHighDemand && attempt < maxRetries) {
+              await sleep(600 * (attempt + 1));
+              continue;
+            }
+            throw new Error(errMsg);
+          } catch (err) {
+            if (userCancelledAnalysis) {
+              throw new Error("អ្នកប្រើប្រាស់បានបោះបង់ការវិភាគ។");
+            }
+            if (err?.name === "AbortError") {
+              if (attempt < maxRetries) {
+                await sleep(500);
+                continue;
+              }
+              throw new Error(
+                `${modelName} ឆ្លើយតបយឺតលើស 20 វិនាទី (Timeout)។`,
+              );
+            }
+            throw err;
+          } finally {
+            clearTimeout(timeoutId);
+            if (activeAbortController === controller) {
+              activeAbortController = null;
+            }
           }
-
-          const errMsg = data?.error?.message || `Gemini API ${res.status}`;
-          const isHighDemand =
-            res.status === 503 ||
-            res.status === 429 ||
-            /high demand|overloaded|unavailable|quota|rate/i.test(errMsg);
-
-          if (isHighDemand && attempt < maxRetries) {
-            await sleep(1200 * (attempt + 1));
-            continue;
-          }
-          throw new Error(errMsg);
         }
       }
 
@@ -2089,6 +2189,7 @@
           return;
         }
 
+        userCancelledAnalysis = false;
         const loadingEl = document.getElementById("visionLoading");
         const emptyEl = document.getElementById("visionEmptyState");
         const outputEl = document.getElementById("visionOutput");
@@ -2339,26 +2440,27 @@ ${picCheckInstruction}`;
           { text: promptText },
           ...uploadedImages.slice(0, MAX_IMAGES).map((img) => ({
             inlineData: {
-              mimeType: img.mimeType,
-              data: img.base64,
+              mimeType: img.apiMimeType || img.mimeType,
+              data: img.apiBase64 || img.base64,
             },
           })),
         ];
 
-        const modelsToTry = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
+        const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
 
         try {
           let data = null;
           let lastError = null;
 
           for (const modelName of modelsToTry) {
+            if (userCancelledAnalysis) break;
             try {
               data = await callGeminiModelWithRetry(
                 apiKey,
                 modelName,
                 parts,
                 responseSchema,
-                2,
+                1,
               );
               break;
             } catch (err) {
@@ -2413,19 +2515,3 @@ ${picCheckInstruction}`;
     </script>
   </body>
 </html>
-```[cite: 31, 32]
-
-<ElicitationsGroup message="បើ Dom ចង់កែលម្អបន្ថែមលើកំណែនេះ៖">
-  <Elicitation
-    label="បន្ថែមប៊ូតុង Apply Safe Lot"
-    query="បន្ថែមប៊ូតុងចុចដើម្បី apply Suggested Safe Lot ចូលក្នុង Lot Size input ដោយស្វ័យប្រវត្តិពេលហានិភ័យលើស Risk Budget"
-  />
-  <Elicitation
-    label="បន្ថែម SL Distance Input"
-    query="បន្ថែមប្រអប់បញ្ចូល SL Distance (USD) ផ្ទាល់ខ្លួនក្នុង Advanced Risk Management ដើម្បីគណនា Lot និង Est. Risk បានភ្លាមៗ"
-  />
-  <Elicitation
-    label="ពិនិត្យលក្ខខណ្ឌ NO SETUP"
-    query="ពិនិត្យ និងរឹតបន្តឹងលក្ខខណ្ឌ NO SETUP ឱ្យកាន់តែច្បាស់លើ R:R តិចពេក និងការប៉ះទង្គិចគ្នារវាង 4H, 1H, 30m, 15m"
-  />
-</ElicitationsGroup>
