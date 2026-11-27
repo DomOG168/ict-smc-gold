@@ -536,10 +536,23 @@
                   class="mt-1 w-full bg-obsidian border border-white/10 rounded-lg px-2.5 py-2 text-xs font-mono text-white"
                 />
               </label>
+              <label class="text-[10px] text-gray-400 col-span-2"
+                >Broker Contract Size (oz per 1.00 lot)
+                <input
+                  id="riskContractSize"
+                  type="number"
+                  min="0.01"
+                  max="100000"
+                  step="0.01"
+                  placeholder="បញ្ចូលតាម Broker ឧ. 100"
+                  class="mt-1 w-full bg-obsidian border border-white/10 rounded-lg px-2.5 py-2 text-xs font-mono text-white"
+                />
+              </label>
             </div>
             <p class="text-[10px] text-gray-500 leading-relaxed">
-              AI នឹងយកតម្លៃទាំងនេះជាកម្រិតកំណត់។ ត្រូវផ្ទៀងផ្ទាត់ Contract Size,
-              Tick Value និង Commission របស់ Broker មុនគណនា Risk ជាក់ស្តែង។
+              Risk គណនាបឋម = |Entry − SL| × Lot × Contract Size (oz/lot)។
+              បើមិនបញ្ចូល Contract Size ឬ Risk លើសកំណត់ កម្មវិធីនឹងបង្ហាញ NO
+              SETUP។ ការគណនាមិនទាន់រាប់ Spread, Commission និង Slippage ទេ។
             </p>
             <div
               class="grid grid-cols-3 gap-2 text-center font-mono text-[10px]"
@@ -737,7 +750,7 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v6_advanced_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v7_advanced_guard_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
@@ -991,20 +1004,35 @@
         const badgeEl = document.getElementById("killzoneBadge");
         if (!badgeEl) return;
 
-        if (hour >= 14 && hour < 17) {
-          badgeEl.textContent = "LONDON KILLZONE (14:00–17:00)";
+        const londonHour = Number(
+          new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Europe/London",
+            hour: "2-digit",
+            hour12: false,
+          }).format(new Date()),
+        );
+        const newYorkHour = Number(
+          new Intl.DateTimeFormat("en-GB", {
+            timeZone: "America/New_York",
+            hour: "2-digit",
+            hour12: false,
+          }).format(new Date()),
+        );
+
+        if (londonHour >= 7 && londonHour < 10) {
+          badgeEl.textContent = "LONDON KILLZONE (LOCAL)";
           badgeEl.className =
             "px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-neoncyan/20 text-neoncyan border border-neoncyan/40";
-        } else if (hour >= 19 && hour < 22) {
-          badgeEl.textContent = "NY KILLZONE (19:00–22:00)";
+        } else if (newYorkHour >= 7 && newYorkHour < 10) {
+          badgeEl.textContent = "NY KILLZONE (LOCAL)";
           badgeEl.className =
             "px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-instgreen/20 text-instgreen border border-instgreen/40";
-        } else if (hour >= 7 && hour < 12) {
-          badgeEl.textContent = "ASIAN RANGE";
+        } else if (hour >= 0 && hour < 8) {
+          badgeEl.textContent = "ASIA SESSION (APPROX)";
           badgeEl.className =
             "px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-instamber/20 text-instamber border border-instamber/40";
         } else {
-          badgeEl.textContent = "OFF-SESSION";
+          badgeEl.textContent = "SESSION CHECK CHART TIME";
           badgeEl.className =
             "px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-white/10 text-gray-300 border border-white/10";
         }
@@ -1140,9 +1168,16 @@
         const maxUsd = Number(
           document.getElementById("riskMaxUsd")?.value || 10,
         );
+        const contractSize = Number(
+          document.getElementById("riskContractSize")?.value || 0,
+        );
         return {
           lot: Number.isFinite(lot) && lot > 0 ? lot : 0.01,
           maxUsd: Number.isFinite(maxUsd) && maxUsd > 0 ? maxUsd : 10,
+          contractSize:
+            Number.isFinite(contractSize) && contractSize > 0
+              ? contractSize
+              : 0,
         };
       }
 
@@ -1152,6 +1187,12 @@
         const capLabel = document.getElementById("riskCapLabel");
         if (lotLabel) lotLabel.textContent = String(risk.lot);
         if (capLabel) capLabel.textContent = `$${risk.maxUsd.toFixed(2)}`;
+        const contractInput = document.getElementById("riskContractSize");
+        if (contractInput)
+          contractInput.setAttribute(
+            "aria-label",
+            "Broker contract size in ounces per 1.00 lot",
+          );
       }
 
       document
@@ -1159,6 +1200,9 @@
         ?.addEventListener("input", updateRiskSettingsUI);
       document
         .getElementById("riskMaxUsd")
+        ?.addEventListener("input", updateRiskSettingsUI);
+      document
+        .getElementById("riskContractSize")
         ?.addEventListener("input", updateRiskSettingsUI);
 
       function computeAnalysisCacheKey(userNote) {
@@ -1175,7 +1219,101 @@
           )
           .join("||");
         const risk = getRiskSettings();
-        return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|lot:${risk.lot}|risk:${risk.maxUsd}|${normalizedNote}|${imgSignatures}`;
+        return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|lot:${risk.lot}|risk:${risk.maxUsd}|contract:${risk.contractSize}|${normalizedNote}|${imgSignatures}`;
+      }
+
+      function validateSetupBeforeDisplay(parsed) {
+        if (!parsed || currentAnalysisMode === "keylevels") return parsed;
+
+        const fail = (reasonKm) => {
+          parsed.has_setup = false;
+          parsed.direction = "NONE";
+          parsed.setup_quality = "NONE";
+          parsed.no_setup_reason_km = reasonKm;
+          parsed.entry_y_ratio = 0.5;
+          parsed.sl_y_ratio = 0.5;
+          parsed.tp_y_ratio = 0.5;
+          return parsed;
+        };
+
+        if (
+          parsed.pic_check?.is_valid_chart === false ||
+          parsed.pic_check?.has_mismatch
+        ) {
+          return fail(
+            "Pic Check រកឃើញ Chart មិនត្រឹមត្រូវ ឬតម្លៃ/Timeframe មិនត្រូវគ្នា។ សូម Upload Chart ថ្មី ហើយវិភាគម្ដងទៀត។",
+          );
+        }
+        if (
+          !parsed.has_setup ||
+          !parsed.direction ||
+          parsed.direction === "NONE"
+        )
+          return parsed;
+
+        const entry = Number(
+          String(parsed.entry_price ?? "").replace(/,/g, ""),
+        );
+        const sl = Number(String(parsed.sl_price ?? "").replace(/,/g, ""));
+        const tp = Number(String(parsed.tp_price ?? "").replace(/,/g, ""));
+        if (
+          ![entry, sl, tp].every(Number.isFinite) ||
+          entry <= 0 ||
+          sl <= 0 ||
+          tp <= 0
+        ) {
+          return fail(
+            "តម្លៃ Entry / SL / TP មិនអាចអានបានច្បាស់។ មិនអនុញ្ញាតឱ្យបង្ហាញ Signal ទេ។",
+          );
+        }
+
+        const isBuy = String(parsed.direction).toUpperCase().includes("BUY");
+        const validOrder = isBuy
+          ? sl < entry && tp > entry
+          : sl > entry && tp < entry;
+        if (!validOrder) {
+          return fail(
+            "ទិសដៅ Entry, Stop Loss និង Take Profit មិនស៊ីគ្នា។ សូមពិនិត្យ Chart និងកុំចូល Order។",
+          );
+        }
+
+        const riskDistance = Math.abs(entry - sl);
+        const rewardDistance = Math.abs(tp - entry);
+        const rr = rewardDistance / riskDistance;
+        if (!Number.isFinite(rr) || rr < 1.5) {
+          return fail(
+            `Risk:Reward គឺប្រហែល 1:${Number.isFinite(rr) ? rr.toFixed(2) : "N/A"} ដែលទាបជាងកម្រិតអប្បបរមា 1:1.5។ NO SETUP។`,
+          );
+        }
+
+        if (liveGoldPrice && isBuy && entry >= liveGoldPrice) {
+          return fail(
+            "BUY LIMIT ត្រូវស្ថិតក្រោមតម្លៃបច្ចុប្បន្ន។ Entry ដែល AI ផ្តល់មិនមែនជា Pullback Buy Limit ត្រឹមត្រូវទេ។",
+          );
+        }
+        if (liveGoldPrice && !isBuy && entry <= liveGoldPrice) {
+          return fail(
+            "SELL LIMIT ត្រូវស្ថិតលើសតម្លៃបច្ចុប្បន្ន។ Entry ដែល AI ផ្តល់មិនមែនជា Pullback Sell Limit ត្រឹមត្រូវទេ។",
+          );
+        }
+
+        const risk = getRiskSettings();
+        if (!risk.contractSize) {
+          return fail(
+            "មិនទាន់បញ្ចូល Broker Contract Size (oz per 1.00 lot)។ សូមពិនិត្យ Specification របស់ Broker រួចបញ្ចូលតម្លៃនេះ ដើម្បីអាចគណនា Risk ជា USD មុនពេលទទួល Signal។",
+          );
+        }
+
+        const estimatedGrossRisk = riskDistance * risk.lot * risk.contractSize;
+        parsed.estimated_gross_risk_usd = Number(estimatedGrossRisk.toFixed(2));
+        parsed.risk_distance_price = Number(riskDistance.toFixed(2));
+        parsed.risk_reward_ratio = Number(rr.toFixed(2));
+        if (estimatedGrossRisk > risk.maxUsd) {
+          return fail(
+            `ការខាតបង់ប៉ាន់ស្មានមុនថ្លៃសេវា = $${estimatedGrossRisk.toFixed(2)} លើស Risk Cap $${risk.maxUsd.toFixed(2)}។ មិនត្រូវបង្រួម SL ចូលក្នុង Structural Invalidation ទេ។ NO SETUP។`,
+          );
+        }
+        return parsed;
       }
 
       function parseJsonSafely(rawText) {
@@ -1345,7 +1483,7 @@
                     ? `<span class="px-2 py-0.5 rounded bg-black/40 border border-white/15 text-[10px] font-mono text-instamber">${parsed.mtf_alignment}</span>`
                     : ""
                 }
-                <span class="text-xs text-red-200 font-bold">ទីផ្សារ Sideway / Choppy ឬគ្មាន Zone ច្បាស់ — រង់ចាំ Setup ច្បាស់សិន</span>
+                <span class="text-xs text-red-200 font-bold">Setup មិនឆ្លងកាត់ ICT Validation ឬ Risk Gate — មិនត្រូវចូល Order</span>
               </div>
               <span class="font-mono text-[11px] text-gray-300">Lot ${getRiskSettings().lot} • Risk Cap $${getRiskSettings().maxUsd.toFixed(2)}</span>
             </div>
@@ -1381,7 +1519,7 @@
                   : ""
               }
             </div>
-            <span class="text-[11px] font-mono text-gray-400">${getRiskSettings().lot} Lot • BE @ ${parsed.be_target || "1:1–1.5"}</span>
+            <span class="text-[11px] font-mono text-gray-400">${getRiskSettings().lot} Lot • Est. Risk $${Number(parsed.estimated_gross_risk_usd || 0).toFixed(2)} • R:R 1:${Number(parsed.risk_reward_ratio || 0).toFixed(2)} • BE @ ${parsed.be_target || "1R+"}</span>
           </div>
           <div class="grid grid-cols-3 gap-2 font-mono text-center">
             <div class="p-2 rounded-lg bg-obsidian border border-neoncyan/25">
@@ -1694,7 +1832,9 @@
           try {
             const cachedRaw = sessionStorage.getItem(cacheKey);
             if (cachedRaw) {
-              const cachedParsed = JSON.parse(cachedRaw);
+              const cachedParsed = validateSetupBeforeDisplay(
+                JSON.parse(cachedRaw),
+              );
               emptyEl.classList.add("hidden");
               displayParsedResult(cachedParsed);
               showToast("បង្ហាញលទ្ធផលដើមដែលថេរសម្រាប់រូបភាពនេះ!");
@@ -1793,12 +1933,17 @@ I) MULTI-TIMEFRAME CONFLUENCE: Use 4H for external bias/dealing range, 1H for st
 
 STRICT SETUP SEQUENCE:
 Require a coherent narrative where applicable: HTF bias + Premium/Discount -> liquidity sweep (BSL for shorts / SSL for longs) -> displacement + MSS/CHoCH -> FVG/OB/OTE confluence -> entry trigger. Inducement and AMD are supporting context, not mandatory labels. Give ONE best pullback/limit setup only when evidence is sufficient; otherwise return NO SETUP. Never chase price. Distinguish confirmed evidence from anticipated/conditional evidence.
+IMPORTANT TEACHING RULE: The lesson cards describe definitions, not proof that a concept exists on the current chart. For every concept explicitly state CONFIRMED / NOT CONFIRMED / NOT VISIBLE / NOT APPLICABLE and cite the timeframe plus the visible swing/zone evidence. Never mark all concepts as confirmed just because the prompt asks you to assess them.
 
 RISK MANAGEMENT:
-User inputs: lot size ${riskSettings.lot}; maximum planned monetary risk USD ${riskSettings.maxUsd}. These are user-defined limits, not guaranteed broker risk calculations. Do NOT assume a universal XAUUSD contract size or that a $10-$13 price move equals a fixed USD loss. Explain that exact cash risk requires broker contract size, tick value, account currency, spread, commission and slippage. Place SL beyond structural invalidation (sweep extreme / OB boundary / swing), not at an arbitrary fixed distance. If structural SL exceeds the user's risk cap, reduce lot size or reject the trade; never squeeze SL inside invalidation just to fit risk. State R:R, TP at opposing liquidity/next HTF level, and BE condition (normally after 1R or 1R-1.5R only when structure supports it). If broker contract details are unknown, provide price-distance risk only and label USD risk as NOT VERIFIED.
+USER RISK INPUTS: lot size ${riskSettings.lot}; maximum planned loss USD ${riskSettings.maxUsd}; broker contract size ${riskSettings.contractSize || "NOT PROVIDED"} oz per 1.00 lot.
+For XAUUSD USD-account estimate: gross price risk = abs(entry - SL) × lot × contract size (oz per 1.00 lot). This estimate excludes spread, commission, swap and slippage. Never invent contract size or claim exact broker risk without verified contract specifications.
+STRICT EXECUTION GATE: If contract size is not provided, return has_setup=false and direction=NONE; explain in Khmer that broker contract size must be entered before risk can be checked. If estimated gross risk exceeds the user's USD cap, return NO SETUP (do not silently reduce the lot or move SL). SL must remain beyond true structural invalidation (sweep extreme / OB boundary / swing), never squeeze it to fit the cap. Require minimum R:R of 1:1.5 after costs are considered; if not achievable, return NO SETUP. State price-distance risk, estimated gross USD risk, R:R, and excluded costs. BE only after at least 1R and only if structure supports it.
 
 OUTPUT:
-- Return has_setup=false and direction=NONE if there is no complete, defensible setup, chart mismatch, unclear key prices, conflicting structure, or risk cap cannot be respected.
+- Return has_setup=false and direction=NONE if there is no complete, defensible setup, chart mismatch, unclear key prices, conflicting structure, contract size is missing, estimated risk exceeds cap, or R:R is below 1:1.5.
+- A BUY LIMIT must be below current/live price; a SELL LIMIT must be above current/live price. If the proposed limit is on the wrong side, return NO SETUP.
+- Do not call a pullback zone a confirmed entry trigger. Separate a pending limit idea from a confirmed trigger; do not issue an actionable setup if the required sweep/displacement/structure shift is not evidenced.
 - In Khmer markdown include: chart validation; HTF/MTF bias; BOS/CHoCH/MSS; liquidity pools and sweep; dealing range + Premium/Discount; FVG/OB; OTE; AMD/Power of 3; IDM; session/Killzone confidence; MTF confluence matrix; primary entry/SL/TP and invalidation; R:R and risk caveat; alternative scenario and NO-TRADE conditions.
 - Provide entry_y_ratio, sl_y_ratio, tp_y_ratio only when levels are clearly visible on image #1; ratios run top-to-bottom from 0.08 to 0.92. If no valid setup, use 0.5 for all ratios.
 - Avoid certainty language. This is chart interpretation, not a guaranteed signal or financial advice. Never claim a concept is confirmed if the image does not support it.
@@ -1931,7 +2076,9 @@ ${picCheckInstruction}`;
 
           const rawContent =
             data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          const parsed = parseJsonSafely(rawContent);
+          const parsed = validateSetupBeforeDisplay(
+            parseJsonSafely(rawContent),
+          );
 
           try {
             sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
