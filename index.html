@@ -509,9 +509,13 @@
               <span class="font-bold text-gray-300"
                 >⚖️ Advanced Risk Management</span
               >
-              <span class="font-mono text-instgreen font-bold">USER INPUT</span>
+              <span
+                id="riskStatusBadge"
+                class="font-mono text-instgreen font-bold"
+                >LOT + SL CALC</span
+              >
             </div>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-3 gap-2">
               <label class="text-[10px] text-gray-400"
                 >Lot Size
                 <input
@@ -525,7 +529,7 @@
                 />
               </label>
               <label class="text-[10px] text-gray-400"
-                >Risk Reference (USD)
+                >Risk Budget (USD)
                 <input
                   id="riskMaxUsd"
                   type="number"
@@ -536,25 +540,47 @@
                   class="mt-1 w-full bg-obsidian border border-white/10 rounded-lg px-2.5 py-2 text-xs font-mono text-white"
                 />
               </label>
-              <label class="text-[10px] text-gray-400 col-span-2"
-                >Optional Broker Contract Size (oz per 1.00 lot)
+              <label class="text-[10px] text-gray-400"
+                >Contract (oz/lot)
                 <input
                   id="riskContractSize"
                   type="number"
                   min="0.01"
                   max="100000"
-                  step="0.01"
-                  placeholder="បញ្ចូលតាម Broker ឧ. 100"
+                  step="1"
+                  value="100"
+                  placeholder="100"
                   class="mt-1 w-full bg-obsidian border border-white/10 rounded-lg px-2.5 py-2 text-xs font-mono text-white"
                 />
               </label>
             </div>
+            <div
+              id="riskCalcBanner"
+              class="rounded-lg bg-obsidian border border-neoncyan/20 px-2.5 py-2 text-[11px] font-mono text-gray-200 flex flex-wrap items-center justify-between gap-2"
+            >
+              <span
+                >Max SL Move:
+                <strong id="maxAllowedSlPts" class="text-neoncyan"
+                  >$10.00</strong
+                ></span
+              >
+              <span
+                >Est. SL Risk:
+                <strong id="liveEstRiskUsd" class="text-instamber"
+                  >រង់ចាំ SL</strong
+                ></span
+              >
+              <span
+                >Safe Lot:
+                <strong id="suggestedSafeLot" class="text-instgreen"
+                  >-</strong
+                ></span
+              >
+            </div>
             <p class="text-[10px] text-gray-500 leading-relaxed">
-              SL និង TP ត្រូវកំណត់តាម Structure, Liquidity និង HTF Levels របស់
-              ICT + SMC។ Risk Reference និង Contract Size
-              គ្រាន់តែសម្រាប់ប៉ាន់ស្មានទំហំហានិភ័យប៉ុណ្ណោះ មិនមែនជាលក្ខខណ្ឌបិទ
-              Signal ទេ។ ការគណនាប៉ាន់ស្មានមិនរាប់ Spread, Commission, Swap និង
-              Slippage។
+              SL កំណត់តាម Structure ជាមុន រួចគណនា Cash Risk = |Entry - SL| × Lot
+              × Contract Size។ បើហានិភ័យលើស Risk Budget គួរកាត់ Lot ឬរំលង setup
+              (មិនរាប់ Spread/Commission/Slippage)។
             </p>
             <div
               class="grid grid-cols-3 gap-2 text-center font-mono text-[10px]"
@@ -568,7 +594,7 @@
               <div class="p-2 rounded-lg bg-obsidian border border-white/5">
                 <div class="text-gray-500">Risk Ref.</div>
                 <div id="riskCapLabel" class="font-bold text-instred mt-0.5">
-                  $10
+                  $10.00
                 </div>
               </div>
               <div class="p-2 rounded-lg bg-obsidian border border-white/5">
@@ -752,13 +778,14 @@
 
     <script>
       const STORAGE_KEY = "ict_smc_gemini_api_key";
-      const RESULT_CACHE_PREFIX = "ict_smc_result_v11_keylevels_validation_";
+      const RESULT_CACHE_PREFIX = "ict_smc_result_v12_risk_nosetup_fix_";
       const MAX_IMAGES = 4;
       let liveGoldPrice = null;
       let currentTVInterval = "15";
       let uploadedImages = [];
       let currentAnalysisMode = "signal"; // 'signal' | 'keylevels'
       let selectedKeyLevelTF = "ALL (1H, 4H, 1D)";
+      let lastParsedResult = null;
 
       function setAnalysisMode(mode) {
         currentAnalysisMode = mode;
@@ -1068,7 +1095,6 @@
         );
         if (imgFiles.length === 0) return;
 
-        // Sequential FileReader keeps the chosen/uploaded order deterministic.
         for (const file of imgFiles) {
           if (uploadedImages.length >= MAX_IMAGES) uploadedImages.shift();
           try {
@@ -1134,6 +1160,7 @@
       }
 
       function resetOverlayAndOutput() {
+        lastParsedResult = null;
         const canvas = document.getElementById("signalCanvas");
         if (canvas) {
           const ctx = canvas.getContext("2d");
@@ -1148,6 +1175,7 @@
         document.getElementById("visionOutput").classList.add("hidden");
         document.getElementById("visionOutput").innerHTML = "";
         document.getElementById("visionEmptyState").classList.remove("hidden");
+        updateRiskSettingsUI();
       }
 
       function deleteSingleImage(index) {
@@ -1168,22 +1196,24 @@
       }
 
       function getRiskSettings() {
-        const lot = Number(
-          document.getElementById("riskLotSize")?.value || 0.01,
+        const lotRaw = Number(document.getElementById("riskLotSize")?.value);
+        const maxUsdRaw = Number(document.getElementById("riskMaxUsd")?.value);
+        const contractRaw = Number(
+          document.getElementById("riskContractSize")?.value,
         );
-        const maxUsd = Number(
-          document.getElementById("riskMaxUsd")?.value || 10,
-        );
-        const contractSize = Number(
-          document.getElementById("riskContractSize")?.value || 0,
-        );
+        const lot = Number.isFinite(lotRaw) && lotRaw > 0 ? lotRaw : 0.01;
+        const maxUsd =
+          Number.isFinite(maxUsdRaw) && maxUsdRaw > 0 ? maxUsdRaw : 10;
+        const contractSize =
+          Number.isFinite(contractRaw) && contractRaw > 0 ? contractRaw : 100;
+        const maxAllowedSlMove = maxUsd / (lot * contractSize);
         return {
-          lot: Number.isFinite(lot) && lot > 0 ? lot : 0.01,
-          maxUsd: Number.isFinite(maxUsd) && maxUsd > 0 ? maxUsd : 10,
-          contractSize:
-            Number.isFinite(contractSize) && contractSize > 0
-              ? contractSize
-              : 0,
+          lot,
+          maxUsd,
+          contractSize,
+          maxAllowedSlMove: Number.isFinite(maxAllowedSlMove)
+            ? maxAllowedSlMove
+            : 0,
         };
       }
 
@@ -1191,25 +1221,88 @@
         const risk = getRiskSettings();
         const lotLabel = document.getElementById("riskLotLabel");
         const capLabel = document.getElementById("riskCapLabel");
+        const maxSlEl = document.getElementById("maxAllowedSlPts");
+        const estRiskEl = document.getElementById("liveEstRiskUsd");
+        const safeLotEl = document.getElementById("suggestedSafeLot");
+        const badgeEl = document.getElementById("riskStatusBadge");
+
         if (lotLabel) lotLabel.textContent = String(risk.lot);
         if (capLabel) capLabel.textContent = `$${risk.maxUsd.toFixed(2)}`;
+        if (maxSlEl) {
+          maxSlEl.textContent = `$${risk.maxAllowedSlMove.toFixed(2)}`;
+        }
+
         const contractInput = document.getElementById("riskContractSize");
-        if (contractInput)
+        if (contractInput) {
           contractInput.setAttribute(
             "aria-label",
             "Broker contract size in ounces per 1.00 lot",
           );
+        }
+
+        const entry = Number(
+          String(lastParsedResult?.entry_price ?? "").replace(/,/g, ""),
+        );
+        const sl = Number(
+          String(lastParsedResult?.sl_price ?? "").replace(/,/g, ""),
+        );
+        const hasActiveSl =
+          lastParsedResult?.has_setup &&
+          Number.isFinite(entry) &&
+          Number.isFinite(sl) &&
+          Math.abs(entry - sl) > 0;
+
+        if (!hasActiveSl) {
+          if (estRiskEl) {
+            estRiskEl.textContent = "រង់ចាំ SL";
+            estRiskEl.className = "text-instamber";
+          }
+          if (safeLotEl) safeLotEl.textContent = "-";
+          if (badgeEl) {
+            badgeEl.textContent = "LOT + SL CALC";
+            badgeEl.className = "font-mono text-instgreen font-bold";
+          }
+          return;
+        }
+
+        const slDistance = Math.abs(entry - sl);
+        const estRiskUsd = slDistance * risk.lot * risk.contractSize;
+        const safeLot = Math.max(
+          0.001,
+          Math.floor((risk.maxUsd / (slDistance * risk.contractSize)) * 1000) /
+            1000,
+        );
+        const overCap = estRiskUsd > risk.maxUsd + 0.0001;
+
+        if (estRiskEl) {
+          estRiskEl.textContent = `$${estRiskUsd.toFixed(2)} (${slDistance.toFixed(2)}pt)`;
+          estRiskEl.className = overCap ? "text-instred" : "text-instgreen";
+        }
+        if (safeLotEl) {
+          safeLotEl.textContent = `${safeLot.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")} lot`;
+        }
+        if (badgeEl) {
+          badgeEl.textContent = overCap ? "OVER RISK REF" : "WITHIN RISK REF";
+          badgeEl.className = overCap
+            ? "font-mono text-instred font-bold"
+            : "font-mono text-instgreen font-bold";
+        }
       }
 
-      document
-        .getElementById("riskLotSize")
-        ?.addEventListener("input", updateRiskSettingsUI);
-      document
-        .getElementById("riskMaxUsd")
-        ?.addEventListener("input", updateRiskSettingsUI);
+      document.getElementById("riskLotSize")?.addEventListener("input", () => {
+        updateRiskSettingsUI();
+        if (lastParsedResult) renderSignalSummaryCard(lastParsedResult);
+      });
+      document.getElementById("riskMaxUsd")?.addEventListener("input", () => {
+        updateRiskSettingsUI();
+        if (lastParsedResult) renderSignalSummaryCard(lastParsedResult);
+      });
       document
         .getElementById("riskContractSize")
-        ?.addEventListener("input", updateRiskSettingsUI);
+        ?.addEventListener("input", () => {
+          updateRiskSettingsUI();
+          if (lastParsedResult) renderSignalSummaryCard(lastParsedResult);
+        });
 
       function computeAnalysisCacheKey(userNote) {
         const normalizedNote = (userNote || "")
@@ -1224,8 +1317,7 @@
               `${img.mimeType}:${img.base64.length}:${img.base64.slice(0, 48)}:${img.base64.slice(-48)}`,
           )
           .join("||");
-        const risk = getRiskSettings();
-        return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|lot:${risk.lot}|risk:${risk.maxUsd}|contract:${risk.contractSize}|${normalizedNote}|${imgSignatures}`;
+        return `${RESULT_CACHE_PREFIX}${currentAnalysisMode}|${selectedKeyLevelTF}|${normalizedNote}|${imgSignatures}`;
       }
 
       function validateSetupBeforeDisplay(parsed) {
@@ -1270,8 +1362,13 @@
           !parsed.has_setup ||
           !parsed.direction ||
           parsed.direction === "NONE"
-        )
+        ) {
+          if (!parsed.no_setup_reason_km) {
+            parsed.no_setup_reason_km =
+              "មិនទាន់មាន liquidity sweep, displacement/MSS ឬ POI confluence គ្រប់គ្រាន់តាម ICT + SMC នៅលើ 4-TF នេះទេ។";
+          }
           return parsed;
+        }
 
         const entry = Number(
           String(parsed.entry_price ?? "").replace(/,/g, ""),
@@ -1285,7 +1382,7 @@
           tp <= 0
         ) {
           return fail(
-            "តម្លៃ Entry / SL / TP មិនអាចអានបានច្បាស់។ មិនអនុញ្ញាតឱ្យបង្ហាញ Signal ទេ។",
+            "តម្លៃ Entry / SL / TP មិនច្បាស់លើ Chart ដូច្នេះមិនអាចបង្ហាញ Signal បានទេ (NO SETUP)។",
           );
         }
 
@@ -1295,7 +1392,7 @@
           : sl > entry && tp < entry;
         if (!validOrder) {
           return fail(
-            "ទិសដៅ Entry, Stop Loss និង Take Profit មិនស៊ីគ្នា។ សូមពិនិត្យ Chart និងកុំចូល Order។",
+            "លំដាប់តម្លៃ Entry, SL និង TP ផ្ទុយពីទិសដៅ Setup ដូច្នេះត្រូវចាត់ទុកជា NO SETUP។",
           );
         }
 
@@ -1304,37 +1401,37 @@
         const rr = riskDistance > 0 ? rewardDistance / riskDistance : NaN;
         if (!Number.isFinite(rr) || riskDistance <= 0) {
           return fail(
-            "ចម្ងាយ Entry និង SL មិនត្រឹមត្រូវ។ សូមពិនិត្យ Structural Invalidation លើ Chart។",
+            "គម្លាត Entry និង SL មិនត្រឹមត្រូវតាមរចនាសម្ព័ន្ធ Chart (NO SETUP)។",
           );
         }
 
         if (liveGoldPrice && isBuy && entry >= liveGoldPrice) {
           return fail(
-            "BUY LIMIT ត្រូវស្ថិតក្រោមតម្លៃបច្ចុប្បន្ន។ Entry ដែល AI ផ្តល់មិនមែនជា Pullback Buy Limit ត្រឹមត្រូវទេ។",
+            "BUY LIMIT ត្រូវនៅក្រោមតម្លៃបច្ចុប្បន្ន ដើម្បីរង់ចាំ pullback ពិតប្រាកដ (NO SETUP)។",
           );
         }
         if (liveGoldPrice && !isBuy && entry <= liveGoldPrice) {
           return fail(
-            "SELL LIMIT ត្រូវស្ថិតលើសតម្លៃបច្ចុប្បន្ន។ Entry ដែល AI ផ្តល់មិនមែនជា Pullback Sell Limit ត្រឹមត្រូវទេ។",
+            "SELL LIMIT ត្រូវនៅលើសតម្លៃបច្ចុប្បន្ន ដើម្បីរង់ចាំ pullback ពិតប្រាកដ (NO SETUP)។",
           );
         }
 
         const risk = getRiskSettings();
+        const estimatedGrossRisk = riskDistance * risk.lot * risk.contractSize;
         parsed.risk_distance_price = Number(riskDistance.toFixed(2));
         parsed.reward_distance_price = Number(rewardDistance.toFixed(2));
         parsed.risk_reward_ratio = Number(rr.toFixed(2));
         parsed.risk_reference_usd = risk.maxUsd;
-        if (risk.contractSize > 0) {
-          const estimatedGrossRisk =
-            riskDistance * risk.lot * risk.contractSize;
-          parsed.estimated_gross_risk_usd = Number(
-            estimatedGrossRisk.toFixed(2),
-          );
-          parsed.risk_reference_exceeded = estimatedGrossRisk > risk.maxUsd;
-        } else {
-          parsed.estimated_gross_risk_usd = null;
-          parsed.risk_reference_exceeded = null;
-        }
+        parsed.estimated_gross_risk_usd = Number(estimatedGrossRisk.toFixed(2));
+        parsed.risk_reference_exceeded = estimatedGrossRisk > risk.maxUsd;
+        parsed.suggested_safe_lot = Number(
+          Math.max(
+            0.001,
+            Math.floor(
+              (risk.maxUsd / (riskDistance * risk.contractSize)) * 1000,
+            ) / 1000,
+          ).toFixed(3),
+        );
         return parsed;
       }
 
@@ -1492,6 +1589,7 @@
           parsed.direction !== "NONE";
 
         card.classList.remove("hidden");
+        const risk = getRiskSettings();
 
         if (!hasSignal) {
           card.className =
@@ -1505,9 +1603,9 @@
                     ? `<span class="px-2 py-0.5 rounded bg-black/40 border border-white/15 text-[10px] font-mono text-instamber">${parsed.mtf_alignment}</span>`
                     : ""
                 }
-                <span class="text-xs text-red-200 font-bold">Setup មិនឆ្លងកាត់ ICT Validation ឬ Risk Gate — មិនត្រូវចូល Order</span>
+                <span class="text-xs text-red-200 font-bold">លក្ខខណ្ឌ ICT/SMC មិនទាន់គ្រប់ — រង់ចាំ Setup ច្បាស់សិន</span>
               </div>
-              <span class="font-mono text-[11px] text-gray-300">Lot ${getRiskSettings().lot} • Risk Cap $${getRiskSettings().maxUsd.toFixed(2)}</span>
+              <span class="font-mono text-[11px] text-gray-300">Lot ${risk.lot} • Budget $${risk.maxUsd.toFixed(2)} • Max SL $${risk.maxAllowedSlMove.toFixed(2)}</span>
             </div>
             ${
               parsed?.no_setup_reason_km
@@ -1517,6 +1615,35 @@
           `;
           return;
         }
+
+        const entry = Number(
+          String(parsed.entry_price ?? "").replace(/,/g, ""),
+        );
+        const sl = Number(String(parsed.sl_price ?? "").replace(/,/g, ""));
+        const tp = Number(String(parsed.tp_price ?? "").replace(/,/g, ""));
+        const slDist =
+          Number.isFinite(entry) && Number.isFinite(sl)
+            ? Math.abs(entry - sl)
+            : Number(parsed.risk_distance_price || 0);
+        const tpDist =
+          Number.isFinite(entry) && Number.isFinite(tp)
+            ? Math.abs(tp - entry)
+            : Number(parsed.reward_distance_price || 0);
+        const rrVal =
+          slDist > 0 && tpDist > 0
+            ? tpDist / slDist
+            : Number(parsed.risk_reward_ratio || 0);
+        const estCashRisk = slDist * risk.lot * risk.contractSize;
+        const overRiskRef = estCashRisk > risk.maxUsd + 0.0001;
+        const safeLot =
+          slDist > 0
+            ? Math.max(
+                0.001,
+                Math.floor(
+                  (risk.maxUsd / (slDist * risk.contractSize)) * 1000,
+                ) / 1000,
+              )
+            : risk.lot;
 
         const isBuy = String(parsed.direction).toUpperCase().includes("BUY");
         const dirBadgeClass = isBuy
@@ -1541,19 +1668,26 @@
                   : ""
               }
             </div>
-            <span class="text-[11px] font-mono text-gray-400">${getRiskSettings().lot} Lot • ${parsed.estimated_gross_risk_usd == null ? "Cash Risk: N/A" : `Est. Risk $${Number(parsed.estimated_gross_risk_usd).toFixed(2)}${parsed.risk_reference_exceeded ? " (លើស Risk Ref.)" : ""}`} • R:R 1:${Number(parsed.risk_reward_ratio || 0).toFixed(2)} • BE @ ${parsed.be_target || "1R+"}</span>
+            <span class="text-[11px] font-mono ${overRiskRef ? "text-instred font-bold" : "text-instgreen"}">${risk.lot} Lot • Est. Risk $${estCashRisk.toFixed(2)} (${slDist.toFixed(2)}pt) • R:R 1:${rrVal.toFixed(2)} • BE @ ${parsed.be_target || "1R+"}</span>
           </div>
+          ${
+            overRiskRef
+              ? `<div class="rounded-lg bg-instred/15 border border-instred/40 px-3 py-2 text-[11px] text-red-200 font-semibold">
+                  ⚠️ SL នេះមានហានិភ័យប៉ាន់ស្មាន <strong>$${estCashRisk.toFixed(2)}</strong> លើស Risk Budget <strong>$${risk.maxUsd.toFixed(2)}</strong> (Max SL លើ ${risk.lot} lot គឺ <strong>$${risk.maxAllowedSlMove.toFixed(2)}</strong>)។ ប្រសិនបើចង់រក្សា Risk ក្នុង budget សូមប្រើ Lot ~<strong>${safeLot}</strong> ឬរំលង setup នេះ។
+                </div>`
+              : ""
+          }
           <div class="grid grid-cols-3 gap-2 font-mono text-center">
             <div class="p-2 rounded-lg bg-obsidian border border-neoncyan/25">
               <div class="text-[10px] text-gray-400">ENTRY PRICE</div>
               <div class="text-sm font-extrabold text-neoncyan mt-0.5">${parsed.entry_price || "N/A"}</div>
             </div>
             <div class="p-2 rounded-lg bg-obsidian border border-instred/25">
-              <div class="text-[10px] text-gray-400">STOP LOSS</div>
+              <div class="text-[10px] text-gray-400">STOP LOSS (-${slDist.toFixed(2)})</div>
               <div class="text-sm font-extrabold text-instred mt-0.5">${parsed.sl_price || "N/A"}</div>
             </div>
             <div class="p-2 rounded-lg bg-obsidian border border-instgreen/25">
-              <div class="text-[10px] text-gray-400">TAKE PROFIT</div>
+              <div class="text-[10px] text-gray-400">TAKE PROFIT (+${tpDist.toFixed(2)})</div>
               <div class="text-sm font-extrabold text-instgreen mt-0.5">${parsed.tp_price || "N/A"}</div>
             </div>
           </div>
@@ -1737,7 +1871,6 @@
                   `${lvl.type || ""} ${lvl.label || ""}`.toUpperCase();
                 let color = "#ffb703";
 
-                // Liquidity and HTF high/low levels
                 if (
                   /BEARISH|SELL|BSL|EQH|PDH|PWH|RESISTANCE|SUPPLY|BEARISH OB/.test(
                     typeUpper,
@@ -1878,6 +2011,8 @@
       }
 
       function displayParsedResult(parsed) {
+        lastParsedResult = parsed;
+        updateRiskSettingsUI();
         const loadingEl = document.getElementById("visionLoading");
         const outputEl = document.getElementById("visionOutput");
         renderPicCheckBanner(parsed.pic_check);
@@ -1897,7 +2032,7 @@
         responseSchema,
         maxRetries = 2,
       ) {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
         const loadingText = document.getElementById("visionLoadingText");
 
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -2100,11 +2235,11 @@ Do NOT use a fixed dollar distance, fixed point count, user's $10 risk reference
 1) STOP LOSS: For BUY, place SL below the actual sell-side liquidity sweep low / protected swing low / bullish OB invalidation boundary, with a small volatility-appropriate buffer. For SELL, place SL above the buy-side liquidity sweep high / protected swing high / bearish OB invalidation boundary, with a small volatility-appropriate buffer. Prefer the true structural invalidation level; do not put SL inside the FVG/OB or directly on an obvious liquidity pool. If no defensible invalidation point is visible, return NO SETUP rather than inventing a price.
 2) TAKE PROFIT: Target the next opposing liquidity pool and meaningful draw on liquidity. For BUY, consider internal BSL/EQH first, then external BSL, PDH/PWH or a clear HTF resistance/OB; for SELL, consider SSL/EQL first, then external SSL, PDL/PWL or a clear HTF support/OB. Use the nearest realistic target as TP1 and a farther external-liquidity target as TP2 when the schema permits. Do not place TP at an arbitrary fixed distance or beyond a major opposing barrier without evidence.
 3) ENTRY/SL/TP must align with dealing range, Premium/Discount, OTE, FVG/OB, sweep and HTF draw on liquidity. Explain the exact structural reason and timeframe for each price.
-4) Calculate and report price-distance risk, estimated cash risk only if broker contract size is supplied, and the resulting R:R. USER INPUTS (informational only): lot ${riskSettings.lot}; risk reference USD ${riskSettings.maxUsd}; optional contract size ${riskSettings.contractSize || "NOT PROVIDED"} oz per 1.00 lot. Never use these values to move structural SL/TP or suppress an otherwise valid ICT/SMC setup. If cash risk exceeds the user's reference, warn clearly and suggest the user independently reduce position size or skip the trade; do NOT distort SL to fit the reference.
+4) Calculate and report price-distance risk, estimated cash risk = |Entry - SL| * lot * contractSize, and the resulting R:R. USER INPUTS (informational only): lot ${riskSettings.lot}; risk budget USD ${riskSettings.maxUsd}; contract size ${riskSettings.contractSize} oz per 1.00 lot. Never use these values to move structural SL/TP or suppress an otherwise valid ICT/SMC setup. If cash risk exceeds the user's budget, warn clearly and state the suggested lot size (${riskSettings.maxUsd} / (|Entry - SL| * ${riskSettings.contractSize})) or advise skipping the trade; do NOT distort SL to fit the budget.
 5) A low R:R is a warning to disclose, NOT an automatic NO SETUP condition, provided the setup is structurally valid. Return NO SETUP only when the chart evidence/structure/entry is invalid, unclear, or contradictory. BE only after meaningful price delivery (e.g. 1R or a new confirming structure shift), not automatically at a fixed level.
 
 OUTPUT:
-- Return has_setup=false and direction=NONE only if there is no complete, defensible ICT/SMC setup, chart mismatch, unclear key prices, or conflicting/invalid structure. Missing contract size, risk reference exceedance, or low R:R are warnings only and must NOT automatically suppress a valid setup.
+- Return has_setup=false and direction=NONE only if there is no complete, defensible ICT/SMC setup, chart mismatch, unclear key prices, or conflicting/invalid structure. Risk budget exceedance or low R:R are warnings only and must NOT automatically suppress a valid setup.
 - A BUY LIMIT must be below current/live price; a SELL LIMIT must be above current/live price. If the proposed limit is on the wrong side, return NO SETUP.
 - Do not call a pullback zone a confirmed entry trigger. Separate a pending limit idea from a confirmed trigger; do not issue an actionable setup if the required sweep/displacement/structure shift is not evidenced.
 - In Khmer markdown include: chart validation; HTF/MTF bias; BOS/CHoCH/MSS; liquidity pools and sweep; dealing range + Premium/Discount; FVG/OB; OTE; AMD/Power of 3; IDM; session/Killzone confidence; MTF confluence matrix; primary entry/SL/TP and invalidation; R:R and risk caveat; alternative scenario and NO-TRADE conditions.
@@ -2278,3 +2413,19 @@ ${picCheckInstruction}`;
     </script>
   </body>
 </html>
+```[cite: 31, 32]
+
+<ElicitationsGroup message="បើ Dom ចង់កែលម្អបន្ថែមលើកំណែនេះ៖">
+  <Elicitation
+    label="បន្ថែមប៊ូតុង Apply Safe Lot"
+    query="បន្ថែមប៊ូតុងចុចដើម្បី apply Suggested Safe Lot ចូលក្នុង Lot Size input ដោយស្វ័យប្រវត្តិពេលហានិភ័យលើស Risk Budget"
+  />
+  <Elicitation
+    label="បន្ថែម SL Distance Input"
+    query="បន្ថែមប្រអប់បញ្ចូល SL Distance (USD) ផ្ទាល់ខ្លួនក្នុង Advanced Risk Management ដើម្បីគណនា Lot និង Est. Risk បានភ្លាមៗ"
+  />
+  <Elicitation
+    label="ពិនិត្យលក្ខខណ្ឌ NO SETUP"
+    query="ពិនិត្យ និងរឹតបន្តឹងលក្ខខណ្ឌ NO SETUP ឱ្យកាន់តែច្បាស់លើ R:R តិចពេក និងការប៉ះទង្គិចគ្នារវាង 4H, 1H, 30m, 15m"
+  />
+</ElicitationsGroup>
