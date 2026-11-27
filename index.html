@@ -510,7 +510,9 @@
               <span class="font-bold text-gray-300"
                 >⚖️ Advanced Risk Management</span
               >
-              <span id="riskStatusBadge" class="font-mono text-instgreen font-bold"
+              <span
+                id="riskStatusBadge"
+                class="font-mono text-instgreen font-bold"
                 >LOT + SL CALC</span
               >
             </div>
@@ -557,12 +559,39 @@
               id="riskCalcBanner"
               class="rounded-lg bg-obsidian border border-neoncyan/20 px-2.5 py-2 text-[11px] font-mono text-gray-200 flex flex-wrap items-center justify-between gap-2"
             >
-              <span>Max SL Move: <strong id="maxAllowedSlPts" class="text-neoncyan">$10.00</strong></span>
-              <span>Est. SL Risk: <strong id="liveEstRiskUsd" class="text-instamber">រង់ចាំ SL</strong></span>
-              <span>Safe Lot: <strong id="suggestedSafeLot" class="text-instgreen">-</strong></span>
+              <span
+                >Max SL Move:
+                <strong id="maxAllowedSlPts" class="text-neoncyan"
+                  >$10.00</strong
+                ></span
+              >
+              <span
+                >Est. SL Risk:
+                <strong id="liveEstRiskUsd" class="text-instamber"
+                  >រង់ចាំ SL</strong
+                ></span
+              >
+              <span class="flex items-center gap-1.5">
+                <span
+                  >Safe Lot:
+                  <strong id="suggestedSafeLot" class="text-instgreen"
+                    >-</strong
+                  ></span
+                >
+                <button
+                  type="button"
+                  id="btnApplySafeLot"
+                  onclick="applySuggestedSafeLot()"
+                  class="hidden px-2 py-0.5 rounded bg-instgreen/20 hover:bg-instgreen text-instgreen hover:text-void border border-instgreen/40 text-[10px] font-bold transition"
+                >
+                  Apply Safe Lot
+                </button>
+              </span>
             </div>
             <p class="text-[10px] text-gray-500 leading-relaxed">
-              SL កំណត់តាម Structure ជាមុន រួចគណនា Cash Risk = |Entry - SL| × Lot × Contract Size។ បើហានិភ័យលើស Risk Budget គួរកាត់ Lot ឬរំលង setup (មិនរាប់ Spread/Commission/Slippage)។
+              SL កំណត់តាម Structure ជាមុន រួចគណនា Cash Risk = |Entry - SL| × Lot
+              × Contract Size។ បើហានិភ័យលើស Risk Budget គួរកាត់ Lot ឬរំលង setup
+              (មិនរាប់ Spread/Commission/Slippage)។
             </p>
             <div
               class="grid grid-cols-3 gap-2 text-center font-mono text-[10px]"
@@ -1302,12 +1331,14 @@
           Number.isFinite(sl) &&
           Math.abs(entry - sl) > 0;
 
+        const applySafeBtn = document.getElementById("btnApplySafeLot");
         if (!hasActiveSl) {
           if (estRiskEl) {
             estRiskEl.textContent = "រង់ចាំ SL";
             estRiskEl.className = "text-instamber";
           }
           if (safeLotEl) safeLotEl.textContent = "-";
+          if (applySafeBtn) applySafeBtn.classList.add("hidden");
           if (badgeEl) {
             badgeEl.textContent = "LOT + SL CALC";
             badgeEl.className = "font-mono text-instgreen font-bold";
@@ -1331,6 +1362,10 @@
         if (safeLotEl) {
           safeLotEl.textContent = `${safeLot.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")} lot`;
         }
+        if (applySafeBtn) {
+          if (overCap) applySafeBtn.classList.remove("hidden");
+          else applySafeBtn.classList.add("hidden");
+        }
         if (badgeEl) {
           badgeEl.textContent = overCap ? "OVER RISK REF" : "WITHIN RISK REF";
           badgeEl.className = overCap
@@ -1339,18 +1374,48 @@
         }
       }
 
-      document
-        .getElementById("riskLotSize")
-        ?.addEventListener("input", () => {
-          updateRiskSettingsUI();
-          if (lastParsedResult) renderSignalSummaryCard(lastParsedResult);
-        });
-      document
-        .getElementById("riskMaxUsd")
-        ?.addEventListener("input", () => {
-          updateRiskSettingsUI();
-          if (lastParsedResult) renderSignalSummaryCard(lastParsedResult);
-        });
+      function applySuggestedSafeLot() {
+        const entry = Number(
+          String(lastParsedResult?.entry_price ?? "").replace(/,/g, ""),
+        );
+        const sl = Number(
+          String(lastParsedResult?.sl_price ?? "").replace(/,/g, ""),
+        );
+        if (
+          !lastParsedResult?.has_setup ||
+          !Number.isFinite(entry) ||
+          !Number.isFinite(sl) ||
+          Math.abs(entry - sl) <= 0
+        ) {
+          return;
+        }
+        const risk = getRiskSettings();
+        const slDistance = Math.abs(entry - sl);
+        const safeLot = Math.max(
+          0.001,
+          Math.floor((risk.maxUsd / (slDistance * risk.contractSize)) * 1000) /
+            1000,
+        );
+        const lotInput = document.getElementById("riskLotSize");
+        if (lotInput) {
+          lotInput.value = String(safeLot);
+        }
+        updateRiskSettingsUI();
+        renderSignalSummaryCard(lastParsedResult);
+        if (uploadedImages[0]?.dataUrl) {
+          drawOverlayOnCanvas(uploadedImages[0].dataUrl, lastParsedResult);
+        }
+        showToast(`បានកែ Lot ទៅ ${safeLot} ដើម្បីរក្សា Risk ក្នុង budget!`);
+      }
+
+      document.getElementById("riskLotSize")?.addEventListener("input", () => {
+        updateRiskSettingsUI();
+        if (lastParsedResult) renderSignalSummaryCard(lastParsedResult);
+      });
+      document.getElementById("riskMaxUsd")?.addEventListener("input", () => {
+        updateRiskSettingsUI();
+        if (lastParsedResult) renderSignalSummaryCard(lastParsedResult);
+      });
       document
         .getElementById("riskContractSize")
         ?.addEventListener("input", () => {
@@ -1481,8 +1546,9 @@
         parsed.suggested_safe_lot = Number(
           Math.max(
             0.001,
-            Math.floor((risk.maxUsd / (riskDistance * risk.contractSize)) * 1000) /
-              1000,
+            Math.floor(
+              (risk.maxUsd / (riskDistance * risk.contractSize)) * 1000,
+            ) / 1000,
           ).toFixed(3),
         );
         return parsed;
@@ -1669,7 +1735,9 @@
           return;
         }
 
-        const entry = Number(String(parsed.entry_price ?? "").replace(/,/g, ""));
+        const entry = Number(
+          String(parsed.entry_price ?? "").replace(/,/g, ""),
+        );
         const sl = Number(String(parsed.sl_price ?? "").replace(/,/g, ""));
         const tp = Number(String(parsed.tp_price ?? "").replace(/,/g, ""));
         const slDist =
@@ -1690,8 +1758,9 @@
           slDist > 0
             ? Math.max(
                 0.001,
-                Math.floor((risk.maxUsd / (slDist * risk.contractSize)) * 1000) /
-                  1000,
+                Math.floor(
+                  (risk.maxUsd / (slDist * risk.contractSize)) * 1000,
+                ) / 1000,
               )
             : risk.lot;
 
@@ -1843,7 +1912,7 @@
               const levelFamily = (lvl) => {
                 const s = `${lvl.type || ""} ${lvl.label || ""}`.toUpperCase();
                 if (/FVG|FAIR VALUE GAP/.test(s)) return "FVG";
-                if (/ORDER BLOCK|OB/.test(s)) return "OB";
+                if (/ORDER BLOCK| OB /.test(s)) return "OB";
                 if (/PDH|PDL|PWH|PWL|BSL|SSL|EQH|EQL|LIQUIDITY/.test(s))
                   return "LIQUIDITY";
                 if (/PREMIUM|DISCOUNT|EQUILIBRIUM|50%/.test(s))
@@ -2064,14 +2133,21 @@
         let md = parsed.khmer_summary_markdown || "គ្មានសេចក្តីសង្ខេប";
         if (currentAnalysisMode !== "keylevels" && parsed.has_setup) {
           const risk = getRiskSettings();
-          const entry = Number(String(parsed.entry_price ?? "").replace(/,/g, ""));
+          const entry = Number(
+            String(parsed.entry_price ?? "").replace(/,/g, ""),
+          );
           const sl = Number(String(parsed.sl_price ?? "").replace(/,/g, ""));
-          if (Number.isFinite(entry) && Number.isFinite(sl) && Math.abs(entry - sl) > 0) {
+          if (
+            Number.isFinite(entry) &&
+            Number.isFinite(sl) &&
+            Math.abs(entry - sl) > 0
+          ) {
             const slDist = Math.abs(entry - sl);
             const estRisk = slDist * risk.lot * risk.contractSize;
             const safeLot = Math.max(
               0.001,
-              Math.floor((risk.maxUsd / (slDist * risk.contractSize)) * 1000) / 1000,
+              Math.floor((risk.maxUsd / (slDist * risk.contractSize)) * 1000) /
+                1000,
             );
             if (estRisk > risk.maxUsd + 0.0001) {
               md = md.replace(
@@ -2168,7 +2244,9 @@
                 await sleep(500);
                 continue;
               }
-              throw new Error(`${modelName} ឆ្លើយតបយឺតលើស 20 វិនាទី (Timeout)។`);
+              throw new Error(
+                `${modelName} ឆ្លើយតបយឺតលើស 20 វិនាទី (Timeout)។`,
+              );
             }
             throw err;
           } finally {
@@ -2333,6 +2411,7 @@ I) MULTI-TIMEFRAME CONFLUENCE: Use 4H for external bias/dealing range, 1H for st
 
 STRICT SETUP SEQUENCE:
 Require a coherent narrative where applicable: HTF bias + Premium/Discount -> liquidity sweep (BSL for shorts / SSL for longs) -> displacement + MSS/CHoCH -> FVG/OB/OTE confluence -> entry trigger. Inducement and AMD are supporting context, not mandatory labels. Give ONE best pullback/limit setup only when evidence is sufficient; otherwise return NO SETUP. Never chase price. Distinguish confirmed evidence from anticipated/conditional evidence.
+TOP-DOWN & REACTION GUARD: If price on 15m/30m/1H is pushing into a major 4H/1H supply/resistance zone, prior swing high/low liquidity pool, or extended impulse leg without a clear pullback to a valid structure POI, flag "NEAR HTF REACTION / DO NOT CHASE" clearly and avoid forcing a weak setup.
 IMPORTANT TEACHING RULE: The lesson cards describe definitions, not proof that a concept exists on the current chart. For every concept explicitly state CONFIRMED / NOT_CONFIRMED / NOT_VISIBLE / NOT_APPLICABLE and cite the timeframe plus the visible swing/zone evidence.
 STRICT EVIDENCE THRESHOLD: Mark a concept as CONFIRMED ONLY when there is direct, unambiguous visual candle/structure evidence in the uploaded chart(s) supporting it. If a retracement, swing, sweep, inducement, or structure shift is partial, unclear, unverified, or not clearly shown on the chart, use NOT_CONFIRMED or NOT_VISIBLE instead of CONFIRMED. Do not mark multiple concepts as CONFIRMED by default.
 RISK CONSISTENCY RULE: In the Khmer markdown summary (especially the Risk Management section), always stay 100% consistent with the calculated SL distance, estimated cash risk (|Entry - SL| * lot * contractSize), and the user's risk budget. Never say a risk is "appropriate" or "acceptable" in the text if estimated cash risk exceeds the user's risk budget.
