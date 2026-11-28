@@ -174,7 +174,7 @@
               onclick="filterLessons('all')"
               class="tab-btn active-all px-3.5 py-2 rounded-xl text-xs font-extrabold transition"
             >
-              មេរៀនទាំងអស់ (8)
+              មេរៀនទាំងអស់ (16)
             </button>
             <button
               type="button"
@@ -182,7 +182,7 @@
               onclick="filterLessons('smc')"
               class="tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-void text-neoncyan border border-neoncyan/30 hover:bg-neoncyan/10 transition"
             >
-              SMC Lessons (4)
+              SMC Lessons (8)
             </button>
             <button
               type="button"
@@ -190,7 +190,7 @@
               onclick="filterLessons('ict')"
               class="tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-void text-instamber border border-instamber/30 hover:bg-instamber/10 transition"
             >
-              ICT Lessons (4)
+              ICT Lessons (8)
             </button>
           </div>
         </div>
@@ -1380,9 +1380,9 @@
                   <strong>NO SETUP</strong> បើគ្មាន)។
                 </li>
                 <li>
-                  <strong>Risk Rule (0.01 Lot):</strong> រក្សា SL ប្រមាណ
-                  <code>$10–$13</code> និងរំកិល SL ទៅ Breakeven (BE) នៅ
-                  <code>1:1 – 1:1.5</code>។
+                  <strong>Risk Rule:</strong> កំណត់ SL តាម Structure ហើយគណនា Lot
+                  ឱ្យសមនឹង Risk Amount របស់អ្នក។ កុំយក 0.01 Lot ឬចំនួនដុល្លារថេរ
+                  ជាច្បាប់សម្រាប់គ្រប់ Broker។
                 </li>
               </ul>
             </div>
@@ -1462,7 +1462,7 @@
                   font-family="monospace"
                   font-weight="bold"
                 >
-                  0.01 LOT • SL ~$10–$13 • BE @ 1:1–1:1.5
+                  LOT BY RISK • STRUCTURE SL • PLAN TP
                 </text>
                 <text
                   x="280"
@@ -1489,6 +1489,693 @@
             </div>
           </article>
         </div>
+      </section>
+
+      <!-- ADVANCED CURRICULUM: EXPANDED SMC + ICT -->
+      <section class="space-y-4 pt-3" id="advanced-lessons">
+        <div class="glass-panel amber-border rounded-2xl p-5 sm:p-6 space-y-2">
+          <span class="text-xs font-mono font-bold uppercase text-instamber"
+            >Part III • Advanced Curriculum</span
+          >
+          <h2 class="text-lg sm:text-xl font-extrabold text-white">
+            មេរៀនកម្រិតមធ្យមទៅកម្រិតខ្ពស់៖ អនុវត្ត SMC + ICT លើ XAUUSD
+          </h2>
+          <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+            ផ្នែកនេះបន្ថែមមេរៀន ៨ ទៀត ដើម្បីភ្ជាប់ Concept
+            ទៅជាដំណើរការវិភាគជាក់ស្តែង។ ចំណុចសំខាន់គឺត្រូវរង់ចាំ Confirmation
+            មិនមែនចូល Trade ដោយសារតែតម្លៃប៉ះ Zone តែមួយមុខទេ។
+          </p>
+          <div class="flex flex-wrap gap-2 text-[11px]">
+            <a
+              href="#smc-5"
+              class="px-2.5 py-1 rounded-lg bg-void border border-white/10 text-gray-300"
+              >៩. Displacement & Inducement</a
+            >
+            <a
+              href="#smc-6"
+              class="px-2.5 py-1 rounded-lg bg-void border border-white/10 text-gray-300"
+              >១០. Breaker & Mitigation</a
+            >
+            <a
+              href="#smc-7"
+              class="px-2.5 py-1 rounded-lg bg-void border border-white/10 text-gray-300"
+              >១១. Liquidity Map</a
+            >
+            <a
+              href="#smc-8"
+              class="px-2.5 py-1 rounded-lg bg-void border border-white/10 text-gray-300"
+              >១២. Entry Model</a
+            >
+            <a
+              href="#ict-5"
+              class="px-2.5 py-1 rounded-lg bg-void border border-white/10 text-gray-300"
+              >១៣. Dealing Range</a
+            >
+            <a
+              href="#ict-6"
+              class="px-2.5 py-1 rounded-lg bg-void border border-white/10 text-gray-300"
+              >១៤. SMT Divergence</a
+            >
+            <a
+              href="#ict-7"
+              class="px-2.5 py-1 rounded-lg bg-void border border-white/10 text-gray-300"
+              >១៥. Judas Swing</a
+            >
+            <a
+              href="#ict-8"
+              class="px-2.5 py-1 rounded-lg bg-void border border-white/10 text-gray-300"
+              >១៦. Risk & Journal</a
+            >
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5">
+          <article
+            id="smc-5"
+            data-category="smc"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 space-y-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                >SMC #05</span
+              >
+              <span class="text-xs text-gray-400 font-mono"
+                >DISPLACEMENT & INDUCEMENT</span
+              >
+            </div>
+            <h3 class="text-lg font-extrabold text-white">
+              ៩. Displacement និង Inducement៖ ស្គាល់កម្លាំងពិត និងអន្ទាក់តម្លៃ
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div
+                class="space-y-3 text-xs sm:text-sm text-gray-300 leading-relaxed"
+              >
+                <p>
+                  <strong class="text-white">Displacement</strong>
+                  គឺជាចលនាតម្លៃខ្លាំងដែលបង្ហាញពីការផ្លាស់ប្តូរ Order Flow។
+                  ជាទូទៅអាចឃើញតាមរយៈទៀនមាន Body ធំ, បិទជិតចុងទៀន និងបំបែក
+                  Swing/Structure សំខាន់។ វាអាចបង្កើត FVG
+                  ប៉ុន្តែមិនមែនគ្រប់ទៀនធំសុទ្ធតែជា Displacement មានគុណភាពទេ។
+                </p>
+                <p>
+                  <strong class="text-white">Inducement (IDM)</strong> គឺជា
+                  Swing ឬ Liquidity តូចមួយដែលអាចទាក់ទាញឱ្យ Trader
+                  ចូលមុនពេលតម្លៃទៅដល់គោលដៅ Liquidity ធំ។ កុំសន្និដ្ឋានថា IDM
+                  ត្រូវបានបង្កើតដោយស្ថាប័នដោយផ្ទាល់—វាជាការបកស្រាយ Price Action។
+                </p>
+                <ul class="list-disc pl-5 space-y-1.5">
+                  <li>រក Swing តូចដែលកើតមុនចលនាធំ។</li>
+                  <li>ពិនិត្យថាតើមាន Sweep ហើយតាមក្រោយដោយ Displacement ឬទេ។</li>
+                  <li>ចាំឱ្យមាន MSS/BOS ជា Confirmation មុនរក Entry។</li>
+                </ul>
+                <div class="rounded-xl bg-void border border-white/10 p-3">
+                  <strong class="text-instamber">ឧទាហរណ៍ XAUUSD៖</strong>
+                  តម្លៃបង្កើត Low តូចៗ → ទម្លុះ Low ដើម្បីយក SSL →
+                  បិទត្រឡប់ឡើងវិញ → Bullish Displacement បំបែក Swing High។
+                  បន្ទាប់មកស្វែងរក Bullish FVG/OB សម្រាប់ Pullback។
+                </div>
+              </div>
+              <div
+                class="rounded-xl bg-void border border-white/10 p-3 space-y-2"
+              >
+                <div class="text-xs font-mono text-gray-400">
+                  ILLUSTRATIVE PRICE SEQUENCE
+                </div>
+                <svg
+                  viewBox="0 0 560 230"
+                  class="w-full h-auto"
+                  role="img"
+                  aria-label="Inducement sweep and bullish displacement diagram"
+                >
+                  <rect width="560" height="230" rx="12" fill="#080b10" />
+                  <line
+                    x1="35"
+                    y1="155"
+                    x2="520"
+                    y2="155"
+                    stroke="#ffb703"
+                    stroke-dasharray="5 4"
+                    opacity=".8"
+                  />
+                  <text x="42" y="146" fill="#ffb703" font-size="11">
+                    IDM / equal lows
+                  </text>
+                  <polyline
+                    points="40,70 100,125 155,95 210,155 245,180 285,95 335,40 385,78 440,25 515,48"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    stroke-width="3"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M210 155 L245 180"
+                    stroke="#ff3b5c"
+                    stroke-width="3"
+                  />
+                  <text x="195" y="205" fill="#ff3b5c" font-size="11">
+                    SSL sweep
+                  </text>
+                  <text
+                    x="310"
+                    y="28"
+                    fill="#00e676"
+                    font-size="11"
+                    font-weight="bold"
+                  >
+                    Bullish displacement
+                  </text>
+                  <line
+                    x1="285"
+                    y1="95"
+                    x2="385"
+                    y2="95"
+                    stroke="#00f0ff"
+                    stroke-dasharray="4 4"
+                  />
+                  <text x="390" y="99" fill="#00f0ff" font-size="10">MSS</text>
+                </svg>
+                <p class="text-[11px] text-gray-400">
+                  រូបភាពជាគំរូសម្រាប់រៀន មិនមែនជា Signal
+                  ឬការធានាថាតម្លៃនឹងធ្វើដូចនេះទេ។
+                </p>
+              </div>
+            </div>
+            <div class="border-t border-white/10 pt-3 text-xs text-gray-300">
+              <strong class="text-white">កំហុសដែលត្រូវជៀសវាង៖</strong>
+              កុំហៅទៀនធំគ្រប់គ្រាន់ថា Displacement ប្រសិនបើវាមិនបំបែក Structure
+              ឬមិនមាន Context។ កុំចូលភ្លាមៗនៅពេលឃើញ Wick Sweep តែមួយ។
+            </div>
+          </article>
+
+          <article
+            id="smc-6"
+            data-category="smc"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 space-y-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                >SMC #06</span
+              >
+              <span class="text-xs text-gray-400 font-mono"
+                >BREAKER BLOCK & MITIGATION</span
+              >
+            </div>
+            <h3 class="text-lg font-extrabold text-white">
+              ១០. Breaker Block និង Mitigation Block
+            </h3>
+            <div
+              class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs sm:text-sm text-gray-300 leading-relaxed"
+            >
+              <div class="space-y-2">
+                <p>
+                  <strong class="text-white">Breaker Block</strong> ជា Zone
+                  ដែលធ្លាប់មានតួនាទីជា OB ប៉ុន្តែតម្លៃបានបរាជ័យក្នុងការរក្សា
+                  Zone ហើយបន្ទាប់មកត្រឡប់មក Test វាពីម្ខាងទៀត។ ឧទាហរណ៍ Bearish
+                  OB ត្រូវបានបំបែកឡើងលើ ហើយពេលត្រឡប់មក Test វាអាចដើរតួជា Bullish
+                  Breaker តាម Context។
+                </p>
+                <p>
+                  <strong class="text-white">Mitigation</strong>
+                  ជាការត្រឡប់មកកាន់ Zone មុន ដើម្បីឱ្យតម្លៃ Rebalance/Retest។
+                  ពាក្យ Mitigation Block ត្រូវបានប្រើខុសៗគ្នាតាមសាលា Trading
+                  ដូច្នេះត្រូវកំណត់ Rule របស់ខ្លួនឱ្យច្បាស់។
+                </p>
+              </div>
+              <div
+                class="rounded-xl bg-void border border-white/10 p-4 space-y-2"
+              >
+                <div class="font-mono text-[11px] text-gray-400">
+                  CHECKLIST • BREAKER VALIDATION
+                </div>
+                <ol class="list-decimal pl-5 space-y-1.5">
+                  <li>កំណត់ OB ដើម និង Swing ដែលពាក់ព័ន្ធ។</li>
+                  <li>រង់ចាំ Candle Close បំបែក Zone ដោយច្បាស់។</li>
+                  <li>កំណត់ថា Zone ត្រូវបាន Flip ឬគ្រាន់តែ Wick ប៉ុណ្ណោះ។</li>
+                  <li>រង់ចាំ Retest និង LTF Confirmation។</li>
+                  <li>ដាក់ SL ក្រៅ Structure ដែលបដិសេធ Setup។</li>
+                </ol>
+              </div>
+            </div>
+            <div
+              class="rounded-xl bg-void border border-instamber/25 p-3 text-xs text-gray-300"
+            >
+              <strong class="text-instamber">ឧទាហរណ៍៖</strong> បើតម្លៃបិទលើ
+              Bearish OB និងបំបែក Lower High ចាស់ នោះអាចចាប់ផ្តើមពិចារណា Bullish
+              Breaker។ បើមានតែ Wick ចាក់លើ Zone ហើយបិទចុះវិញ
+              មិនគួរប្រញាប់សន្និដ្ឋានថា Breaker ទេ។
+            </div>
+          </article>
+
+          <article
+            id="smc-7"
+            data-category="smc"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 space-y-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                >SMC #07</span
+              >
+              <span class="text-xs text-gray-400 font-mono"
+                >LIQUIDITY MAP • PDH / PDL / PWH / PWL</span
+              >
+            </div>
+            <h3 class="text-lg font-extrabold text-white">
+              ១១. បង្កើត Liquidity Map៖ កម្រិតដែលគួរតាមដានមុនបើក Trade
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+              Liquidity Map ជាផែនទីនៃតំបន់ដែលអាចមាន Stop Orders និង Pending
+              Orders ប្រមូលផ្តុំ។ វាជួយកំណត់ថាតម្លៃអាចទៅរកកន្លែងណាមុន
+              និងកន្លែងណាអាចមាន Reaction។
+              វាមិនអាចប្រាប់ទិសដៅអនាគតបានដោយខ្លួនឯងទេ។
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div class="rounded-xl bg-void border border-white/10 p-3">
+                <strong class="text-instamber">PDH / PDL</strong>
+                <p class="text-gray-300 mt-1">
+                  Previous Day High / Low។ គូស High និង Low របស់ថ្ងៃមុន
+                  ហើយមើលថាតម្លៃកំពុងខិតទៅយក BSL ឬ SSL។
+                </p>
+              </div>
+              <div class="rounded-xl bg-void border border-white/10 p-3">
+                <strong class="text-neoncyan">PWH / PWL</strong>
+                <p class="text-gray-300 mt-1">
+                  Previous Week High / Low។ ជា Reference
+                  កម្រិតខ្ពស់ជាងកម្រិតថ្ងៃ ហើយអាចមានសារៈសំខាន់នៅពេលតម្លៃជិត
+                  Weekly Extreme។
+                </p>
+              </div>
+              <div class="rounded-xl bg-void border border-white/10 p-3">
+                <strong class="text-instgreen">EQH / EQL</strong>
+                <p class="text-gray-300 mt-1">
+                  Equal Highs / Equal Lows។ កំណត់ Swing
+                  ដែលមានកម្រិតប្រហាក់ប្រហែលគ្នា
+                  មិនចាំបាច់ត្រូវគ្នាពិតប្រាកដដល់ចំណុចតែមួយទេ។
+                </p>
+              </div>
+            </div>
+            <div
+              class="rounded-xl bg-void border border-white/10 p-4 text-xs text-gray-300"
+            >
+              <strong class="text-white">លំហាត់ធ្វើលើ Chart៖</strong>
+              <ol class="list-decimal pl-5 mt-2 space-y-1">
+                <li>បើក XAUUSD 4H និងគូស Weekly High/Low។</li>
+                <li>ប្ដូរទៅ 1H ហើយគូស PDH/PDL និង Equal High/Low ដែលច្បាស់។</li>
+                <li>
+                  សម្គាល់ថាតើតម្លៃបាន Sweep កម្រិតណារួចហើយ
+                  និងកម្រិតណានៅមិនទាន់បានប៉ះ។
+                </li>
+                <li>
+                  កុំដាក់ TP ទៅលើ Liquidity ដែលតម្លៃបានយករួចហើយ ដោយមិនពិនិត្យ
+                  Structure ថ្មី។
+                </li>
+              </ol>
+            </div>
+          </article>
+
+          <article
+            id="smc-8"
+            data-category="smc"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 space-y-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-neoncyan/15 text-neoncyan border border-neoncyan/30"
+                >SMC #08</span
+              >
+              <span class="text-xs text-gray-400 font-mono"
+                >ENTRY MODEL • SWEEP → MSS → RETEST</span
+              >
+            </div>
+            <h3 class="text-lg font-extrabold text-white">
+              ១២. Entry Model ជាជំហាន៖ Sweep → Displacement → MSS → Retest
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div class="space-y-2 text-xs sm:text-sm text-gray-300">
+                <p>
+                  Entry Model គឺជាលក្ខខណ្ឌដែលអ្នកកំណត់ជាមុន ដើម្បីមិនចូល Trade
+                  ដោយអារម្មណ៍។ សម្រាប់គំរូនេះ ត្រូវការការបញ្ជាក់ជាបន្តបន្ទាប់
+                  មិនមែនគ្រាន់តែតម្លៃប៉ះ OB/FVG ទេ។
+                </p>
+                <ol class="list-decimal pl-5 space-y-1.5">
+                  <li>
+                    <strong class="text-white">Context:</strong> HTF បង្ហាញ Bias
+                    និង Target Liquidity។
+                  </li>
+                  <li>
+                    <strong class="text-white">Sweep:</strong> តម្លៃយក Liquidity
+                    នៅទីតាំងដែលមានហេតុផល។
+                  </li>
+                  <li>
+                    <strong class="text-white">Displacement:</strong>
+                    មានចលនាខ្លាំងផ្ទុយពី Sweep។
+                  </li>
+                  <li>
+                    <strong class="text-white">MSS:</strong> Candle Close បំបែក
+                    Swing ដែលកំណត់ទុក។
+                  </li>
+                  <li>
+                    <strong class="text-white">Retest:</strong> ចាំតម្លៃត្រឡប់មក
+                    FVG/OB ឬតំបន់ Entry ដែលបានកំណត់។
+                  </li>
+                  <li>
+                    <strong class="text-white">Invalidation:</strong> កំណត់ SL
+                    និងចំណុចដែល Setup លែងត្រឹមត្រូវ។
+                  </li>
+                </ol>
+              </div>
+              <div
+                class="rounded-xl bg-void border border-white/10 p-4 space-y-3"
+              >
+                <div class="text-[11px] font-mono text-gray-400">
+                  MODEL FLOW
+                </div>
+                <div
+                  class="grid grid-cols-2 gap-2 text-center text-xs font-bold"
+                >
+                  <div
+                    class="rounded-lg p-3 bg-instred/10 border border-instred/30 text-instred"
+                  >
+                    1. Liquidity Sweep
+                  </div>
+                  <div
+                    class="rounded-lg p-3 bg-neoncyan/10 border border-neoncyan/30 text-neoncyan"
+                  >
+                    2. Displacement
+                  </div>
+                  <div
+                    class="rounded-lg p-3 bg-instamber/10 border border-instamber/30 text-instamber"
+                  >
+                    3. MSS Close
+                  </div>
+                  <div
+                    class="rounded-lg p-3 bg-instgreen/10 border border-instgreen/30 text-instgreen"
+                  >
+                    4. Retest & Entry
+                  </div>
+                </div>
+                <p class="text-[11px] text-gray-400">
+                  បើខ្វះជំហានសំខាន់ណាមួយ សូមរង់ចាំ ឬកត់ត្រាជា No Trade។
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article
+            id="ict-5"
+            data-category="ict"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 space-y-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-instamber/15 text-instamber border border-instamber/30"
+                >ICT #05</span
+              >
+              <span class="text-xs text-gray-400 font-mono"
+                >DEALING RANGE & PREMIUM / DISCOUNT</span
+              >
+            </div>
+            <h3 class="text-lg font-extrabold text-white">
+              ១៣. Dealing Range៖ ជ្រើស Swing ត្រឹមត្រូវសម្រាប់ Premium និង
+              Discount
+            </h3>
+            <div
+              class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs sm:text-sm text-gray-300 leading-relaxed"
+            >
+              <div class="space-y-2">
+                <p>
+                  Dealing Range គឺជាចន្លោះពី Swing Low ទៅ Swing High ឬពី Swing
+                  High ទៅ Swing Low ដែលអ្នកប្រើជាមូលដ្ឋានវាស់ទីតាំងតម្លៃ។
+                  ការជ្រើស Swing មិនត្រឹមត្រូវអាចធ្វើឱ្យ Premium/Discount និង
+                  OTE ខុសទាំងមូល។
+                </p>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>
+                    ប្រើ Swing ដែលបង្កើតចលនាសំខាន់ និងពាក់ព័ន្ធនឹង Structure
+                    បច្ចុប្បន្ន។
+                  </li>
+                  <li>
+                    សម្រាប់ Bullish Range វាស់ពី Low ទៅ High; សម្រាប់ Bearish
+                    Range វាស់ពី High ទៅ Low តាមទិសចលនា។
+                  </li>
+                  <li>
+                    50% គឺ Equilibrium; ខាងលើគឺ Premium និងខាងក្រោមគឺ Discount
+                    ក្នុង Range នោះ។
+                  </li>
+                  <li>
+                    OTE ជា Confluence Zone មួយ មិនមែនជាការធានាថាតម្លៃនឹងបត់ទេ។
+                  </li>
+                </ul>
+              </div>
+              <div class="rounded-xl bg-void border border-white/10 p-4">
+                <strong class="text-instamber">ឧទាហរណ៍លេខសាមញ្ញ៖</strong>
+                <p class="mt-2">
+                  សន្មត់ថា XAUUSD មាន Swing Low = 2,000 និង Swing High = 2,100។
+                  Equilibrium ប្រហែល 2,050។ តម្លៃក្រោម 2,050 ស្ថិតក្នុង Discount
+                  នៃ Range នេះ; តម្លៃលើ 2,050 ស្ថិតក្នុង Premium។
+                </p>
+                <p class="mt-2 text-gray-400">
+                  លេខនេះជាឧទាហរណ៍គណិតវិទ្យា មិនមែនជាតម្លៃទីផ្សារបច្ចុប្បន្ន ឬ
+                  Trade Signal ទេ។
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article
+            id="ict-6"
+            data-category="ict"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 space-y-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-instamber/15 text-instamber border border-instamber/30"
+                >ICT #06</span
+              >
+              <span class="text-xs text-gray-400 font-mono"
+                >SMT DIVERGENCE</span
+              >
+            </div>
+            <h3 class="text-lg font-extrabold text-white">
+              ១៤. SMT Divergence៖ ប្រៀបធៀបទីផ្សារដែលមានទំនាក់ទំនងគ្នា
+            </h3>
+            <div
+              class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs sm:text-sm text-gray-300 leading-relaxed"
+            >
+              <div class="space-y-2">
+                <p>
+                  SMT Divergence
+                  គឺជាការមិនស្របគ្នារវាងទីផ្សារពីរដែលជាទូទៅមានទំនាក់ទំនងគ្នា។
+                  សម្រាប់មាស អ្នកខ្លះប្រៀបធៀប XAUUSD ជាមួយ Silver (XAGUSD)
+                  ឬពិនិត្យ Dollar Index (DXY) ជា Context បន្ថែម។
+                  ទំនាក់ទំនងទាំងនេះអាចប្រែប្រួលតាមពេលវេលា។
+                </p>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>ប្រៀបធៀប Swing High/Low ក្នុង Time Window ដូចគ្នា។</li>
+                  <li>
+                    ឧទាហរណ៍ XAUUSD ធ្វើ Lower Low ប៉ុន្តែ XAGUSD មិនធ្វើ Lower
+                    Low ថ្មី។
+                  </li>
+                  <li>
+                    SMT គ្រាន់តែជាភស្តុតាងបន្ថែម ត្រូវការការបញ្ជាក់ពី Liquidity
+                    Sweep និង MSS លើ Chart ដែលអ្នក Trade។
+                  </li>
+                </ul>
+              </div>
+              <div
+                class="rounded-xl bg-void border border-white/10 p-4 space-y-2"
+              >
+                <div class="font-mono text-[11px] text-gray-400">
+                  CONCEPT EXAMPLE
+                </div>
+                <div class="rounded-lg border border-instred/30 p-3">
+                  <strong class="text-instred">XAUUSD:</strong>
+                  <p class="mt-1">បំបែក Low ចាស់ ហើយបង្កើត Lower Low ថ្មី។</p>
+                </div>
+                <div class="rounded-lg border border-instgreen/30 p-3">
+                  <strong class="text-instgreen">XAGUSD:</strong>
+                  <p class="mt-1">
+                    មិនបំបែក Low ចាស់ — បង្ហាញភាពមិនស្របគ្នា (Potential bullish
+                    SMT)។
+                  </p>
+                </div>
+                <p class="text-gray-400">
+                  មិនត្រូវប្រើ SMT តែមួយមុខដើម្បី Buy/Sell ទេ។
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article
+            id="ict-7"
+            data-category="ict"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 space-y-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-instamber/15 text-instamber border border-instamber/30"
+                >ICT #07</span
+              >
+              <span class="text-xs text-gray-400 font-mono"
+                >JUDAS SWING & SESSION CONTEXT</span
+              >
+            </div>
+            <h3 class="text-lg font-extrabold text-white">
+              ១៥. Judas Swing៖ កុំច្រឡំការរត់ដំបូងជាទិសដៅប្រចាំថ្ងៃ
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+              Judas Swing ជាគំនិតក្នុង ICT
+              ដែលពិពណ៌នាចលនាដំបូងមួយដែលរត់ទៅទិសផ្ទុយពីទិសដៅដែលគេរំពឹងសម្រាប់
+              Session ឬ Daily Range មុនពេលតម្លៃប្ដូរទិស។ វាមិនកើតឡើងរាល់ថ្ងៃទេ
+              ហើយមិនអាចសន្និដ្ឋានតាមម៉ោងតែមួយបានឡើយ។
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div class="rounded-xl bg-void border border-white/10 p-3">
+                <strong class="text-neoncyan">១. Context</strong>
+                <p class="text-gray-300 mt-1">
+                  កំណត់ Daily Bias, Asian High/Low និង Liquidity ដែលនៅសល់។
+                </p>
+              </div>
+              <div class="rounded-xl bg-void border border-white/10 p-3">
+                <strong class="text-instred">២. False Expansion</strong>
+                <p class="text-gray-300 mt-1">
+                  តម្លៃអាច Sweep High/Low មួយ មុនពេលបង្ហាញការបដិសេធ។
+                </p>
+              </div>
+              <div class="rounded-xl bg-void border border-white/10 p-3">
+                <strong class="text-instgreen">៣. Confirmation</strong>
+                <p class="text-gray-300 mt-1">
+                  រង់ចាំ Displacement និង MSS; បន្ទាប់មកស្វែងរក Retest Zone។
+                </p>
+              </div>
+            </div>
+            <div
+              class="rounded-xl bg-void border border-instamber/25 p-3 text-xs text-gray-300"
+            >
+              <strong class="text-instamber">ចំណាំម៉ោងកម្ពុជា៖</strong> ម៉ោង
+              Session អាចផ្លាស់ប្តូរតាម Daylight Saving Time
+              របស់ទីផ្សារអាមេរិក/អឺរ៉ុប។ ត្រូវពិនិត្យម៉ោង Broker និង Calendar
+              ជាក់ស្តែង មិនត្រូវយកម៉ោងក្នុងមេរៀនជាច្បាប់ថេរទេ។
+            </div>
+          </article>
+
+          <article
+            id="ict-8"
+            data-category="ict"
+            class="lesson-card glass-panel rounded-2xl p-5 sm:p-6 space-y-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-instamber/15 text-instamber border border-instamber/30"
+                >ICT #08</span
+              >
+              <span class="text-xs text-gray-400 font-mono"
+                >POSITION SIZING • RISK • JOURNAL</span
+              >
+            </div>
+            <h3 class="text-lg font-extrabold text-white">
+              ១៦. Position Sizing, Risk Management និង Trading Journal
+            </h3>
+            <div
+              class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs sm:text-sm text-gray-300 leading-relaxed"
+            >
+              <div class="space-y-2">
+                <p>
+                  <strong class="text-white">Position Sizing</strong>
+                  គឺការគណនាទំហំ Lot តាមចំនួនប្រាក់ដែលអ្នកព្រមទទួលហានិភ័យ
+                  និងចម្ងាយ Stop Loss។ កុំជ្រើស Lot ដោយសារតែចង់បានប្រាក់ចំណេញធំ។
+                </p>
+                <div class="rounded-xl bg-void border border-white/10 p-3">
+                  <strong class="text-instgreen">រូបមន្តទូទៅ៖</strong>
+                  <p class="font-mono mt-1">
+                    Risk Amount = Account Equity × Risk %
+                  </p>
+                  <p class="font-mono mt-1">
+                    Lot Size = Risk Amount ÷ (SL Distance × Value per Price Unit
+                    per Lot)
+                  </p>
+                  <p class="text-gray-400 mt-2">
+                    ត្រូវពិនិត្យ Contract Specification, Tick Value
+                    និងរូបិយប័ណ្ណគណនីរបស់ Broker មុនប្រើរូបមន្ត។
+                  </p>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <strong class="text-white">Trading Journal គួរកត់ត្រា៖</strong>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>កាលបរិច្ឆេទ, Session និង News ដែលពាក់ព័ន្ធ។</li>
+                  <li>HTF Bias, Liquidity Target និង Entry Model។</li>
+                  <li>Entry, SL, TP, Risk % និងលទ្ធផលជា R-Multiple។</li>
+                  <li>Screenshot មុនចូល និងក្រោយចេញ Trade។</li>
+                  <li>កំហុស, អារម្មណ៍ និងចំណុចត្រូវកែលម្អ។</li>
+                </ul>
+              </div>
+            </div>
+            <div
+              class="rounded-xl bg-void border border-instred/25 p-3 text-xs text-gray-300"
+            >
+              <strong class="text-instred">ច្បាប់សុវត្ថិភាព៖</strong>
+              កុំសន្មត់ថា 0.01 Lot តែងតែមានហានិភ័យដូចគ្នាលើគ្រប់ Broker។
+              កុំបន្ថែម Lot ដើម្បីសងការខាត (Revenge Trading) ហើយកុំរំកិល SL
+              ឱ្យឆ្ងាយជាងផែនការដើម។
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- STUDY WORKFLOW & KNOWLEDGE CHECK -->
+      <section class="glass-panel rounded-2xl p-5 sm:p-6 space-y-4">
+        <div>
+          <span class="text-xs font-mono font-bold uppercase text-neoncyan"
+            >Practice Lab • XAUUSD</span
+          >
+          <h2 class="text-lg font-extrabold text-white">
+            ផែនការហាត់រៀន និង Checklist មុនចូល Trade
+          </h2>
+          <p class="text-xs text-gray-300 mt-1">
+            ប្រើ Checklist នេះរាល់ថ្ងៃ
+            ដើម្បីបម្លែងចំណេះដឹងទៅជាដំណើរការដែលអាចវាស់វែងបាន។
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-xl bg-void border border-white/10 p-4">
+            <h3 class="font-bold text-white text-sm mb-2">
+              Pre-Trade Checklist
+            </h3>
+            <ul class="space-y-2 text-xs text-gray-300">
+              <li>□ ខ្ញុំបានកំណត់ 4H/1H Bias និង Market Structure។</li>
+              <li>□ ខ្ញុំបានគូស PDH/PDL, PWH/PWL និង Liquidity Pools។</li>
+              <li>□ តម្លៃស្ថិតនៅទីតាំងសមស្របក្នុង Dealing Range។</li>
+              <li>□ មាន Sweep និង Displacement ដែលអាចពន្យល់បាន។</li>
+              <li>□ មាន MSS បិទបញ្ជាក់ និង Entry Zone ច្បាស់។</li>
+              <li>□ ខ្ញុំបានគណនា Lot, SL, TP និង Risk មុនចុច Order។</li>
+              <li>
+                □ មិនមាន News Risk ឬ Spread ខុសធម្មតាដែលខ្ញុំមិនបានគិតគូរ។
+              </li>
+            </ul>
+          </div>
+          <div class="rounded-xl bg-void border border-white/10 p-4">
+            <h3 class="font-bold text-white text-sm mb-2">លំហាត់ ៧ ថ្ងៃ</h3>
+            <ol class="list-decimal pl-5 space-y-1.5 text-xs text-gray-300">
+              <li>ថ្ងៃ១៖ សម្គាល់ Swing High/Low និង BOS/MSS លើ 4H។</li>
+              <li>ថ្ងៃ២៖ រក OB និងកត់ត្រាថា Zone ណាដែលមាន Displacement។</li>
+              <li>ថ្ងៃ៣៖ គូស FVG និងវាស់ 50% CE។</li>
+              <li>ថ្ងៃ៤៖ គូស BSL/SSL, PDH/PDL និងសម្គាល់ Sweep។</li>
+              <li>ថ្ងៃ៥៖ ហាត់ Dealing Range, Premium/Discount និង OTE។</li>
+              <li>ថ្ងៃ៦៖ សាកល្បង Entry Model លើទិន្នន័យចាស់ (Backtest)។</li>
+              <li>
+                ថ្ងៃ៧៖ ពិនិត្យ Journal និងរាប់ Win Rate, Average R
+                និងកំហុសដដែលៗ។
+              </li>
+            </ol>
+          </div>
+        </div>
+        <p class="text-[11px] text-gray-400 leading-relaxed">
+          ការអប់រំប៉ុណ្ណោះ មិនមែនជាការណែនាំឱ្យទិញ/លក់ ឬធានាប្រាក់ចំណេញទេ។
+          ត្រូវសាកល្បងលើ Demo/Backtest និងយល់ពីហានិភ័យមុនប្រើเงินจริง។
+        </p>
       </section>
 
       <!-- BOTTOM CALL TO ACTION -->
